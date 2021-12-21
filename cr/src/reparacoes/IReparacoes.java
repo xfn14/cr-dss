@@ -1,3 +1,5 @@
+package reparacoes;
+
 public interface IReparacoes {
     String createPLanosTrabalho();
     String createPasso(float horas, float custoPecas);

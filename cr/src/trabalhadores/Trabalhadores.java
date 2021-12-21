@@ -1,23 +1,17 @@
+package trabalhadores;
+
+import java.util.ArrayList;
 import java.util.List;
 
-public class Trabalhador implements ITrabalhadores{
+public class Trabalhadores implements ITrabalhadores{
+    private List<Trabalhador> trabalhadores;
 
-    private String idTrabalhador;
-
-    public Trabalhador(){
-        this.idTrabalhador = "";
+    public Trabalhadores(){
+        this.trabalhadores = new ArrayList<>();
     }
 
-    public Trabalhador(String idTrabalhador) {
-        this.idTrabalhador = idTrabalhador;
-    }
-
-    public String getIdTrabalhador() {
-        return idTrabalhador;
-    }
-
-    public void setIdTrabalhador(String idTrabalhador) {
-        this.idTrabalhador = idTrabalhador;
+    public List<Trabalhador> getTrabalhadores() {
+        return this.trabalhadores;
     }
 
     @Override

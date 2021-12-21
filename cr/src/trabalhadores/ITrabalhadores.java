@@ -1,3 +1,5 @@
+package trabalhadores;
+
 import java.util.List;
 
 public interface ITrabalhadores {
