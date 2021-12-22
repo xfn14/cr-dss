@@ -1,9 +1,8 @@
 package pedidos;
 
-import java.util.Objects;
-
 public class ServicoExpresso extends Pedido {
     private String idServicoE;
+    private Tipo tipo;
 
     public ServicoExpresso(Pedido pedido, String idServicoE){
         super(pedido);
@@ -11,8 +10,30 @@ public class ServicoExpresso extends Pedido {
     }
 
     public ServicoExpresso(ServicoExpresso serE){
-        super(serE.getData(), serE.getIdPedido(), serE.getIdCliente(), serE.getIdReparacao(), serE.getIdEquipamento());
+        super(serE.getData(), serE.getIdPedido(), serE.getIdCliente(), serE.getIdReparacao(),
+              serE.getIdEquipamento(), serE.getIdFuncionario(), serE.getEstado());
         this.idServicoE = serE.getIdServicoE();
+    }
+
+    public enum Tipo {
+        FORMATAR_PC(10),
+        INSTALAR_OS(10),
+        SUBSTITUIR_ECRA(50),
+        SUBSTITUIR_BATERIA(30);
+
+        private double precoBase;
+
+        Tipo(double precoBase){
+            this.precoBase = precoBase;
+        }
+
+        public void addPreco(double preco){
+            this.precoBase += preco;
+        }
+
+        public double getPreco() {
+            return this.precoBase;
+        }
     }
 
     public String getIdServicoE() {
@@ -23,29 +44,15 @@ public class ServicoExpresso extends Pedido {
         this.idServicoE = idServicoE;
     }
 
+    public Tipo getTipo() {
+        return this.tipo;
+    }
+
+    public void setTipo(Tipo tipo) {
+        this.tipo = tipo;
+    }
+
     public ServicoExpresso clone(){
         return new ServicoExpresso(this);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        ServicoExpresso that = (ServicoExpresso) o;
-        return Objects.equals(this.idServicoE, that.getIdServicoE());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), this.idServicoE);
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("ServicoExpresso{");
-        sb.append("idServicoE='").append(this.idServicoE).append('\'');
-        sb.append('}');
-        return sb.toString();
     }
 }

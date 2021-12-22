@@ -1,29 +1,19 @@
 package reparacoes;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Reparacoes implements IReparacoes {
-    private List<Reparacao> reparacoes;
+    private Map<String,Reparacao> reparacaoMap;
+    private Map<String,PlanoTrabalho> planoTrabalhoMap;
 
     public Reparacoes(){
-        this.reparacoes = new ArrayList<>();
-    }
-
-    public Reparacoes(Reparacoes reparacoes){
-        this.reparacoes = reparacoes.getReparacoes();
-    }
-
-    public List<Reparacao> getReparacoes() {
-        return this.reparacoes.stream()
-                .map(Reparacao::clone)
-                .collect(Collectors.toList());
+        this.reparacaoMap = new HashMap<>();
+        this.planoTrabalhoMap = new HashMap<>();
     }
 
     @Override
-    public String createPLanosTrabalho() {
+    public String createPlanosTrabalho() {
         return null;
     }
 
@@ -55,30 +45,5 @@ public class Reparacoes implements IReparacoes {
     @Override
     public void registaConclusao(String idReparacao) {
 
-    }
-
-    public Reparacoes clone(){
-        return new Reparacoes(this);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Reparacoes that = (Reparacoes) o;
-        return Objects.equals(this.reparacoes, that.getReparacoes());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.reparacoes);
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("Reparacoes{");
-        sb.append("reparacoes=").append(this.reparacoes);
-        sb.append('}');
-        return sb.toString();
     }
 }

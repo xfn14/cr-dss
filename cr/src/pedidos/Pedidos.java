@@ -1,32 +1,41 @@
 package pedidos;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import exceptions.InvalidIdException;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Pedidos implements IPedidos {
-    private List<Pedido> pedidos;
+    private Map<String,Pedido> pedidoMap;
+    private Map<String,Entrega> entregaMap;
 
     public Pedidos(){
-        this.pedidos = new ArrayList<>();
-    }
-
-    public Pedidos(Pedidos pedidos){
-        this.pedidos = pedidos.getPedidos();
+        this.pedidoMap = new HashMap<>();
+        this.entregaMap = new HashMap<>();
     }
 
     public void addPedido(Pedido pedido){
-        this.pedidos.add(pedido);
+        this.pedidoMap.put(pedido.getIdPedido(), pedido.clone());
+    }
+
+    public void addEntrega(Entrega entrega){
+        this.entregaMap.put(entrega.getIdPedido(), entrega.clone());
     }
 
     public List<Pedido> getPedidos() {
-        return this.pedidos;
+        return new ArrayList<>(this.pedidoMap.values());
+    }
+
+    public List<Entrega> getEntregas() {
+        return new ArrayList<>(this.entregaMap.values());
     }
 
     @Override
     public List<String> getListPedidosOrcamento() {
-        return null;
+        return this.getPedidos().stream()
+                .filter(p -> p instanceof PedidoOrcamento)
+                .map(Pedido::getIdPedido)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -35,13 +44,25 @@ public class Pedidos implements IPedidos {
     }
 
     @Override
-    public Float getPrecoSE(String IdServicoExpresso) {
-        return null;
+    public double getPrecoSE(String idServicoExpresso) throws InvalidIdException {
+        Pedido pedido = this.pedidoMap.get(idServicoExpresso);
+        if(pedido == null)
+            throw new InvalidIdException(idServicoExpresso, InvalidIdException.Type.PEDIDO);
+        ServicoExpresso se = (ServicoExpresso) pedido;
+        return se.getTipo().getPreco();
     }
 
     @Override
-    public void cancelaPedido(String idPedido) {
+    public boolean verificarDisponibilidadeSE(int idServicoExpresso) {
+        return false;
+    }
 
+    @Override
+    public void cancelaPedido(String idPedido) throws InvalidIdException {
+        Pedido pedido = this.pedidoMap.get(idPedido);
+        if(pedido == null)
+            throw new InvalidIdException(idPedido, InvalidIdException.Type.PEDIDO);
+        pedido.setEstado(Pedido.Estado.CANCELADO);
     }
 
     @Override
@@ -57,11 +78,6 @@ public class Pedidos implements IPedidos {
     @Override
     public void registaAceitacaoCliente(String idReparacao) {
 
-    }
-
-    @Override
-    public boolean verificarDisponibilidadeSE(int idServicoExpresso) {
-        return false;
     }
 
     @Override
@@ -95,32 +111,7 @@ public class Pedidos implements IPedidos {
     }
 
     @Override
-    public void criarFichaCLiente(String nome, String email, String nmr) {
+    public void criarFichaCliente(String nome, String email, String nmr) {
 
-    }
-
-    public Pedidos clone(){
-        return new Pedidos(this);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Pedidos pedidos1 = (Pedidos) o;
-        return Objects.equals(this.pedidos, pedidos1.getPedidos());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.pedidos);
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("Pedidos{");
-        sb.append("pedidos=").append(pedidos);
-        sb.append('}');
-        return sb.toString();
     }
 }

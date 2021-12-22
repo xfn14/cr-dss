@@ -2,6 +2,8 @@ package trabalhadores;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class Trabalhadores implements ITrabalhadores{
     private List<Trabalhador> trabalhadores;
@@ -10,8 +12,14 @@ public class Trabalhadores implements ITrabalhadores{
         this.trabalhadores = new ArrayList<>();
     }
 
+    public Trabalhadores(Trabalhadores trabalhadores){
+        this.trabalhadores = trabalhadores.getTrabalhadores();
+    }
+
     public List<Trabalhador> getTrabalhadores() {
-        return this.trabalhadores;
+        return this.trabalhadores.stream()
+                .map(Trabalhador::clone)
+                .collect(Collectors.toList());
     }
 
     @Override

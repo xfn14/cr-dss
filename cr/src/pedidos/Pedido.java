@@ -1,7 +1,6 @@
 package pedidos;
 
 import java.util.Date;
-import java.util.Objects;
 
 public class Pedido {
     private Date data;
@@ -9,22 +8,18 @@ public class Pedido {
     private String idCliente;
     private String idReparacao;
     private String idEquipamento;
+    private String idFuncionario;
+    private Estado estado;
 
-    public Pedido(){
-        this.data = new Date();
-        this.idPedido = "";
-        this.idCliente = "";
-        this.idReparacao = "";
-        this.idEquipamento = "";
-    }
-
-    public Pedido(Date data, String idPedido, String idCliente,
-                  String idReparacao, String idEquipamento) {
+    public Pedido(Date data, String idPedido, String idCliente, String idReparacao,
+                  String idEquipamento, String idFuncionario, Estado estado) {
         this.data = data;
         this.idPedido = idPedido;
         this.idCliente = idCliente;
         this.idReparacao = idReparacao;
         this.idEquipamento = idEquipamento;
+        this.idFuncionario= idFuncionario;
+        this.estado = estado;
     }
 
     public Pedido(Pedido pedido){
@@ -33,6 +28,22 @@ public class Pedido {
         this.idCliente = pedido.getIdCliente();
         this.idReparacao = pedido.getIdReparacao();
         this.idEquipamento = pedido.getIdEquipamento();
+        this.idFuncionario = pedido.getIdFuncionario();
+        this.estado = pedido.getEstado();
+    }
+
+    public enum Estado {
+        DECORRER,
+        FINALIZADO,
+        CANCELADO
+    }
+
+    public String getIdFuncionario() {
+        return idFuncionario;
+    }
+
+    public void setIdFuncionario(String idFuncionario) {
+        this.idFuncionario = idFuncionario;
     }
 
     public Date getData() {
@@ -75,36 +86,15 @@ public class Pedido {
         this.idEquipamento = idEquipamento;
     }
 
+    public Estado getEstado() {
+        return this.estado;
+    }
+
+    public void setEstado(Estado estado) {
+        this.estado = estado;
+    }
+
     public Pedido clone(){
         return new Pedido(this);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Pedido pedido = (Pedido) o;
-        return this.data.getTime() == pedido.getData().getTime() &&
-               this.idPedido.equals(pedido.getIdPedido()) &&
-               this.idCliente.equals(pedido.getIdCliente()) &&
-               this.idReparacao.equals(pedido.getIdReparacao()) &&
-               this.idEquipamento.equals(pedido.getIdEquipamento());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.data, this.idPedido, this.idCliente, this.idReparacao, this.idEquipamento);
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("Pedido{");
-        sb.append("data=").append(this.data);
-        sb.append(", idPedido='").append(this.idPedido).append('\'');
-        sb.append(", idCliente='").append(this.idCliente).append('\'');
-        sb.append(", idReparacao='").append(this.idReparacao).append('\'');
-        sb.append(", idEquipamento='").append(this.idEquipamento).append('\'');
-        sb.append('}');
-        return sb.toString();
     }
 }

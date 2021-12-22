@@ -1,7 +1,7 @@
 package reparacoes;
 
 public interface IReparacoes {
-    String createPLanosTrabalho();
+    String createPlanosTrabalho();
     String createPasso(float horas, float custoPecas);
     void conclusaoPlanoDeTrabalho(String codPlanoDeTrabalho);
     String getPlanoDeTrabalho(String IdEquipamento);

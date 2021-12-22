@@ -4,17 +4,30 @@ import java.util.Objects;
 
 public class Reparacao {
     private String idReparacao;
+    private String idPlanoTrabalho;
+    private Estado estado;
 
     public Reparacao(){
         this.idReparacao = "";
+        this.idPlanoTrabalho = "";
+
     }
 
-    public Reparacao(String idReparacao){
+    public Reparacao(String idReparacao, String idPlanoTrabalho){
         this.idReparacao = idReparacao;
+        this.idPlanoTrabalho = idPlanoTrabalho;
     }
 
     public Reparacao(Reparacao reparacao){
         this.idReparacao = reparacao.getIdReparacao();
+        this.idPlanoTrabalho = reparacao.getIdPlanoTrabalho();
+    }
+
+    public enum Estado {
+        DECORRER,
+        PAUSA,
+        FINALIZADA,
+        CANCELADA
     }
 
     public String getIdReparacao() {
@@ -23,6 +36,14 @@ public class Reparacao {
 
     public void setIdReparacao(String idReparacao) {
         this.idReparacao = idReparacao;
+    }
+
+    public String getIdPlanoTrabalho() {
+        return this.idPlanoTrabalho;
+    }
+
+    public void setIdPlanoTrabalho(String idPlanoTrabalho) {
+        this.idPlanoTrabalho = idPlanoTrabalho;
     }
 
     public Reparacao clone(){
