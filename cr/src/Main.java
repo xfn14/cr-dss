@@ -1,13 +1,19 @@
+import gui.CRFrame;
+
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.*;
 
 public class Main {
-    public static final Logger LOGGER = Logger.getLogger("cr");
+    public static final Logger LOGGER = Logger.getLogger("CR");
 
     public static void main(String[] args) {
         loadLoggerSettings();
+
+        CRFrame crFrame = new CRFrame();
+        Thread crFrameThread = new Thread(crFrame);
+        crFrameThread.start();
     }
 
     private static void loadLoggerSettings(){

@@ -7,8 +7,8 @@ import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public class Trabalhadores implements ITrabalhadores{
-    public static final Logger LOGGER = Logger.getLogger("cr");
+public class Trabalhadores implements ITrabalhadores {
+    public static final Logger LOGGER = Logger.getLogger("CR");
     private Map<String,Trabalhador> trabalhadores;
 
     public Trabalhadores(){
@@ -56,7 +56,7 @@ public class Trabalhadores implements ITrabalhadores{
             return true;
         } catch (NoSuchAlgorithmException e) {
             LOGGER.warning("Não foi encontrado o algoritmo SHA-1");
-           return false;
+            return false;
         }
     }
 
@@ -67,11 +67,12 @@ public class Trabalhadores implements ITrabalhadores{
     }
 
     public boolean verificarDisponibilidadeTecnicos(){
-        return trabalhadores.values().stream().
-                anyMatch(trabalhador ->
-                (trabalhador instanceof Tecnico &&
+        return trabalhadores.values().stream()
+                .anyMatch(trabalhador -> (
+                        trabalhador instanceof Tecnico &&
                         trabalhador.isAutenticado() &&
-                        ((Tecnico) trabalhador).isAvailable()));
+                        ((Tecnico) trabalhador).isAvailable()
+                ));
     }
 
     @Override

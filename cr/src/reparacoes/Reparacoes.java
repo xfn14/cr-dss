@@ -1,16 +1,9 @@
-
-
-
-
 package reparacoes;
 
 import exceptions.InvalidIdException;
 
-import java.time.Duration;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.sql.Time;
 
 public class Reparacoes implements IReparacoes {
     private Map<String,Reparacao> reparacaoMap;
@@ -33,19 +26,18 @@ public class Reparacoes implements IReparacoes {
     }
 
     @Override
-    public void addPasso(double horas, double custoPecas,String idPlano) {
-        if (planoTrabalhoMap.containsKey(idPlano)); //return error later
+    public void addPasso(String idPlano, double horas, double custoPecas) throws InvalidIdException {
+        if (planoTrabalhoMap.containsKey(idPlano))
+            throw new InvalidIdException(idPlano, InvalidIdException.Type.PLANO_TRABALHO);
         PlanoTrabalho planoTrabalho = planoTrabalhoMap.get(idPlano);
-        Passo passo = new Passo(horas,custoPecas);
+        Passo passo = new Passo(horas, custoPecas);
         planoTrabalho.addPasso(passo);
     }
 
     @Override
-    public PlanoTrabalho getPlanoDeTrabalho(String IdPedido){
-        if (this.planoTrabalhoMap.containsKey(IdPedido)){
-            return this.planoTrabalhoMap.get(IdPedido).clone();
-        }
-        else return null;
+    public PlanoTrabalho getPlanoDeTrabalho(String idPedido){
+        PlanoTrabalho planoTrabalho = this.planoTrabalhoMap.get(idPedido);
+        return planoTrabalho == null ? null : planoTrabalho.clone();
     }
 
     @Override

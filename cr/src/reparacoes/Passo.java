@@ -1,20 +1,18 @@
 package reparacoes;
 
-import java.sql.Time;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Passo {
     private double custoPecas;
     private Duration duration;
     private List<Passo> subPassos;
 
-    public Passo( double custoPecas, Duration duration, List<Passo> subPassos){
+    public Passo(double custoPecas, Duration duration, List<Passo> subPassos){
         this.custoPecas = custoPecas;
         this.duration = duration;
-        this.subPassos = subPassos.stream().collect(Collectors.toList());
+        this.subPassos = new ArrayList<>(subPassos);
     }
 
      public Passo(double horas,double custoPecas){
@@ -23,7 +21,6 @@ public class Passo {
         this.subPassos = new ArrayList<>();
      }
 
-
     public double getCustoPecas() {
         return this.custoPecas;
     }
@@ -31,7 +28,6 @@ public class Passo {
     public void setCustoPecas(double custoPecas) {
         this.custoPecas = custoPecas;
     }
-
 
     public List<Passo> getSubPassos() {
         return this.subPassos;

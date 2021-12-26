@@ -7,8 +7,7 @@ import java.util.Objects;
 public class PlanoTrabalho {
     private String idPlanoTrabalho;
     private List<Passo> passos;
-    private Reparacao.Estado estado;  //TBD
-
+    private Reparacao.Estado estado;  // TODO
 
     public PlanoTrabalho(String idPlanoTrabalho, List<Passo> passos){
         this.idPlanoTrabalho = idPlanoTrabalho;
@@ -22,9 +21,8 @@ public class PlanoTrabalho {
     }
 
     public void addPasso (Passo passo){
-        passos.add(passo);
+        this.passos.add(passo);
     }
-
 
     public void setEstado (Reparacao.Estado estado){
         this.estado = estado;

@@ -2,7 +2,7 @@ package exceptions;
 
 public class InvalidIdException extends Exception {
     public InvalidIdException(String id, Type tipo){
-        super("Invalido id de " + tipo.getName() + " \"" + tipo + "\"");
+        super("Invalido id de " + tipo.getName() + " \"" + id + "\"");
     }
 
     public enum Type {
@@ -10,7 +10,8 @@ public class InvalidIdException extends Exception {
         SERVICO_EXPRESSO("serviço expresso"),
         PEDIDO_ORCAMENTO("pedido de orçamento"),
         REPARACAO("reparacao"),
-        TRABALHADOR("trabalhador");
+        TRABALHADOR("trabalhador"),
+        PLANO_TRABALHO("plano de trabalho");
 
         private final String name;
 
