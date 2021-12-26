@@ -1,30 +1,37 @@
 package pedidos;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public class Entrega {
-    private Date data;
+    private LocalDateTime data;
     private String idPedido;
     private String idFuncionario;
 
-    public Entrega (Date data, String idPedido,String idFuncionario){
+    public Entrega (LocalDateTime data, String idPedido,String idFuncionario){
         this.data = data;
         this.idPedido= idPedido;
         this.idFuncionario = idFuncionario;
     }
 
+    public Entrega (String idPedido,String idFuncionario){
+        this.idPedido= idPedido;
+        this.idFuncionario = idFuncionario;
+        this.data = LocalDateTime.now();
+    }
+    
     public Entrega(Entrega entrega){
         this.data = entrega.getData();
         this.idPedido = entrega.getIdPedido();
         this.idFuncionario = entrega.getIdFuncionario();
     }
 
-    public Date getData() {
-        return new Date(this.data.getTime());
+    public LocalDateTime getData() {
+        return data;
     }
 
-    public void setData(Date data) {
-        this.data = new Date(data.getTime());
+    public void setData(LocalDateTime data) {
+        this.data = data;
     }
 
     public String getIdPedido() {

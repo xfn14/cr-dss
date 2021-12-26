@@ -5,14 +5,14 @@ public class PedidoOrcamento extends Pedido {
     private String idPlanoTrabalho;
 
     public PedidoOrcamento(Pedido pedido, double orcamento, String idPlanoTrabalho){
-        super(pedido.getData(), pedido.getIdPedido(), pedido.getIdCliente(), pedido.getIdReparacao(),
+        super(pedido.getData(), pedido.getIdPedido(), pedido.getIdCliente(),
               pedido.getIdEquipamento(), pedido.getIdFuncionario(), pedido.getEstado());
         this.orcamento = orcamento;
         this.idPlanoTrabalho = idPlanoTrabalho;
     }
 
     public PedidoOrcamento(PedidoOrcamento pedO){
-        super(pedO.getData(), pedO.getIdPedido(), pedO.getIdCliente(), pedO.getIdReparacao(),
+        super(pedO.getData(), pedO.getIdPedido(), pedO.getIdCliente(),
               pedO.getIdEquipamento(), pedO.getIdFuncionario(), pedO.getEstado());
         this.orcamento = pedO.getOrcamento();
         this.idPlanoTrabalho = pedO.getIdPlanoTrabalho();

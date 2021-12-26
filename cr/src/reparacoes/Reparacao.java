@@ -50,6 +50,10 @@ public class Reparacao {
         return new Reparacao(this);
     }
 
+    public void setEstado(Estado e){
+        this.estado = e;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -6,17 +6,15 @@ public class Pedido {
     private Date data;
     private String idPedido;
     private String idCliente;
-    private String idReparacao;
     private String idEquipamento;
     private String idFuncionario;
     private Estado estado;
 
-    public Pedido(Date data, String idPedido, String idCliente, String idReparacao,
+    public Pedido(Date data, String idPedido, String idCliente,
                   String idEquipamento, String idFuncionario, Estado estado) {
         this.data = data;
         this.idPedido = idPedido;
         this.idCliente = idCliente;
-        this.idReparacao = idReparacao;
         this.idEquipamento = idEquipamento;
         this.idFuncionario= idFuncionario;
         this.estado = estado;
@@ -26,7 +24,6 @@ public class Pedido {
         this.data = pedido.getData() == null ? new Date() : new Date(pedido.getData().getTime());
         this.idPedido = pedido.getIdPedido();
         this.idCliente = pedido.getIdCliente();
-        this.idReparacao = pedido.getIdReparacao();
         this.idEquipamento = pedido.getIdEquipamento();
         this.idFuncionario = pedido.getIdFuncionario();
         this.estado = pedido.getEstado();
@@ -70,13 +67,6 @@ public class Pedido {
         this.idCliente = idCliente;
     }
 
-    public String getIdReparacao() {
-        return this.idReparacao;
-    }
-
-    public void setIdReparacao(String idReparacao) {
-        this.idReparacao = idReparacao;
-    }
 
     public String getIdEquipamento() {
         return this.idEquipamento;

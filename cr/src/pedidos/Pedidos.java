@@ -1,17 +1,21 @@
 package pedidos;
 
+import com.sun.xml.internal.ws.api.databinding.ClientCallBridge;
 import exceptions.InvalidIdException;
 
+import java.beans.PropertyEditor;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class Pedidos implements IPedidos {
     private Map<String,Pedido> pedidoMap;
     private Map<String,Entrega> entregaMap;
+    private Map<String, Cliente> clientesMap;
 
     public Pedidos(){
         this.pedidoMap = new HashMap<>();
         this.entregaMap = new HashMap<>();
+        this.clientesMap = new HashMap<>();
     }
 
     public void addPedido(Pedido pedido){
@@ -30,6 +34,7 @@ public class Pedidos implements IPedidos {
         return new ArrayList<>(this.entregaMap.values());
     }
 
+
     @Override
     public List<String> getListPedidosOrcamento() {
         return this.getPedidos().stream()
@@ -40,7 +45,12 @@ public class Pedidos implements IPedidos {
 
     @Override
     public List<String> getListEquipamentosLevantar() {
-        return null;
+        List<String> ret = new ArrayList<>();
+        for (Pedido p : this.pedidoMap.values()){
+            if(p.getEstado().equals(Pedido.Estado.FINALIZADO))
+                ret.add(p.getIdPedido());
+        }
+        return ret;
     }
 
     @Override
@@ -53,8 +63,11 @@ public class Pedidos implements IPedidos {
     }
 
     @Override
-    public boolean verificarDisponibilidadeSE(int idServicoExpresso) {
-        return false;
+    public boolean verificarDisponibilidadeSE(String idServicoExpresso) throws InvalidIdException {
+        Pedido p = this.pedidoMap.get(idServicoExpresso);
+        if (!(p instanceof ServicoExpresso))
+            throw new InvalidIdException(idServicoExpresso, InvalidIdException.Type.PEDIDO);
+        return true;
     }
 
     @Override
@@ -66,8 +79,12 @@ public class Pedidos implements IPedidos {
     }
 
     @Override
-    public void registaPedidoOrcamento(String codPedido) {
-
+    public void registaPedidoOrcamento(String codPedido) throws InvalidIdException{
+        Pedido pedido = this.pedidoMap.get(codPedido);
+        if(pedido == null || pedido instanceof ServicoExpresso)
+            throw new InvalidIdException(codPedido, InvalidIdException.Type.PEDIDO);
+        PedidoOrcamento pedidoOrcamento = new PedidoOrcamento(pedido,-1,codPedido);
+        this.pedidoMap.put(codPedido,pedidoOrcamento);
     }
 
     @Override
@@ -91,13 +108,15 @@ public class Pedidos implements IPedidos {
     }
 
     @Override
-    public void adicionarParaLevantar(String idEquipamento) {
-
+    public void adicionarParaLevantar(String idPedido) {
+        Pedido p = this.pedidoMap.get(idPedido);
+        p.setEstado(Pedido.Estado.FINALIZADO); //NAO SEI SE ESTA BEM?????
     }
 
     @Override
-    public void entregaEquipamento(String codE) {
-
+    public void entregaEquipamento(String codPedido,String idFuncionario) {
+        Entrega entrega = new Entrega(idFuncionario,codPedido);
+        this.entregaMap.put(codPedido, entrega);
     }
 
     @Override
@@ -111,7 +130,7 @@ public class Pedidos implements IPedidos {
     }
 
     @Override
-    public void criarFichaCliente(String nome, String email, String nmr) {
-
+    public void criarFichaCliente(String nome, String email, String nmr, String nmrUtente) {
+        this.clientesMap.put(nome, new Cliente(nome, email ,nmr, nmrUtente));
     }
 }

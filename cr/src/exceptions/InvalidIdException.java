@@ -7,6 +7,8 @@ public class InvalidIdException extends Exception {
 
     public enum Type {
         PEDIDO("pedido"),
+        SERVICO_EXPRESSO("serviço expresso"),
+        PEDIDO_ORCAMENTO("pedido de orçamento"),
         REPARACAO("reparacao"),
         TRABALHADOR("trabalhador");
 

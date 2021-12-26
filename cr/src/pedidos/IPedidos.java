@@ -10,15 +10,15 @@ public interface IPedidos {
     List<String> getListEquipamentosLevantar();
     double getPrecoSE(String IdServicoExpresso) throws InvalidIdException;
     void cancelaPedido(String idPedido) throws InvalidIdException;
-    void registaPedidoOrcamento(String codPedido);
+    void registaPedidoOrcamento(String codPedido) throws InvalidIdException;
     void registarContactoCliente(String idCliente, Date data);
     void registaAceitacaoCliente(String idReparacao);
-    boolean verificarDisponibilidadeSE(int idServicoExpresso);
+    boolean verificarDisponibilidadeSE(String idServicoExpresso) throws InvalidIdException;
     void registarSE(int idServicoExpresso, String idCliente);
     void atualizaDisponibilidadeSE(int idServicoExpresso);
-    void adicionarParaLevantar(String idEquipamento);
-    void entregaEquipamento(String codE);
+    void adicionarParaLevantar(String idPedido);
+    void entregaEquipamento(String codE, String idFuncionario);
     void notificaCliente(String IdCliente );
     void imprimirComprovativo(String cdPedido);
-    void criarFichaCliente(String nome, String email, String nmr);
+    void criarFichaCliente(String nome, String email, String nmr, String nmrUtente);
 }

@@ -7,11 +7,40 @@ import java.util.Objects;
 public class PlanoTrabalho {
     private String idPlanoTrabalho;
     private List<Passo> passos;
+    private Reparacao.Estado estado;  //TBD
+
 
     public PlanoTrabalho(String idPlanoTrabalho, List<Passo> passos){
         this.idPlanoTrabalho = idPlanoTrabalho;
         this.passos = new ArrayList<>();
     }
+
+    public PlanoTrabalho(String idPlanoTrabalho){
+        this.idPlanoTrabalho = idPlanoTrabalho;
+        this.passos = new ArrayList<>();
+        this.estado = Reparacao.Estado.DECORRER;
+    }
+
+    public void addPasso (Passo passo){
+        passos.add(passo);
+    }
+
+
+    public void setEstado (Reparacao.Estado estado){
+        this.estado = estado;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
 
     public PlanoTrabalho(PlanoTrabalho planoTrabalho){
         this.idPlanoTrabalho = planoTrabalho.getIdPlanoTrabalho();

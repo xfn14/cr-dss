@@ -10,7 +10,7 @@ public class ServicoExpresso extends Pedido {
     }
 
     public ServicoExpresso(ServicoExpresso serE){
-        super(serE.getData(), serE.getIdPedido(), serE.getIdCliente(), serE.getIdReparacao(),
+        super(serE.getData(), serE.getIdPedido(), serE.getIdCliente(),
               serE.getIdEquipamento(), serE.getIdFuncionario(), serE.getEstado());
         this.idServicoE = serE.getIdServicoE();
     }
