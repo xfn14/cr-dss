@@ -1,4 +1,4 @@
-import gui.CRFrame;
+import gui.LoginFrame;
 import sgcr.SGCR;
 
 import java.io.IOException;
@@ -15,9 +15,9 @@ public class Main {
         SGCR sgcr = new SGCR();
         sgcr.registarTrabalhador("fn14", "1234", "1234");
 
-        CRFrame crFrame = new CRFrame(sgcr);
-        Thread crFrameThread = new Thread(crFrame);
-        crFrameThread.start();
+        LoginFrame loginFrame = new LoginFrame(sgcr, 800, 600);
+        Thread thread = new Thread(loginFrame);
+        thread.start();
     }
 
     private static void loadLoggerSettings(){

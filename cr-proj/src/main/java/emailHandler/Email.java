@@ -58,7 +58,7 @@ public class Email {
     }
 
 
-    public static void pedidoOrcamento (String email,String nome, double orcamento){
+    public static void pedidoOrcamento (String email,String nome, double orcamento) {
         sendEmail(pedidoOrcamento,email,nome,orcamento);
     }
 
@@ -73,7 +73,7 @@ public class Email {
     public static void valorSuperiorOrcamento (String email, String nome){
         sendEmail(valorSuperiorOrcamento,email,nome,0);
     }
-    
+
     private static void sendEmail (int tipo,String email,String nome,double number){
         Session session = startSessionSend();
         try {

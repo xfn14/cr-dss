@@ -77,6 +77,7 @@ public class Pedidos implements IPedidos {
     }
 
     @Override
+    public void registaPedidoOrcamento(String codPedido) throws InvalidIdException {
         Pedido pedido = this.pedidoMap.get(codPedido);
         if(pedido == null || pedido instanceof ServicoExpresso)
             throw new InvalidIdException(codPedido, InvalidIdException.Type.PEDIDO);
