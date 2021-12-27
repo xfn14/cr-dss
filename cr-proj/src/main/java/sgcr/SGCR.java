@@ -143,8 +143,9 @@ public class SGCR {
         this.reparacoes.createPlanosTrabalho(idPedido);
     }
 
-    public void registaPasso(double horas, double custoPecas) {
-        this.reparacoes.registaPasso(horas,custoPecas);
+    public void registaPasso(double horas, double custoPecas,String idReparacao) {
+        this.reparacoes.registaPasso(horas,custoPecas,idReparacao
+        );
     }
 
     public void addPasso(String idPlano, double horas, double custoPecas) throws InvalidIdException {

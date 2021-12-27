@@ -21,6 +21,14 @@ public class Passo {
         this.subPassos = new ArrayList<>();
      }
 
+     public void addSubPasso (double horas, double custoPecas){
+        Passo passo = new Passo(horas,custoPecas);
+        subPassos.add(passo);
+     }
+
+
+
+
     public double getCustoPecas() {
         return this.custoPecas;
     }

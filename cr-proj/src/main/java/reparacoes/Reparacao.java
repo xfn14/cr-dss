@@ -1,5 +1,6 @@
 package reparacoes;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -7,13 +8,16 @@ public class Reparacao {
     private String idReparacao;
     private String idPlanoTrabalho;
     private Estado estado;
-    private List<Passo> passos; //TODO: Registar passos 
+    private List<Passo> passos; //TODO: Registar passos
+    private double dinheiroGasto;
 
 
     public Reparacao(){
         this.idReparacao = "";
         this.idPlanoTrabalho = "";
-
+        this.estado = Estado.DECORRER;
+        this.passos = new ArrayList<>();
+        this.dinheiroGasto = 0;
     }
 
     public Reparacao(String idReparacao, String idPlanoTrabalho){
@@ -31,6 +35,12 @@ public class Reparacao {
         PAUSA,
         FINALIZADA,
         CANCELADA
+    }
+
+    public void registaPasso (double horas, double custoPecas){
+        Passo passo = new Passo(horas,custoPecas);
+        this.passos.add(passo);
+        this.dinheiroGasto+=custoPecas;
     }
 
     public String getIdReparacao() {

@@ -32,6 +32,12 @@ public class PlanoTrabalho {
         this.estado = estado;
     }
 
+    public void addSubPasso(double horas, double custoPecas) {
+        int length = passos.size();
+        Passo passo = passos.get(length-1);
+        passo.addSubPasso(horas,custoPecas);
+    }
+
 
     public enum Estado {
         AGUARDA_ACEITACAO,

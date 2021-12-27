@@ -4,7 +4,7 @@ import exceptions.InvalidIdException;
 
 public interface IReparacoes {
     void createPlanosTrabalho(String idPedido);
-    void registaPasso(double horas, double custoPecas);
+    void registaPasso(double horas, double custoPecas,String idReparacao);
     void conclusaoPlanoDeTrabalho(String codPlanoDeTrabalho);
     PlanoTrabalho getPlanoDeTrabalho(String idPedido);
     void addPasso(String idPlano, double horas, double custoPecas) throws InvalidIdException;

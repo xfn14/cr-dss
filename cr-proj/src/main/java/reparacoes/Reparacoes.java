@@ -2,6 +2,7 @@ package reparacoes;
 
 import exceptions.InvalidIdException;
 
+import java.lang.invoke.StringConcatFactory;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,8 +22,10 @@ public class Reparacoes implements IReparacoes {
     }
 
     @Override
-    public void registaPasso(double horas, double custoPecas){
-
+    public void registaPasso(double horas, double custoPecas, String idReparacao){
+        Reparacao reparacao = reparacaoMap.get(idReparacao);
+        reparacao.registaPasso(horas,custoPecas);
+        //TODO: comparar se o dinheiro gasto for superior ao orcamento
     }
 
     @Override
@@ -32,6 +35,11 @@ public class Reparacoes implements IReparacoes {
         PlanoTrabalho planoTrabalho = planoTrabalhoMap.get(idPlano);
         Passo passo = new Passo(horas, custoPecas);
         planoTrabalho.addPasso(passo);
+    }
+
+    public void addSubPasso (String idPlano,double horas, double custoPecas){
+        PlanoTrabalho planoTrabalho = planoTrabalhoMap.get(idPlano);
+        planoTrabalho.addSubPasso(horas,custoPecas);
     }
 
     @Override
