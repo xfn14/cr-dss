@@ -1,4 +1,5 @@
 import gui.CRFrame;
+import sgcr.SGCR;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -11,7 +12,10 @@ public class Main {
     public static void main(String[] args) {
         loadLoggerSettings();
 
-        CRFrame crFrame = new CRFrame();
+        SGCR sgcr = new SGCR();
+        sgcr.registarTrabalhador("fn14", "1234", "1234");
+
+        CRFrame crFrame = new CRFrame(sgcr);
         Thread crFrameThread = new Thread(crFrame);
         crFrameThread.start();
     }

@@ -7,29 +7,39 @@ import java.util.Objects;
 public class PlanoTrabalho {
     private String idPlanoTrabalho;
     private List<Passo> passos;
-    private Reparacao.Estado estado;  // TODO
+    private Estado estado;// TODO
+    private double orcamento;
 
     public PlanoTrabalho(String idPlanoTrabalho, List<Passo> passos){
         this.idPlanoTrabalho = idPlanoTrabalho;
-        this.passos = new ArrayList<>();
+        this.passos = passos;
+        this.orcamento = 0;
     }
 
     public PlanoTrabalho(String idPlanoTrabalho){
         this.idPlanoTrabalho = idPlanoTrabalho;
         this.passos = new ArrayList<>();
-        this.estado = Reparacao.Estado.DECORRER;
+        this.estado = Estado.DECORRER;
+        this.orcamento = 0;
     }
 
     public void addPasso (Passo passo){
         this.passos.add(passo);
+        this.orcamento += passo.getCustoPecas();
     }
 
-    public void setEstado (Reparacao.Estado estado){
+    public void setEstado (Estado estado){
         this.estado = estado;
     }
 
 
-
+    public enum Estado {
+        AGUARDA_ACEITACAO,
+        DECORRER,
+        PAUSA,
+        FINALIZADO,
+        CANCELADO     
+    }
 
 
 

@@ -77,7 +77,6 @@ public class Pedidos implements IPedidos {
     }
 
     @Override
-    public void registaPedidoOrcamento(String codPedido) throws InvalidIdException{
         Pedido pedido = this.pedidoMap.get(codPedido);
         if(pedido == null || pedido instanceof ServicoExpresso)
             throw new InvalidIdException(codPedido, InvalidIdException.Type.PEDIDO);
@@ -86,8 +85,9 @@ public class Pedidos implements IPedidos {
     }
 
     @Override
-    public void registarContactoCliente(String idCliente, Date data) {
-
+    public void registarContactoCliente(String idPedido,Contacto.Type tipo,String idFuncionario) {
+        Pedido pedido = pedidoMap.get(idPedido);
+        pedido.registaContacto(tipo,idFuncionario);
     }
 
     @Override
@@ -119,7 +119,7 @@ public class Pedidos implements IPedidos {
 
     @Override
     public void notificaCliente(String IdCliente) {
-
+        
     }
 
     @Override
@@ -129,6 +129,15 @@ public class Pedidos implements IPedidos {
 
     @Override
     public void criarFichaCliente(String nome, String email, String nmr, String nmrUtente) {
-        this.clientesMap.put(nome, new Cliente(nome, email ,nmr, nmrUtente));
+        this.clientesMap.put(nmr, new Cliente(nome, email ,nmr, nmrUtente));
     }
+
+    @Override
+    public Map.Entry<String,String> getNomeEmailCliente(String idPedido) {
+        Pedido pedido = pedidoMap.get(idPedido);
+        String idCliente = pedido.getIdCliente();
+        Cliente cliente = clientesMap.get(idCliente);
+        return  Map.entry(cliente.getNome(),cliente.getEmail());
+    }
+
 }

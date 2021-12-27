@@ -1,6 +1,9 @@
 package pedidos;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Pedido {
     private Date data;
@@ -9,6 +12,7 @@ public class Pedido {
     private String idEquipamento;
     private String idFuncionario;
     private Estado estado;
+    private List<Contacto> contactos;
 
     public Pedido(Date data, String idPedido, String idCliente,
                   String idEquipamento, String idFuncionario, Estado estado) {
@@ -16,8 +20,9 @@ public class Pedido {
         this.idPedido = idPedido;
         this.idCliente = idCliente;
         this.idEquipamento = idEquipamento;
-        this.idFuncionario= idFuncionario;
+        this.idFuncionario = idFuncionario;
         this.estado = estado;
+        this.contactos = new ArrayList<>();
     }
 
     public Pedido(Pedido pedido){
@@ -27,13 +32,27 @@ public class Pedido {
         this.idEquipamento = pedido.getIdEquipamento();
         this.idFuncionario = pedido.getIdFuncionario();
         this.estado = pedido.getEstado();
+        this.contactos = pedido.getContactos();
     }
+
 
     public enum Estado {
         DECORRER,
         FINALIZADO,
         CANCELADO
     }
+
+
+    public void registaContacto(Contacto.Type tipo, String idFuncionario) {
+        Contacto contacto = new Contacto(idFuncionario,tipo);
+        contactos.add(contacto);
+    }
+
+
+
+
+
+
 
     public String getIdFuncionario() {
         return idFuncionario;
@@ -67,7 +86,6 @@ public class Pedido {
         this.idCliente = idCliente;
     }
 
-
     public String getIdEquipamento() {
         return this.idEquipamento;
     }
@@ -82,6 +100,10 @@ public class Pedido {
 
     public void setEstado(Estado estado) {
         this.estado = estado;
+    }
+
+    public List<Contacto> getContactos() {
+        return this.contactos.stream().map(Contacto::clone).collect(Collectors.toList());
     }
 
     public Pedido clone(){

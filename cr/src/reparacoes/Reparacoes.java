@@ -21,7 +21,7 @@ public class Reparacoes implements IReparacoes {
     }
 
     @Override
-    public void registaPasso(double horas, double custoPecas) {
+    public void registaPasso(double horas, double custoPecas){
 
     }
 
@@ -57,7 +57,10 @@ public class Reparacoes implements IReparacoes {
     @Override
     public void conclusaoPlanoDeTrabalho(String IdPedido) {
         if (this.planoTrabalhoMap.containsKey(IdPedido)){
-            this.planoTrabalhoMap.get(IdPedido).setEstado(Reparacao.Estado.FINALIZADA);
+            this.planoTrabalhoMap.get(IdPedido).setEstado(PlanoTrabalho.Estado.AGUARDA_ACEITACAO);
         }
     }
+
+
+
 }

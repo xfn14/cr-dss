@@ -16,7 +16,7 @@ public class Cliente {
         this.email = "";
     }
 
-    public Cliente (String nome , String nmrUtente, String nmr, String email){
+    public Cliente(String nome, String nmrUtente, String nmr, String email){
         this.nome = nome;
         this.nmrUtente = nmrUtente;
         this.nmr = nmr;

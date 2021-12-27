@@ -30,20 +30,20 @@ public class Trabalhadores implements ITrabalhadores {
     }
 
     @Override
-    public boolean doLogin(String id, String pass) {
+    public Trabalhador doLogin(String id, String pass) {
         if (trabalhadores.containsKey(id)){
             Trabalhador t = this.trabalhadores.get(id);
             try {
                 String passe = SecurityUtil.getStringSHA1(pass);
                 if (t.getPasse().equals(passe)){
                     this.trabalhadores.get(id).setAutenticado(true);
-                    return true;
+                    return t;
                 }
             } catch (NoSuchAlgorithmException e) {
                 LOGGER.warning("Não foi encontrado o algoritmo SHA-1");
             }
         }
-        return false;
+        return null;
     }
 
     @Override
@@ -62,7 +62,7 @@ public class Trabalhadores implements ITrabalhadores {
 
     @Override
     public List<String> getListTecnicos() {
-        return trabalhadores.values().stream().filter(t->t instanceof Tecnico)
+        return trabalhadores.values().stream().filter(t -> t instanceof Tecnico)
                 .map(Trabalhador::getIdTrabalhador).collect(Collectors.toList());
     }
 

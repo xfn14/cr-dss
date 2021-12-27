@@ -1,11 +1,14 @@
 package reparacoes;
 
+import java.util.List;
 import java.util.Objects;
 
 public class Reparacao {
     private String idReparacao;
     private String idPlanoTrabalho;
     private Estado estado;
+    private List<Passo> passos; //TODO: Registar passos 
+
 
     public Reparacao(){
         this.idReparacao = "";
