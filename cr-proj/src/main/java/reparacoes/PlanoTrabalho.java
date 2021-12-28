@@ -1,6 +1,7 @@
 package reparacoes;
 
 import java.io.Serializable;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,11 +10,13 @@ public class PlanoTrabalho implements Serializable {
     private List<Passo> passos;
     private Estado estado;// TODO
     private double orcamento;
+    private Duration duracaoTotal;
 
     public PlanoTrabalho(String idPlanoTrabalho, List<Passo> passos) {
         this.idPlanoTrabalho = idPlanoTrabalho;
         this.passos = passos;
         this.orcamento = 0;
+        this.duracaoTotal=Duration.ZERO;
     }
 
     public PlanoTrabalho(String idPlanoTrabalho) {
@@ -23,7 +26,9 @@ public class PlanoTrabalho implements Serializable {
         this.orcamento = 0;
     }
 
-    public void addPasso(Passo passo) {
+    public void addPasso(double horas, double custoPecas) {
+        this.duracaoTotal= this.duracaoTotal.plus(Duration.ofHours((long)horas));
+        Passo passo = new Passo(horas,custoPecas);
         this.passos.add(passo);
         this.orcamento += passo.getCustoPecas();
     }
@@ -73,5 +78,9 @@ public class PlanoTrabalho implements Serializable {
 
     public double getOrcamento() {
         return orcamento;
+    }
+
+    public Duration getDuracaoTotal() {
+        return duracaoTotal;
     }
 }

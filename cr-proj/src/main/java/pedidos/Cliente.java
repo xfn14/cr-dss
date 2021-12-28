@@ -5,21 +5,21 @@ import java.util.List;
 
 public class Cliente implements Serializable {
     private String nome;
-    private String nmrUtente;
+    private String nif;
     private String nmr;
     private String email;
     private List<String> pedidos;
 
     public Cliente(String nome, String nmrUtente, String nmr, String email) {
         this.nome = nome;
-        this.nmrUtente = nmrUtente;
+        this.nif = nmrUtente;
         this.nmr = nmr;
         this.email = email;
     }
 
     public Cliente(Cliente cliente) {
         this.nome = cliente.getNome();
-        this.nmrUtente = cliente.getNmrUtente();
+        this.nif = cliente.getNmrUtente();
         this.nmr = cliente.getNmr();
         this.email = cliente.getEmail();
     }
@@ -33,11 +33,11 @@ public class Cliente implements Serializable {
     }
 
     public String getNmrUtente() {
-        return this.nmrUtente;
+        return this.nif;
     }
 
-    public void setNmrUtente(String nmrUtente) {
-        this.nmrUtente = nmrUtente;
+    public void setNmrUtente(String nif) {
+        this.nif = nif;
     }
 
     public String getNmr() {

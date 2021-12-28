@@ -23,7 +23,8 @@ public class Contacto implements Serializable {
     enum Type {
         PRONTO_LEVANTAR,
         SEM_REPARACAO,
-        VALOR_SUPERIOR
+        VALOR_SUPERIOR,
+        PEDIDO_ORCAMENTO,
     }
 
     public String getIdTrabalhador() {

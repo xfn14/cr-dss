@@ -11,10 +11,11 @@ public class ServicoExpresso extends Pedido implements Serializable {
         this.idServicoE = idServicoE;
     }
 
-    public ServicoExpresso(ServicoExpresso serE) {
-        super(serE.getData(), serE.getIdPedido(), serE.getIdCliente(),
-                serE.getIdEquipamento(), serE.getIdFuncionario(), serE.getEstado());
-        this.idServicoE = serE.getIdServicoE();
+
+    public ServicoExpresso(String idPedido,String idCliente,String idEquipamento,String idFuncionario,Tipo tipo){
+        super(idPedido,idCliente,idEquipamento,idFuncionario);
+        this.tipo = tipo;
+        setEstado(Estado.DECORRER);
     }
 
     public enum Tipo {
@@ -54,7 +55,4 @@ public class ServicoExpresso extends Pedido implements Serializable {
         this.tipo = tipo;
     }
 
-    public ServicoExpresso clone() {
-        return new ServicoExpresso(this);
-    }
 }

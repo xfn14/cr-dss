@@ -30,8 +30,15 @@ public class Reparacao implements Serializable {
     public enum Estado {
         DECORRER,
         PAUSA,
+        AGURDA_ACEITACAO,
         FINALIZADA,
         CANCELADA
+    }
+
+
+
+    public boolean aguardaAceitacao(){
+        return estado.equals(Estado.AGURDA_ACEITACAO);
     }
 
     public String getIdReparacao() {

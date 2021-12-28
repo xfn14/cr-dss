@@ -4,7 +4,10 @@ import exceptions.InvalidIdException;
 import exceptions.ValorSuperior;
 
 import java.io.Serializable;
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Reparacoes implements IReparacoes, Serializable {
@@ -49,8 +52,7 @@ public class Reparacoes implements IReparacoes, Serializable {
         if (planoTrabalhoMap.containsKey(idPlano))
             throw new InvalidIdException(idPlano, InvalidIdException.Type.PLANO_TRABALHO);
         PlanoTrabalho planoTrabalho = planoTrabalhoMap.get(idPlano);
-        Passo passo = new Passo(horas, custoPecas);
-        planoTrabalho.addPasso(passo);
+        planoTrabalho.addPasso(horas,custoPecas);
     }
 
     public void addSubPasso(String idPlano,int indexPasso ,double horas, double custoPecas) {
@@ -79,9 +81,7 @@ public class Reparacoes implements IReparacoes, Serializable {
     }
 
     @Override
-    public void conclusaoPlanoDeTrabalho(String idPedido) throws InvalidIdException {
-        if (this.planoTrabalhoMap.containsKey(idPedido))
-            throw new InvalidIdException(idPedido, InvalidIdException.Type.PEDIDO);
+    public void conclusaoPlanoDeTrabalho(String idPedido){
         this.planoTrabalhoMap.get(idPedido).setEstado(PlanoTrabalho.Estado.AGUARDA_ACEITACAO);
     }
 
@@ -91,5 +91,28 @@ public class Reparacoes implements IReparacoes, Serializable {
             throw new InvalidIdException(idPlano, InvalidIdException.Type.PEDIDO);
         this.planoTrabalhoMap.get(idPlano).setEstado(PlanoTrabalho.Estado.PAUSA);
     }
+
+    public Map.Entry<Double,Duration> getOrcamentoEHorasPlano(String idPlano){
+        PlanoTrabalho planoTrabalho = planoTrabalhoMap.get(idPlano);
+        double orcamento = planoTrabalho.getOrcamento();
+        Duration duration = planoTrabalho.getDuracaoTotal();
+        return Map.entry(orcamento,duration);
+    }
+    @Override
+    public void reparacaoAguardaAceitacao(String idReparacao){
+        Reparacao reparacao = reparacaoMap.get(idReparacao);
+        reparacao.setEstado(Reparacao.Estado.AGURDA_ACEITACAO);
+    }
+
+    public List<String> listAguardaAceitacao () {
+        List<String> resultList = new ArrayList<>();
+        reparacaoMap.forEach((key, value) -> {
+            if (value.aguardaAceitacao()) {
+                resultList.add(key);
+            }
+        });
+        return resultList;
+    }
+
 
 }

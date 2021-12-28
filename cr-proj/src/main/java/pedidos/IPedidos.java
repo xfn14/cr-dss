@@ -14,27 +14,41 @@ public interface IPedidos {
 
     void cancelaPedido(String idPedido) throws InvalidIdException;
 
-    void registaPedidoOrcamento(String codPedido) throws InvalidIdException;
-
-    void registarContactoCliente(String idPedido, Contacto.Type tipo, String idFuncionario);
+    void registaPedidoOrcamento(String idCliente,String idFuncionario,String descricao);
 
     void registaAceitacaoCliente(String idReparacao);
 
     boolean verificarDisponibilidadeSE(String idServicoExpresso) throws InvalidIdException;
 
-    void registarSE(int idServicoExpresso, String idCliente);
-
-    void atualizaDisponibilidadeSE(int idServicoExpresso);
+    //void atualizaDisponibilidadeSE(int idServicoExpresso);
 
     void adicionarParaLevantar(String idPedido);
 
     void entregaEquipamento(String codE, String idFuncionario);
 
-    void notificaCliente(String IdCliente);
-
     void imprimirComprovativo(String cdPedido);
 
-    void criarFichaCliente(String nome, String email, String nmr, String nmrUtente);
+    void criarFichaCliente(String nome, String email, String nmr, String nif);
 
     Map.Entry<String, String> getNomeEmailCliente(String idPedido);
+
+    void registarContactoParaLevantar(String idPedido,String idFuncionario);
+
+    void registarContactoSemReparacao(String idPedido,String idFuncionario);
+
+    void registarContactoValorSuperior(String idPedido,String idFuncionario);
+
+    void registarContactoPedidoOrcamento(String idPedido,String idFuncionario);
+
+    void registarFormatarPC(ServicoExpresso.Tipo tipo, String idCliente, String idFuncionario);
+
+    void registarInstalarOS(ServicoExpresso.Tipo tipo, String idCliente, String idFuncionario);
+
+    void registarSubstituirEcra(ServicoExpresso.Tipo tipo, String idCliente, String idFuncionario);
+
+    void registarSubstituirBateria(ServicoExpresso.Tipo tipo, String idCliente, String idFuncionario);
+
+    void conclusaoPlanoTrabalho(String idPedido);
+
+    List<Map.Entry<String,String>> aguardaResposta ();
 }

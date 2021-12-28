@@ -24,16 +24,18 @@ public class LoginFrame extends JFrame implements Runnable, ActionListener {
 
         this.sgcr = sgcr;
         this.initLoginPanel();
+
+        super.add(this.panel, BorderLayout.CENTER);
+
+        super.setSize(this.WIDTH, this.HEIGHT);
+        super.setResizable(false);
+        super.setLocationRelativeTo(null);
+        super.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     }
 
     @Override
     public void run() {
-        super.add(this.panel, BorderLayout.CENTER);
-
-        super.setSize(this.WIDTH, this.HEIGHT);
         super.setVisible(true);
-        super.setLocationRelativeTo(null);
-        super.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     }
 
     private void initLoginPanel() {
@@ -58,6 +60,7 @@ public class LoginFrame extends JFrame implements Runnable, ActionListener {
         this.panel.add(username, grid);
 
         this.usernameInput = new JTextField(16);
+        this.usernameInput.addActionListener(this);
         grid.gridx = 1;
         grid.gridy = 1;
         this.panel.add(this.usernameInput, grid);
@@ -68,6 +71,7 @@ public class LoginFrame extends JFrame implements Runnable, ActionListener {
         this.panel.add(password, grid);
 
         this.passwordInput = new JPasswordField(16);
+        this.passwordInput.addActionListener(this);
         grid.gridx = 1;
         grid.gridy = 2;
         this.panel.add(this.passwordInput, grid);
@@ -82,24 +86,22 @@ public class LoginFrame extends JFrame implements Runnable, ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource().equals(this.login)) {
-            Trabalhador trabalhador = this.sgcr.doLogin(
-                    this.usernameInput.getText(),
-                    String.valueOf(this.passwordInput.getPassword())
-            );
-            if (trabalhador == null)
-                this.status.setText("<html><font color=red>Login Invalido!</font></html>");
-            else {
-                this.resetFields();
-                CRFrame crFrame = new CRFrame(this, trabalhador);
-                Thread thread = new Thread(crFrame);
-                thread.start();
-                super.setVisible(false);
-            }
+        Trabalhador trabalhador = this.sgcr.doLogin(
+                this.usernameInput.getText(),
+                String.valueOf(this.passwordInput.getPassword())
+        );
+        if (trabalhador == null)
+            this.status.setText("<html><font color=red>Login Invalido!</font></html>");
+        else {
+            this.resetFields();
+            CRFrame crFrame = new CRFrame(this, trabalhador);
+            Thread thread = new Thread(crFrame);
+            thread.start();
+            super.setVisible(false);
         }
     }
 
-    private void resetFields(){
+    private void resetFields() {
         this.usernameInput.setText("");
         this.passwordInput.setText("");
         this.status.setText("");

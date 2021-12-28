@@ -10,6 +10,7 @@ public class Passo implements Serializable {
     private Duration duration;
     private List<Passo> subPassos;
 
+
     public Passo(double custoPecas, Duration duration, List<Passo> subPassos) {
         this.custoPecas = custoPecas;
         this.duration = duration;

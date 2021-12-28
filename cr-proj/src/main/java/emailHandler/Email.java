@@ -1,10 +1,25 @@
 package emailHandler;
 
+import sgcr.SGCR;
+
+import java.io.IOException;
+import java.time.Duration;
+import java.time.ZonedDateTime;
 import java.util.*;
 import javax.mail.*;
 import javax.mail.internet.*;
 
-public class Email {
+public class Email implements Runnable{
+    private boolean running = true;
+    private SGCR sgcr;
+
+
+    public Email (SGCR sgcr){
+        this.sgcr= sgcr;
+    }
+
+
+
     private static String password = "grupoG35";
     private static String user = "sgcrgrupo35@gmail.com";
     /*
@@ -30,15 +45,20 @@ public class Email {
         return "SGCR - " + result;
     }
 
-    private static String message(int tipo, String nome, double orcamento) {
+    private static String mesageOrcamento(String nome,double orcamento,Duration duration){
+        return "Caro " + nome + ",\n\n" +
+                "Informamos que o orçamento relativo ao seu pedido será " + orcamento + ".\n" +
+                "E que serão necessárias aproximadamente " + duration + ".\n" +
+                "Responda a este email caso aceite.\n" +
+                "Ignore caso contrário. E faça o levantamento do equipamento na loja\n" +
+                "\nCumprimentos, SGCR.";
+    }
+
+
+    private static String message(int tipo, String nome) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Caro ").append(nome).append(",\n\n");
         switch (tipo) {
-            case pedidoOrcamento:
-                stringBuilder.append("Informamos que o orçamento relativo ao seu pedido será ").append(orcamento).append(".\n");
-                stringBuilder.append("Responda a este email caso aceite.\n");
-                stringBuilder.append("Ignore caso contrário. E faça o levantamento do equipamento na loja\n");
-                break;
             case naoPodeSerReparado:
                 stringBuilder.append("Lamentamos informar que o equipamento relativo ao seu pedido não tem reparação\n\n");
                 stringBuilder.append("Fica disponível para ser levantado na loja.\n");
@@ -58,30 +78,39 @@ public class Email {
     }
 
 
-    public static void pedidoOrcamento(String email, String nome, double orcamento) {
-        sendEmail(pedidoOrcamento, email, nome, orcamento);
+
+    public static void pedidoOrcamento(String email, String nome, double orcamento, Duration duration) {
+        String message = mesageOrcamento(nome,orcamento,duration);
+        String subject = subject(pedidoOrcamento);
+        sendEmail(email,message,subject);
     }
 
     public static void naoPodeSerReparado(String email, String nome) {
-        sendEmail(naoPodeSerReparado, email, nome, 0);
+        String message = message(naoPodeSerReparado,nome);
+        String subject = subject(naoPodeSerReparado);
+        sendEmail(email,message,subject);
     }
 
     public static void prontoALevantar(String email, String nome) {
-        sendEmail(prontoaLevantar, email, nome, 0);
+        String message = message(prontoaLevantar,nome);
+        String subject = subject(prontoaLevantar);
+        sendEmail(email,message,subject);
     }
 
     public static void valorSuperiorOrcamento(String email, String nome) {
-        sendEmail(valorSuperiorOrcamento, email, nome, 0);
+        String message = message(valorSuperiorOrcamento,nome);
+        String subject = subject(valorSuperiorOrcamento);
+        sendEmail(email,message,subject);
     }
 
-    private static void sendEmail(int tipo, String email, String nome, double number) {
+    private static void sendEmail(String email, String messageText,String subject) {
         Session session = startSessionSend();
         try {
             MimeMessage message = new MimeMessage(session);
             message.setFrom(new InternetAddress(user));
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(email));
-            message.setSubject(subject(tipo));
-            message.setText(message(tipo, nome, number));
+            message.setSubject(subject);
+            message.setText(messageText);
             //send the message
             Transport.send(message);
         } catch (MessagingException e) {
@@ -89,6 +118,10 @@ public class Email {
 
         }
     }
+
+
+
+
 
     private static Session startSessionSend() {
         Properties properties = new Properties();
@@ -115,6 +148,33 @@ public class Email {
         return checkIfRespond(email, subject(valorSuperiorOrcamento));
     }
 
+
+    private Message[] getMessage(){
+        try {
+            Properties properties = new Properties();
+            //
+            String host = "pop.gmail.com";
+            properties.put("mail.pop3.host", host);
+            properties.put("mail.pop3.port", "995");
+            properties.put("mail.pop3.starttls.enable", "true");
+            Session emailSession = Session.getInstance(properties);
+
+            //create the POP3 store object and connect with the pop server
+            Store store = emailSession.getStore("pop3s");
+
+            store.connect(host, user, password);
+
+            //create the folder object and open it
+            Folder emailFolder = store.getFolder("INBOX");
+            emailFolder.open(Folder.READ_ONLY);
+
+            // retrieve the messages from the folder in an array and print it
+            return emailFolder.getMessages();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
     private static boolean checkIfRespond(String email, String subjectName) {
         try {
@@ -175,6 +235,21 @@ public class Email {
         //valorSuperiorOrcamento("jdmartinsvieira63@gmail.com","Diogo");
         boolean resposta = checkRespostaPedidoOrcamento(email);
         System.out.println(resposta);
+    }
+
+
+    public void run (){
+        while(running){
+            List<Map.Entry<String,String>> pedidosAguardarEmail = sgcr.listPedidosAguardaAceitacao();
+            List<Map.Entry<String,String>> reparacoesAguardarEmail = sgcr.listReparacoesAguardaAceitacao();
+
+
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /*

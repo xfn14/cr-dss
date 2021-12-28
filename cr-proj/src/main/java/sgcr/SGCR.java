@@ -13,6 +13,8 @@ import trabalhadores.Trabalhador;
 import trabalhadores.Trabalhadores;
 
 import java.io.Serializable;
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -51,7 +53,6 @@ public class SGCR implements Serializable {
         this.reparacoes = reparacoes;
     }
 
-
     public void registaConclusaoReparacao(String idReparacao) throws InvalidIdException {
         reparacoes.registaConclusao(idReparacao);
         Map.Entry<String, String> entry = pedidos.getNomeEmailCliente(idReparacao);
@@ -70,8 +71,18 @@ public class SGCR implements Serializable {
         Email.naoPodeSerReparado(email, nome);
     }
 
-    public void registaConclusaoPlanoTrabalho() {
-        //this.pedidos.registaConclusaoPlanoTrabalho();
+    public void registaConclusaoPlanoTrabalho(String idPlano) {
+        this.reparacoes.conclusaoPlanoDeTrabalho(idPlano);
+        Map.Entry<Double, Duration> entry = reparacoes.getOrcamentoEHorasPlano(idPlano);
+        double orcamento = entry.getKey();
+        Duration duration = entry.getValue();
+
+
+        Map.Entry<String, String> entryContactos = pedidos.getNomeEmailCliente(idPlano);
+        String email = entryContactos.getValue();
+        String nome = entryContactos.getKey();
+
+        Email.pedidoOrcamento(email,nome,orcamento,duration);
     }
 
     public Trabalhador doLogin(String username, String passe) {
@@ -118,17 +129,14 @@ public class SGCR implements Serializable {
         this.pedidos.cancelaPedido(idPedido);
     }
 
-    public void registaPedidoOrcamento(String codPedido) throws InvalidIdException {
-        this.pedidos.registaPedidoOrcamento(codPedido);
+    public void registaPedidoOrcamento(String idCliente,String idFuncionario,String descricao) throws InvalidIdException {
+        this.pedidos.registaPedidoOrcamento(idCliente,idFuncionario,descricao);
     }
 
     public void criarFichaCliente(String nome, String email, String nmr, String nmrUtente) {
         this.pedidos.criarFichaCliente(nome, email, nmr, nmrUtente);
     }
 
-    public Map.Entry<String, String> getNomeEmailCliente(String idPedido) {
-        return this.pedidos.getNomeEmailCliente(idPedido);
-    }
 
     public void entregaEquipamento(String codPedido, String idFuncionario) {
         this.pedidos.entregaEquipamento(codPedido, idFuncionario);
@@ -139,13 +147,10 @@ public class SGCR implements Serializable {
     }
 
 
-    /*
-    public void registarContactoCliente  (String idPedido, Contacto.Type tipo, String idFuncionario) {
-        this.pedidos.registarContactoCliente(idPedido,tipo,idFuncionario);
+
+    public void registarContactoParaLevantar  (String idPedido, String idFuncionario) {
+        //this.pedidos.registarContactoCliente(idPedido,idFuncionario);
     }
-
-
-     */
 
 
     public void createPlanosTrabalho(String idPedido) {
@@ -160,8 +165,7 @@ public class SGCR implements Serializable {
             Map.Entry<String, String> entry = pedidos.getNomeEmailCliente(idReparacao);
             String email = entry.getValue();
             String nome = entry.getKey();
-            this.reparacoes.reparacaoParaEspera(idReparacao);
-
+            this.reparacoes.reparacaoAguardaAceitacao(idReparacao);
             Email.valorSuperiorOrcamento(email,nome);
         }
     }
@@ -182,18 +186,16 @@ public class SGCR implements Serializable {
         this.reparacoes.registaConclusao(idReparacao);
     }
 
-    public void conclusaoPlanoDeTrabalho(String IdPedido) throws InvalidIdException {
-        this.reparacoes.conclusaoPlanoDeTrabalho(IdPedido);
+    public void conclusaoPlanoDeTrabalho(String idPedido) throws InvalidIdException {
+        this.pedidos.conclusaoPlanoTrabalho(idPedido);
+        this.reparacoes.conclusaoPlanoDeTrabalho(idPedido);
     }
 
 
     public void criaReparacao (String idReparacao){
         double orcamento = this.reparacoes.getOrcamento(idReparacao);
-        //this.reparacoes.
+        this.reparacoes.criaReparacao(idReparacao,orcamento);
     }
-
-
-
 
 
     public List<String> getListReparacoesByTecnico() {
@@ -207,4 +209,21 @@ public class SGCR implements Serializable {
     public int getNrRececaoEntregaByFuncionario() {
         return 0;
     }
+
+    public List<Map.Entry<String,String>> listPedidosAguardaAceitacao(){
+        return pedidos.aguardaResposta();
+    }
+
+    public List<Map.Entry<String,String>> listReparacoesAguardaAceitacao(){
+        List<String> list = reparacoes.listAguardaAceitacao();
+        List<Map.Entry<String,String>> resultList = new ArrayList<>();
+        for (String id: list){
+            String email = pedidos.getNomeEmailCliente(id).getValue();
+            resultList.add(Map.entry(id,email));
+        }
+        return resultList;
+    }
+
+
+
 }
