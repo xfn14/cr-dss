@@ -1,6 +1,7 @@
 package pedidos;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Cliente implements Serializable {
@@ -15,6 +16,7 @@ public class Cliente implements Serializable {
         this.nif = nmrUtente;
         this.nmr = nmr;
         this.email = email;
+        this.pedidos = new ArrayList<>();
     }
 
     public Cliente(Cliente cliente) {
@@ -22,6 +24,7 @@ public class Cliente implements Serializable {
         this.nif = cliente.getNmrUtente();
         this.nmr = cliente.getNmr();
         this.email = cliente.getEmail();
+        this.pedidos = cliente.getPedidos();
     }
 
     public String getNome() {

@@ -53,4 +53,8 @@ public class Passo implements Serializable {
     public void setSubPassos(List<Passo> subPassos) {
         this.subPassos = subPassos;
     }
+
+    public String getDescricao() {
+        return descricao;
+    }
 }

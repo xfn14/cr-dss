@@ -28,8 +28,8 @@ public class Reparacoes implements IReparacoes, Serializable {
     }
 
 
-    public void criaReparacao(String idReparacao, double orcamento){
-        Reparacao reparacao = new Reparacao(idReparacao,orcamento);
+    public void criaReparacao(String idReparacao, String idTecnico,double orcamento){
+        Reparacao reparacao = new Reparacao(idReparacao,idTecnico,orcamento);
         this.reparacaoMap.put(idReparacao,reparacao);
     }
 
@@ -115,6 +115,38 @@ public class Reparacoes implements IReparacoes, Serializable {
         Reparacao reparacao = reparacaoMap.get(idReparacao);
         reparacao.reparacaoAceite();
     }
+
+
+    public Map<String,InfoReparacao> reparacoesByTecnicoMonth (List<String> reparacaoMonth){
+        Map<String,InfoReparacao> resultMap = new TreeMap<>();
+        for (String idReparacao : reparacaoMonth){
+            Reparacao reparacao = reparacaoMap.get(idReparacao);
+            PlanoTrabalho planoTrabalho = planoTrabalhoMap.get(idReparacao);
+            Duration duracaoReal = reparacao.getDuracaoTotal();
+            Duration duracaoPrevista = planoTrabalho.getDuracaoTotal();
+            long desvio = duracaoReal.toHours() - duracaoPrevista.toHours();
+            String idTecnico = reparacao.getIdTecnico();
+            if (!resultMap.containsKey(idTecnico)){
+                InfoReparacao infoReparacao = new InfoReparacao();
+                resultMap.put(idTecnico,infoReparacao);
+            }
+            InfoReparacao infoReparacao = resultMap.get(idTecnico);
+            infoReparacao.addInfo(duracaoReal,desvio);
+        }
+        return resultMap;
+    }
+
+    public void reparacoesExaustivaByTecnicoMonth (List<String> reparacaoMonth,Map<String,List<String>> resultMap){
+        for (String idReparacao : reparacaoMonth){
+            Reparacao reparacao = reparacaoMap.get(idReparacao);
+            String idTecnico = reparacao.getIdTecnico();
+            resultMap.putIfAbsent(idTecnico,new ArrayList<>());
+            List<String> list = resultMap.get(idTecnico);
+            reparacao.addDescricoesToList(list);
+        }
+    }
+
+
 
 
 }

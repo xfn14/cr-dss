@@ -15,6 +15,7 @@ import trabalhadores.Trabalhadores;
 import java.io.Serializable;
 import java.security.SecureRandom;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
@@ -194,25 +195,29 @@ public class SGCR implements Serializable {
     }
 
 
-    public void criaReparacao (String idReparacao){
+    public void criaReparacao (String idReparacao,String idTecnico){
         double orcamento = this.reparacoes.getOrcamento(idReparacao);
-        this.reparacoes.criaReparacao(idReparacao,orcamento);
+        this.reparacoes.criaReparacao(idReparacao,idTecnico,orcamento);
     }
 
 
-    public List<String> getListReparacoesByTecnico() {
+    public List<String> getListReparacoesByTecnico(LocalDateTime month) {
+        List<String> pedidosMonth = pedidos.getPedidosConcluidosMonth(month);
+        Map<String,Integer> servicosExpressoMap = pedidos.getNrServicosExpressoMonth(month,pedidosMonth);
+
         return null;
     }
 
-    public List<String> getListIntervencoesByTecnico() {
-        return null;
+    public Map<String,List<String>> getListIntervencoesByTecnico(LocalDateTime month) {
+        List<String> pedidosMonth = pedidos.getPedidosConcluidosMonth(month);
+        Map<String,List<String>> resultMap = pedidos.getServicosExpressoByTecnico(pedidosMonth);
+        reparacoes.reparacoesExaustivaByTecnicoMonth(pedidosMonth,resultMap);
+        return resultMap;
     }
 
-    public int getNrRececaoEntregaByFuncionario() {
-        List<String> funcionarioList = trabalhadores.getListFuncionarios();
-        for (String funcionario : funcionarioList){
-
-        }
+    public int getNrRececaoEntregaByFuncionario(LocalDateTime month) {
+        Map<String,Integer> pedidosMap  = pedidos.getNrPedidosByFuncionario(month);
+        Map<String,Integer> entregasMap = pedidos.getNrEntregasByFuncionario(month);
         return 0;
     }
 

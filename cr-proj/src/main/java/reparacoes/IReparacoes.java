@@ -24,7 +24,7 @@ public interface IReparacoes {
 
     double getOrcamento(String idPlano);
 
-    void criaReparacao(String idReparacao, double orcamento);
+    void criaReparacao(String idReparacao, String idTecnico,double orcamento);
 
     Map.Entry<Double, Duration> getOrcamentoEHorasPlano(String idPlano);
 
@@ -34,5 +34,9 @@ public interface IReparacoes {
 
     void reparacaoAceite(String idReparacao);
 
+    Map<String,InfoReparacao> reparacoesByTecnicoMonth (List<String> reparacaoMonth);
+
+
+    public void reparacoesExaustivaByTecnicoMonth (List<String> reparacaoMonth,Map<String,List<String>> resultMap);
 
     }

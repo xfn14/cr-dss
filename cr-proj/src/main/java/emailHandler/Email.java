@@ -12,6 +12,7 @@ import javax.mail.internet.*;
 public class Email implements Runnable {
     private boolean running = true;
     private SGCR sgcr;
+    //private LocalDate date  TODO: Ver o dia e se ainda não tiver corrido neste dia, correr a verificação para ausência de resposta| Arquivar Pedido
 
 
     public Email(SGCR sgcr) {

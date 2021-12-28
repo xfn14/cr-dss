@@ -3,7 +3,7 @@ package pedidos;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class Contacto implements Serializable {
+public class    Contacto implements Serializable {
     private String idTrabalhador;
     private LocalDateTime dateTime;
     private Type type;

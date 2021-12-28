@@ -25,6 +25,7 @@ public class Trabalhadores implements ITrabalhadores, Serializable {
                 .collect(Collectors.toMap(Map.Entry::getKey, t -> t.getValue().clone()));
     }
 
+    @Override
     public Map<String, Trabalhador> getTrabalhadores() {
         return this.trabalhadores
                 .entrySet()

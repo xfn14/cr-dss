@@ -1,9 +1,11 @@
 package pedidos;
 
+import javax.xml.transform.sax.SAXResult;
 import java.io.Serializable;
 
 public class ServicoExpresso extends Pedido implements Serializable {
     private String idServicoE;
+    private String idTecnico;
     private Tipo tipo;
 
     public ServicoExpresso(Pedido pedido, String idServicoE) {
@@ -12,9 +14,10 @@ public class ServicoExpresso extends Pedido implements Serializable {
     }
 
 
-    public ServicoExpresso(String idPedido,String idCliente,String idEquipamento,String idFuncionario,Tipo tipo){
+    public ServicoExpresso(String idPedido, String idCliente, String idEquipamento, String idFuncionario, Tipo tipo, String idTecnico){
         super(idPedido,idCliente,idEquipamento,idFuncionario);
         this.tipo = tipo;
+        this.idTecnico=idTecnico;
         setEstado(Estado.DECORRER);
     }
 
@@ -55,4 +58,7 @@ public class ServicoExpresso extends Pedido implements Serializable {
         this.tipo = tipo;
     }
 
+    public String getIdTecnico() {
+        return idTecnico;
+    }
 }

@@ -1,4 +1,4 @@
-package gui.main;
+package gui.pedidos;
 
 import sgcr.SGCR;
 

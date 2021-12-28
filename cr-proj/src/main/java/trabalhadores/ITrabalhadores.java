@@ -1,9 +1,12 @@
 package trabalhadores;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ITrabalhadores {
     Trabalhador doLogin(String id, String pass);
+
+    Map<String, Trabalhador> getTrabalhadores();
 
     boolean registarGestor(String id, String pass, String confirmaPass);
 
@@ -13,7 +16,7 @@ public interface ITrabalhadores {
 
     List<String> getListTecnicos();
 
-    List<String> getListFuncionarios ();
+    List<String> getListFuncionarios();
 
     List<String> getListReparacoesByTecnico();
 

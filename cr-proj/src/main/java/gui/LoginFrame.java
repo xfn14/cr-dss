@@ -86,18 +86,20 @@ public class LoginFrame extends JFrame implements Runnable, ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        Trabalhador trabalhador = this.sgcr.doLogin(
-                this.usernameInput.getText(),
-                String.valueOf(this.passwordInput.getPassword())
-        );
-        if (trabalhador == null)
-            this.status.setText("<html><font color=red>Login Invalido!</font></html>");
-        else {
-            this.resetFields();
-            CRFrame crFrame = new CRFrame(this, trabalhador);
-            Thread thread = new Thread(crFrame);
-            thread.start();
-            super.setVisible(false);
+        if(e.getSource().equals(this.login) || e.getSource().equals(this.usernameInput) || e.getSource().equals(this.passwordInput)){
+            Trabalhador trabalhador = this.sgcr.doLogin(
+                    this.usernameInput.getText(),
+                    String.valueOf(this.passwordInput.getPassword())
+            );
+            if (trabalhador == null)
+                this.status.setText("<html><font color=red>Login Invalido!</font></html>");
+            else {
+                this.resetFields();
+                CRFrame crFrame = new CRFrame(this, trabalhador);
+                Thread thread = new Thread(crFrame);
+                thread.start();
+                super.setVisible(false);
+            }
         }
     }
 

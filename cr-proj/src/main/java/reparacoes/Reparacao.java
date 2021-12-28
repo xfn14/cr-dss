@@ -1,12 +1,15 @@
 package reparacoes;
 
 import java.io.Serializable;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Reparacao implements Serializable {
     private String idReparacao;
+    private String idTecnico;
     private Estado estado;
+    private Duration duracaoTotal;
     private List<Passo> passos; //TODO: Registar passos
     private double orcamento;
     private double orcamentoExpectavel;
@@ -17,15 +20,15 @@ public class Reparacao implements Serializable {
         this.estado = Estado.DECORRER;
         this.passos = new ArrayList<>();
         this.orcamentoExpectavel = 0;
+        this.duracaoTotal=Duration.ZERO;
     }
 
-    public Reparacao(String idReparacao, double orcamento) {
+    public Reparacao(String idReparacao, String idTecnico,double orcamento) {
         this.idReparacao = idReparacao;
         this.orcamento = orcamento;
         this.orcamentoExpectavel = orcamento;
+        this.duracaoTotal = Duration.ZERO;
     }
-
-
 
     public enum Estado {
         DECORRER,
@@ -47,6 +50,7 @@ public class Reparacao implements Serializable {
 
     public int registaPasso(double horas, double custoPecas) {
         Passo passo = new Passo(horas, custoPecas);
+        this.duracaoTotal = this.duracaoTotal.plus(Duration.ofHours((long) horas));
         this.passos.add(passo);
         return passos.size()-1;
     }
@@ -65,6 +69,15 @@ public class Reparacao implements Serializable {
         setEstado(Estado.PAUSA);
         this.orcamento = this.orcamentoExpectavel;
     }
+
+
+    public void addDescricoesToList (List<String> list){
+        for (Passo passo : passos){
+            String descricao = passo.getDescricao();
+            list.add(descricao);
+        }
+    }
+
 
     public void setIdReparacao(String idReparacao) {
         this.idReparacao = idReparacao;
@@ -85,5 +98,15 @@ public class Reparacao implements Serializable {
     public void setPassos(List<Passo> passos) {
         this.passos = new ArrayList<>(passos);
     }
+
+    public Duration getDuracaoTotal() {
+        return duracaoTotal;
+    }
+
+    public String getIdTecnico() {
+        return idTecnico;
+    }
+
+
 
 }
