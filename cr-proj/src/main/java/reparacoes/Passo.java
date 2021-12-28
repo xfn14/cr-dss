@@ -23,6 +23,8 @@ public class Passo implements Serializable {
     }
 
     public void addSubPasso(double horas, double custoPecas) {
+        this.custoPecas+= custoPecas;
+        this.duration  = this.duration.plusHours((long) horas);
         Passo passo = new Passo(horas, custoPecas);
         subPassos.add(passo);
     }

@@ -1,6 +1,7 @@
 package reparacoes;
 
 import exceptions.InvalidIdException;
+import exceptions.ValorSuperior;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -21,11 +22,26 @@ public class Reparacoes implements IReparacoes, Serializable {
         this.planoTrabalhoMap.put(idPedido, planoTrabalho);
     }
 
+    public double getOrcamento (String idPlano){
+        PlanoTrabalho planoTrabalho = planoTrabalhoMap.get(idPlano);
+        return planoTrabalho.getOrcamento();
+    }
+
+
+    public void criaReparacao(String idReparacao, double orcamento){
+        Reparacao reparacao = new Reparacao(idReparacao,orcamento);
+        this.reparacaoMap.put(idReparacao,reparacao);
+    }
+
     @Override
-    public void registaPasso(double horas, double custoPecas, String idReparacao) {
+    public void registaPasso(double horas, double custoPecas, String idReparacao) throws ValorSuperior {
         Reparacao reparacao = reparacaoMap.get(idReparacao);
-        reparacao.registaPasso(horas, custoPecas);
-        //TODO: comparar se o dinheiro gasto for superior ao orcamento
+        int indexPasso = reparacao.registaPasso(horas, custoPecas);
+        PlanoTrabalho planoTrabalho = planoTrabalhoMap.get(idReparacao);
+        double expectavel = planoTrabalho.getCustoPecasPasso(indexPasso);
+        double diferenca = custoPecas-expectavel;
+        reparacao.changeOrcamento(diferenca);
+        if (reparacao.checkSuperior120()) throw new ValorSuperior();
     }
 
     @Override
@@ -37,9 +53,9 @@ public class Reparacoes implements IReparacoes, Serializable {
         planoTrabalho.addPasso(passo);
     }
 
-    public void addSubPasso(String idPlano, double horas, double custoPecas) {
+    public void addSubPasso(String idPlano,int indexPasso ,double horas, double custoPecas) {
         PlanoTrabalho planoTrabalho = planoTrabalhoMap.get(idPlano);
-        planoTrabalho.addSubPasso(horas, custoPecas);
+        planoTrabalho.addSubPasso(indexPasso,horas, custoPecas);
     }
 
     @Override
@@ -68,4 +84,12 @@ public class Reparacoes implements IReparacoes, Serializable {
             throw new InvalidIdException(idPedido, InvalidIdException.Type.PEDIDO);
         this.planoTrabalhoMap.get(idPedido).setEstado(PlanoTrabalho.Estado.AGUARDA_ACEITACAO);
     }
+
+
+    public void planoTrabalhoParaEspera(String idPlano) throws InvalidIdException {
+        if (this.planoTrabalhoMap.containsKey(idPlano))
+            throw new InvalidIdException(idPlano, InvalidIdException.Type.PEDIDO);
+        this.planoTrabalhoMap.get(idPlano).setEstado(PlanoTrabalho.Estado.PAUSA);
+    }
+
 }

@@ -1,11 +1,12 @@
 package reparacoes;
 
 import exceptions.InvalidIdException;
+import exceptions.ValorSuperior;
 
 public interface IReparacoes {
     void createPlanosTrabalho(String idPedido);
 
-    void registaPasso(double horas, double custoPecas, String idReparacao);
+    void registaPasso(double horas, double custoPecas, String idReparacao) throws ValorSuperior;
 
     void conclusaoPlanoDeTrabalho(String codPlanoDeTrabalho) throws InvalidIdException;
 
@@ -16,4 +17,7 @@ public interface IReparacoes {
     void reparacaoParaEspera(String idReparacao) throws InvalidIdException;
 
     void registaConclusao(String idReparacao) throws InvalidIdException;
+
+    double getOrcamento (String idPlano);
+
 }

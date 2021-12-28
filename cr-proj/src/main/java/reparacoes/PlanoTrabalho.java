@@ -32,10 +32,18 @@ public class PlanoTrabalho implements Serializable {
         this.estado = estado;
     }
 
-    public void addSubPasso(double horas, double custoPecas) {
-        int length = passos.size();
-        Passo passo = passos.get(length - 1);
+    public void addSubPasso(int indexPasso,double horas, double custoPecas){
+        if (indexPasso >= passos.size()){
+            Passo passo = new Passo(0,0);
+            passos.add(passo);
+        }
+        Passo passo = passos.get(indexPasso);
         passo.addSubPasso(horas, custoPecas);
+    }
+
+
+    public double getCustoPecasPasso(int indexPasso){
+        return this.passos.get(indexPasso).getCustoPecas();
     }
 
     public enum Estado {
@@ -61,5 +69,9 @@ public class PlanoTrabalho implements Serializable {
     @Override
     public PlanoTrabalho clone() {
         return new PlanoTrabalho(this);
+    }
+
+    public double getOrcamento() {
+        return orcamento;
     }
 }

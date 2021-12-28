@@ -3,33 +3,29 @@ package reparacoes;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class Reparacao implements Serializable {
     private String idReparacao;
-    private String idPlanoTrabalho;
     private Estado estado;
     private List<Passo> passos; //TODO: Registar passos
-    private double dinheiroGasto;
+    private double orcamento;
+    private double orcamentoExpectavel;
 
 
     public Reparacao() {
         this.idReparacao = "";
-        this.idPlanoTrabalho = "";
         this.estado = Estado.DECORRER;
         this.passos = new ArrayList<>();
-        this.dinheiroGasto = 0;
+        this.orcamentoExpectavel = 0;
     }
 
-    public Reparacao(String idReparacao, String idPlanoTrabalho) {
+    public Reparacao(String idReparacao, double orcamento) {
         this.idReparacao = idReparacao;
-        this.idPlanoTrabalho = idPlanoTrabalho;
+        this.orcamento = orcamento;
+        this.orcamentoExpectavel = orcamento;
     }
 
-    public Reparacao(Reparacao reparacao) {
-        this.idReparacao = reparacao.getIdReparacao();
-        this.idPlanoTrabalho = reparacao.getIdPlanoTrabalho();
-    }
+
 
     public enum Estado {
         DECORRER,
@@ -38,26 +34,27 @@ public class Reparacao implements Serializable {
         CANCELADA
     }
 
-    public void registaPasso(double horas, double custoPecas) {
-        Passo passo = new Passo(horas, custoPecas);
-        this.passos.add(passo);
-        this.dinheiroGasto += custoPecas;
-    }
-
     public String getIdReparacao() {
         return this.idReparacao;
     }
 
+    public int registaPasso(double horas, double custoPecas) {
+        Passo passo = new Passo(horas, custoPecas);
+        this.passos.add(passo);
+        return passos.size()-1;
+    }
+
+    public void changeOrcamento (double diff){
+        this.orcamento+= diff;
+    }
+
+    public boolean checkSuperior120(){
+        double superior = orcamentoExpectavel*1.2;
+        return orcamento > superior;
+    }
+
     public void setIdReparacao(String idReparacao) {
         this.idReparacao = idReparacao;
-    }
-
-    public String getIdPlanoTrabalho() {
-        return this.idPlanoTrabalho;
-    }
-
-    public void setIdPlanoTrabalho(String idPlanoTrabalho) {
-        this.idPlanoTrabalho = idPlanoTrabalho;
     }
 
     public Estado getEstado() {
@@ -76,7 +73,4 @@ public class Reparacao implements Serializable {
         this.passos = new ArrayList<>(passos);
     }
 
-    public Reparacao clone() {
-        return new Reparacao(this);
-    }
 }

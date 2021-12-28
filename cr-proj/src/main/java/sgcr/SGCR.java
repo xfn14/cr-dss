@@ -2,6 +2,7 @@ package sgcr;
 
 import emailHandler.Email;
 import exceptions.InvalidIdException;
+import exceptions.ValorSuperior;
 import pedidos.IPedidos;
 import pedidos.Pedidos;
 import reparacoes.IReparacoes;
@@ -151,9 +152,18 @@ public class SGCR implements Serializable {
         this.reparacoes.createPlanosTrabalho(idPedido);
     }
 
-    public void registaPasso(double horas, double custoPecas, String idReparacao) {
-        this.reparacoes.registaPasso(horas, custoPecas, idReparacao
-        );
+    public void registaPasso(double horas, double custoPecas, String idReparacao) throws InvalidIdException {
+        try {
+            this.reparacoes.registaPasso(horas, custoPecas, idReparacao);
+        }
+        catch (ValorSuperior e){
+            Map.Entry<String, String> entry = pedidos.getNomeEmailCliente(idReparacao);
+            String email = entry.getValue();
+            String nome = entry.getKey();
+            this.reparacoes.reparacaoParaEspera(idReparacao);
+
+            Email.valorSuperiorOrcamento(email,nome);
+        }
     }
 
     public void addPasso(String idPlano, double horas, double custoPecas) throws InvalidIdException {
@@ -175,6 +185,16 @@ public class SGCR implements Serializable {
     public void conclusaoPlanoDeTrabalho(String IdPedido) throws InvalidIdException {
         this.reparacoes.conclusaoPlanoDeTrabalho(IdPedido);
     }
+
+
+    public void criaReparacao (String idReparacao){
+        double orcamento = this.reparacoes.getOrcamento(idReparacao);
+        //this.reparacoes.
+    }
+
+
+
+
 
     public List<String> getListReparacoesByTecnico() {
         return null;
