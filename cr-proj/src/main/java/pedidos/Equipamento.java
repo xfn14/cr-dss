@@ -1,31 +1,27 @@
 package pedidos;
 
-import java.util.Objects;
+import java.io.Serializable;
 
-public class Equipamento {
+public class Equipamento implements Serializable {
     private String idEquipamento;
-
-    public Equipamento(){
-        this.idEquipamento = "";
-    }
 
     public Equipamento(String idEquipamento) {
         this.idEquipamento = idEquipamento;
     }
 
-    public Equipamento(Equipamento equipamento){
+    public Equipamento(Equipamento equipamento) {
         this.idEquipamento = equipamento.getIdEquipamento();
     }
 
     public String getIdEquipamento() {
-        return idEquipamento;
+        return this.idEquipamento;
     }
 
     public void setIdEquipamento(String idEquipamento) {
         this.idEquipamento = idEquipamento;
     }
 
-    public Equipamento clone(){
+    public Equipamento clone() {
         return new Equipamento(this);
     }
 }

@@ -1,11 +1,12 @@
 package pedidos;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Pedido {
+public class Pedido implements Serializable {
     private Date data;
     private String idPedido;
     private String idCliente;
@@ -25,7 +26,7 @@ public class Pedido {
         this.contactos = new ArrayList<>();
     }
 
-    public Pedido(Pedido pedido){
+    public Pedido(Pedido pedido) {
         this.data = pedido.getData() == null ? new Date() : new Date(pedido.getData().getTime());
         this.idPedido = pedido.getIdPedido();
         this.idCliente = pedido.getIdCliente();
@@ -35,27 +36,19 @@ public class Pedido {
         this.contactos = pedido.getContactos();
     }
 
-
     public enum Estado {
         DECORRER,
         FINALIZADO,
         CANCELADO
     }
 
-
     public void registaContacto(Contacto.Type tipo, String idFuncionario) {
-        Contacto contacto = new Contacto(idFuncionario,tipo);
+        Contacto contacto = new Contacto(idFuncionario, tipo);
         contactos.add(contacto);
     }
 
-
-
-
-
-
-
     public String getIdFuncionario() {
-        return idFuncionario;
+        return this.idFuncionario;
     }
 
     public void setIdFuncionario(String idFuncionario) {
@@ -106,7 +99,7 @@ public class Pedido {
         return this.contactos.stream().map(Contacto::clone).collect(Collectors.toList());
     }
 
-    public Pedido clone(){
+    public Pedido clone() {
         return new Pedido(this);
     }
 }

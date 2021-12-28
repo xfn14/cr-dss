@@ -1,19 +1,20 @@
 package pedidos;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class Contacto {
+public class Contacto implements Serializable {
     private String idTrabalhador;
     private LocalDateTime dateTime;
     private Type type;
 
-    public Contacto(String idTrabalhador, Type type){
+    public Contacto(String idTrabalhador, Type type) {
         this.idTrabalhador = idTrabalhador;
         this.dateTime = LocalDateTime.now();
         this.type = type;
     }
 
-    public Contacto(Contacto contacto){
+    public Contacto(Contacto contacto) {
         this.idTrabalhador = contacto.getIdTrabalhador();
         this.dateTime = contacto.getDateTime();
         this.type = contacto.getType();
@@ -49,7 +50,7 @@ public class Contacto {
         this.type = type;
     }
 
-    public Contacto clone(){
+    public Contacto clone() {
         return new Contacto(this);
     }
 }

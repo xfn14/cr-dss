@@ -1,33 +1,33 @@
 package pedidos;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Date;
 
-public class Entrega {
+public class Entrega implements Serializable {
     private LocalDateTime data;
     private String idPedido;
     private String idFuncionario;
 
-    public Entrega (LocalDateTime data, String idPedido,String idFuncionario){
+    public Entrega(LocalDateTime data, String idPedido, String idFuncionario) {
         this.data = data;
-        this.idPedido= idPedido;
+        this.idPedido = idPedido;
         this.idFuncionario = idFuncionario;
     }
 
-    public Entrega (String idPedido,String idFuncionario){
-        this.idPedido= idPedido;
+    public Entrega(String idPedido, String idFuncionario) {
+        this.idPedido = idPedido;
         this.idFuncionario = idFuncionario;
         this.data = LocalDateTime.now();
     }
-    
-    public Entrega(Entrega entrega){
+
+    public Entrega(Entrega entrega) {
         this.data = entrega.getData();
         this.idPedido = entrega.getIdPedido();
         this.idFuncionario = entrega.getIdFuncionario();
     }
 
     public LocalDateTime getData() {
-        return data;
+        return this.data;
     }
 
     public void setData(LocalDateTime data) {
@@ -50,7 +50,7 @@ public class Entrega {
         this.idFuncionario = idFuncionario;
     }
 
-    public Entrega clone(){
+    public Entrega clone() {
         return new Entrega(this);
     }
 }

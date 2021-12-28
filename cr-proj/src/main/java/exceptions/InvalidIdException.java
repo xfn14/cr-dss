@@ -1,7 +1,7 @@
 package exceptions;
 
 public class InvalidIdException extends Exception {
-    public InvalidIdException(String id, Type tipo){
+    public InvalidIdException(String id, Type tipo) {
         super("Invalido id de " + tipo.getName() + " \"" + id + "\"");
     }
 
@@ -15,7 +15,7 @@ public class InvalidIdException extends Exception {
 
         private final String name;
 
-        Type(String name){
+        Type(String name) {
             this.name = name;
         }
 

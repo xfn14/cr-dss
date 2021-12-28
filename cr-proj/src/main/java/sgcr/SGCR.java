@@ -2,7 +2,6 @@ package sgcr;
 
 import emailHandler.Email;
 import exceptions.InvalidIdException;
-import pedidos.Contacto;
 import pedidos.IPedidos;
 import pedidos.Pedidos;
 import reparacoes.IReparacoes;
@@ -12,15 +11,16 @@ import trabalhadores.ITrabalhadores;
 import trabalhadores.Trabalhador;
 import trabalhadores.Trabalhadores;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-public class SGCR {
+public class SGCR implements Serializable {
     private ITrabalhadores trabalhadores;
     private IPedidos pedidos;
     private IReparacoes reparacoes;
 
-    public SGCR(){
+    public SGCR() {
         this.trabalhadores = new Trabalhadores();
         this.pedidos = new Pedidos();
         this.reparacoes = new Reparacoes();
@@ -51,29 +51,29 @@ public class SGCR {
     }
 
 
-    public void registaConclusaoReparacao(String idReparacao){
+    public void registaConclusaoReparacao(String idReparacao) throws InvalidIdException {
         reparacoes.registaConclusao(idReparacao);
-        Map.Entry<String,String> entry = pedidos.getNomeEmailCliente(idReparacao);
+        Map.Entry<String, String> entry = pedidos.getNomeEmailCliente(idReparacao);
         String email = entry.getValue();
         String nome = entry.getKey();
         //Informar o cliente que o equipamento está pronto a levantar
-        Email.prontoALevantar(email,nome);
+        Email.prontoALevantar(email, nome);
     }
 
     public void registaEquipamentoSemReparacao(String idPedido) throws InvalidIdException {
         pedidos.cancelaPedido(idPedido);
-        Map.Entry<String,String> entry = pedidos.getNomeEmailCliente(idPedido);
+        Map.Entry<String, String> entry = pedidos.getNomeEmailCliente(idPedido);
         String email = entry.getValue();
         String nome = entry.getKey();
         //Informar o cliente que o equipamento não tem reparação
-        Email.naoPodeSerReparado(email,nome);
+        Email.naoPodeSerReparado(email, nome);
     }
 
-    public void registaConclusaoPlanoTrabalho(){
+    public void registaConclusaoPlanoTrabalho() {
         //this.pedidos.registaConclusaoPlanoTrabalho();
     }
 
-    public Trabalhador doLogin(String username, String passe){
+    public Trabalhador doLogin(String username, String passe) {
         return trabalhadores.doLogin(username, passe);
     }
 
@@ -85,7 +85,7 @@ public class SGCR {
         return trabalhadores.getListTecnicos();
     }
 
-    public boolean verificarDisponibilidadeTecnicos(){
+    public boolean verificarDisponibilidadeTecnicos() {
         return trabalhadores.verificarDisponibilidadeTecnicos();
     }
 
@@ -109,7 +109,7 @@ public class SGCR {
         this.pedidos.cancelaPedido(idPedido);
     }
 
-    public void registaPedidoOrcamento(String codPedido) throws InvalidIdException{
+    public void registaPedidoOrcamento(String codPedido) throws InvalidIdException {
         this.pedidos.registaPedidoOrcamento(codPedido);
     }
 
@@ -117,11 +117,11 @@ public class SGCR {
         this.pedidos.criarFichaCliente(nome, email, nmr, nmrUtente);
     }
 
-    public Map.Entry<String,String> getNomeEmailCliente(String idPedido){
+    public Map.Entry<String, String> getNomeEmailCliente(String idPedido) {
         return this.pedidos.getNomeEmailCliente(idPedido);
     }
 
-    public void entregaEquipamento(String codPedido,String idFuncionario) {
+    public void entregaEquipamento(String codPedido, String idFuncionario) {
         this.pedidos.entregaEquipamento(codPedido, idFuncionario);
     }
 
@@ -143,28 +143,28 @@ public class SGCR {
         this.reparacoes.createPlanosTrabalho(idPedido);
     }
 
-    public void registaPasso(double horas, double custoPecas,String idReparacao) {
-        this.reparacoes.registaPasso(horas,custoPecas,idReparacao
+    public void registaPasso(double horas, double custoPecas, String idReparacao) {
+        this.reparacoes.registaPasso(horas, custoPecas, idReparacao
         );
     }
 
     public void addPasso(String idPlano, double horas, double custoPecas) throws InvalidIdException {
-        this.reparacoes.addPasso(idPlano,horas,custoPecas);
+        this.reparacoes.addPasso(idPlano, horas, custoPecas);
     }
 
-    public PlanoTrabalho getPlanoDeTrabalho(String idPedido){
+    public PlanoTrabalho getPlanoDeTrabalho(String idPedido) {
         return this.reparacoes.getPlanoDeTrabalho(idPedido);
     }
 
-    public void reparacaoParaEspera(String idReparacao) {
+    public void reparacaoParaEspera(String idReparacao) throws InvalidIdException {
         this.reparacoes.reparacaoParaEspera(idReparacao);
     }
 
-    public void registaConclusao(String idReparacao) {
+    public void registaConclusao(String idReparacao) throws InvalidIdException {
         this.reparacoes.registaConclusao(idReparacao);
     }
 
-    public void conclusaoPlanoDeTrabalho(String IdPedido) {
+    public void conclusaoPlanoDeTrabalho(String IdPedido) throws InvalidIdException {
         this.reparacoes.conclusaoPlanoDeTrabalho(IdPedido);
     }
 

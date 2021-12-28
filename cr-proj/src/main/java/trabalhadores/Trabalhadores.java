@@ -1,28 +1,31 @@
 package trabalhadores;
 
-import utils.SecurityUtil;
+import utils.SecurityUtils;
 
+import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public class Trabalhadores implements ITrabalhadores {
+public class Trabalhadores implements ITrabalhadores, Serializable {
     public static final Logger LOGGER = Logger.getLogger("CR");
-    private Map<String,Trabalhador> trabalhadores;
+    private final Map<String, Trabalhador> trabalhadores;
 
-    public Trabalhadores(){
+    public Trabalhadores() {
         this.trabalhadores = new HashMap<>();
     }
 
-    public Trabalhadores(Map<String, Trabalhador> trabalhadores){
+    public Trabalhadores(Map<String, Trabalhador> trabalhadores) {
         this.trabalhadores = trabalhadores
                 .entrySet()
                 .stream()
-                .collect(Collectors.toMap(Map.Entry :: getKey, t -> t.getValue().clone()));
+                .collect(Collectors.toMap(Map.Entry::getKey, t -> t.getValue().clone()));
     }
 
-    public Map<String,Trabalhador> getTrabalhadores() {
+    public Map<String, Trabalhador> getTrabalhadores() {
         return this.trabalhadores
                 .entrySet()
                 .stream()
@@ -31,11 +34,11 @@ public class Trabalhadores implements ITrabalhadores {
 
     @Override
     public Trabalhador doLogin(String id, String pass) {
-        if (trabalhadores.containsKey(id)){
+        if (trabalhadores.containsKey(id)) {
             Trabalhador t = this.trabalhadores.get(id);
             try {
-                String passe = SecurityUtil.getStringSHA1(pass);
-                if (t.getPasse().equals(passe)){
+                String passe = SecurityUtils.getStringSHA1(pass);
+                if (t.getPasse().equals(passe)) {
                     this.trabalhadores.get(id).setAutenticado(true);
                     return t;
                 }
@@ -50,9 +53,9 @@ public class Trabalhadores implements ITrabalhadores {
     public boolean registarTrabalhador(String id, String passe, String confimaPasse) {
         if (trabalhadores.containsKey(id) || !passe.equals(confimaPasse)) return false;
         try {
-            String pass = SecurityUtil.getStringSHA1(passe);
-            Trabalhador t = new Trabalhador(id,pass);
-            trabalhadores.put(id,t);
+            String pass = SecurityUtils.getStringSHA1(passe);
+            Trabalhador t = new Trabalhador(id, pass);
+            trabalhadores.put(id, t);
             return true;
         } catch (NoSuchAlgorithmException e) {
             LOGGER.warning("Não foi encontrado o algoritmo SHA-1");
@@ -62,11 +65,15 @@ public class Trabalhadores implements ITrabalhadores {
 
     @Override
     public List<String> getListTecnicos() {
-        return trabalhadores.values().stream().filter(t -> t instanceof Tecnico)
-                .map(Trabalhador::getIdTrabalhador).collect(Collectors.toList());
+        return trabalhadores
+                .values()
+                .stream()
+                .filter(t -> t instanceof Tecnico)
+                .map(Trabalhador::getIdTrabalhador)
+                .collect(Collectors.toList());
     }
 
-    public boolean verificarDisponibilidadeTecnicos(){
+    public boolean verificarDisponibilidadeTecnicos() {
         return trabalhadores.values().stream()
                 .anyMatch(trabalhador -> (
                         trabalhador instanceof Tecnico &&

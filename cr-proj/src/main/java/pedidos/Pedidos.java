@@ -2,25 +2,29 @@ package pedidos;
 
 import exceptions.InvalidIdException;
 
-import java.util.*;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-public class Pedidos implements IPedidos {
-    private Map<String,Pedido> pedidoMap;
-    private Map<String,Entrega> entregaMap;
+public class Pedidos implements IPedidos, Serializable {
+    private Map<String, Pedido> pedidoMap;
+    private Map<String, Entrega> entregaMap;
     private Map<String, Cliente> clientesMap;
 
-    public Pedidos(){
+    public Pedidos() {
         this.pedidoMap = new HashMap<>();
         this.entregaMap = new HashMap<>();
         this.clientesMap = new HashMap<>();
     }
 
-    public void addPedido(Pedido pedido){
+    public void addPedido(Pedido pedido) {
         this.pedidoMap.put(pedido.getIdPedido(), pedido.clone());
     }
 
-    public void addEntrega(Entrega entrega){
+    public void addEntrega(Entrega entrega) {
         this.entregaMap.put(entrega.getIdPedido(), entrega.clone());
     }
 
@@ -31,7 +35,6 @@ public class Pedidos implements IPedidos {
     public List<Entrega> getEntregas() {
         return new ArrayList<>(this.entregaMap.values());
     }
-
 
     @Override
     public List<String> getListPedidosOrcamento() {
@@ -44,17 +47,16 @@ public class Pedidos implements IPedidos {
     @Override
     public List<String> getListEquipamentosLevantar() {
         List<String> ret = new ArrayList<>();
-        for (Pedido p : this.pedidoMap.values()){
-            if(p.getEstado().equals(Pedido.Estado.FINALIZADO))
+        for (Pedido p : this.pedidoMap.values())
+            if (p.getEstado().equals(Pedido.Estado.FINALIZADO))
                 ret.add(p.getIdPedido());
-        }
         return ret;
     }
 
     @Override
     public double getPrecoSE(String idServicoExpresso) throws InvalidIdException {
         Pedido pedido = this.pedidoMap.get(idServicoExpresso);
-        if(pedido == null)
+        if (pedido == null)
             throw new InvalidIdException(idServicoExpresso, InvalidIdException.Type.PEDIDO);
         ServicoExpresso se = (ServicoExpresso) pedido;
         return se.getTipo().getPreco();
@@ -71,7 +73,7 @@ public class Pedidos implements IPedidos {
     @Override
     public void cancelaPedido(String idPedido) throws InvalidIdException {
         Pedido pedido = this.pedidoMap.get(idPedido);
-        if(pedido == null)
+        if (pedido == null)
             throw new InvalidIdException(idPedido, InvalidIdException.Type.PEDIDO);
         pedido.setEstado(Pedido.Estado.CANCELADO);
     }
@@ -79,16 +81,16 @@ public class Pedidos implements IPedidos {
     @Override
     public void registaPedidoOrcamento(String codPedido) throws InvalidIdException {
         Pedido pedido = this.pedidoMap.get(codPedido);
-        if(pedido == null || pedido instanceof ServicoExpresso)
+        if (pedido == null || pedido instanceof ServicoExpresso)
             throw new InvalidIdException(codPedido, InvalidIdException.Type.PEDIDO);
-        PedidoOrcamento pedidoOrcamento = new PedidoOrcamento(pedido,-1,codPedido);
-        this.pedidoMap.put(codPedido,pedidoOrcamento);
+        PedidoOrcamento pedidoOrcamento = new PedidoOrcamento(pedido, -1, codPedido);
+        this.pedidoMap.put(codPedido, pedidoOrcamento);
     }
 
     @Override
-    public void registarContactoCliente(String idPedido,Contacto.Type tipo,String idFuncionario) {
+    public void registarContactoCliente(String idPedido, Contacto.Type tipo, String idFuncionario) {
         Pedido pedido = pedidoMap.get(idPedido);
-        pedido.registaContacto(tipo,idFuncionario);
+        pedido.registaContacto(tipo, idFuncionario);
     }
 
     @Override
@@ -113,14 +115,14 @@ public class Pedidos implements IPedidos {
     }
 
     @Override
-    public void entregaEquipamento(String codPedido,String idFuncionario) {
-        Entrega entrega = new Entrega(idFuncionario,codPedido);
+    public void entregaEquipamento(String codPedido, String idFuncionario) {
+        Entrega entrega = new Entrega(idFuncionario, codPedido);
         this.entregaMap.put(codPedido, entrega);
     }
 
     @Override
     public void notificaCliente(String IdCliente) {
-        
+
     }
 
     @Override
@@ -130,15 +132,14 @@ public class Pedidos implements IPedidos {
 
     @Override
     public void criarFichaCliente(String nome, String email, String nmr, String nmrUtente) {
-        this.clientesMap.put(nmr, new Cliente(nome, email ,nmr, nmrUtente));
+        this.clientesMap.put(nmr, new Cliente(nome, email, nmr, nmrUtente));
     }
 
     @Override
-    public Map.Entry<String,String> getNomeEmailCliente(String idPedido) {
+    public Map.Entry<String, String> getNomeEmailCliente(String idPedido) {
         Pedido pedido = pedidoMap.get(idPedido);
         String idCliente = pedido.getIdCliente();
         Cliente cliente = clientesMap.get(idCliente);
-        return  Map.entry(cliente.getNome(),cliente.getEmail());
+        return Map.entry(cliente.getNome(), cliente.getEmail());
     }
-
 }

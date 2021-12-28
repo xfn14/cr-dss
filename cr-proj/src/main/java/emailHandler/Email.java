@@ -21,19 +21,19 @@ public class Email {
     private static final int valorSuperiorOrcamento = 3;
 
 
-    private static String subject(int tipo){
-        String result ="";
+    private static String subject(int tipo) {
+        String result = "";
         if (tipo == pedidoOrcamento) result = "Pedido de Orçamento";
         if (tipo == naoPodeSerReparado) result = "Equipamento Sem Reparação";
-        if (tipo == prontoaLevantar)result = "Equipamento pronto a ser levantado";
-        if (tipo == valorSuperiorOrcamento)result = "Valor Superior ao Orçamento";
+        if (tipo == prontoaLevantar) result = "Equipamento pronto a ser levantado";
+        if (tipo == valorSuperiorOrcamento) result = "Valor Superior ao Orçamento";
         return "SGCR - " + result;
     }
 
-    private static String message (int tipo,String nome, double orcamento){
-        StringBuilder stringBuilder  = new StringBuilder();
+    private static String message(int tipo, String nome, double orcamento) {
+        StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Caro ").append(nome).append(",\n\n");
-        switch(tipo) {
+        switch (tipo) {
             case pedidoOrcamento:
                 stringBuilder.append("Informamos que o orçamento relativo ao seu pedido será ").append(orcamento).append(".\n");
                 stringBuilder.append("Responda a este email caso aceite.\n");
@@ -58,30 +58,30 @@ public class Email {
     }
 
 
-    public static void pedidoOrcamento (String email,String nome, double orcamento) {
-        sendEmail(pedidoOrcamento,email,nome,orcamento);
+    public static void pedidoOrcamento(String email, String nome, double orcamento) {
+        sendEmail(pedidoOrcamento, email, nome, orcamento);
     }
 
-    public static void naoPodeSerReparado (String email, String nome){
-        sendEmail(naoPodeSerReparado,email,nome,0);
+    public static void naoPodeSerReparado(String email, String nome) {
+        sendEmail(naoPodeSerReparado, email, nome, 0);
     }
 
-    public static void prontoALevantar (String email, String nome){
-        sendEmail(prontoaLevantar,email,nome,0);
+    public static void prontoALevantar(String email, String nome) {
+        sendEmail(prontoaLevantar, email, nome, 0);
     }
 
-    public static void valorSuperiorOrcamento (String email, String nome){
-        sendEmail(valorSuperiorOrcamento,email,nome,0);
+    public static void valorSuperiorOrcamento(String email, String nome) {
+        sendEmail(valorSuperiorOrcamento, email, nome, 0);
     }
 
-    private static void sendEmail (int tipo,String email,String nome,double number){
+    private static void sendEmail(int tipo, String email, String nome, double number) {
         Session session = startSessionSend();
         try {
             MimeMessage message = new MimeMessage(session);
             message.setFrom(new InternetAddress(user));
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(email));
             message.setSubject(subject(tipo));
-            message.setText(message(tipo,nome,number));
+            message.setText(message(tipo, nome, number));
             //send the message
             Transport.send(message);
         } catch (MessagingException e) {
@@ -90,9 +90,7 @@ public class Email {
         }
     }
 
-
-    private static Session startSessionSend(){
-
+    private static Session startSessionSend() {
         Properties properties = new Properties();
         properties.put("mail.smtp.auth", true);
         properties.put("mail.smtp.host", "smtp.gmail.com");
@@ -109,15 +107,13 @@ public class Email {
     }
 
 
-    public static boolean checkRespostaPedidoOrcamento (String email){
-        return checkIfRespond(email,subject(pedidoOrcamento));
+    public static boolean checkRespostaPedidoOrcamento(String email) {
+        return checkIfRespond(email, subject(pedidoOrcamento));
     }
 
-    public static boolean checkRespostaValorSuperior (String email){
-        return checkIfRespond(email,subject(valorSuperiorOrcamento));
+    public static boolean checkRespostaValorSuperior(String email) {
+        return checkIfRespond(email, subject(valorSuperiorOrcamento));
     }
-
-
 
 
     private static boolean checkIfRespond(String email, String subjectName) {
@@ -168,7 +164,6 @@ public class Email {
         }
         return false;
     }
-
 
 
     //https://www.tutorialspoint.com/javamail_api/javamail_api_deleting_emails.htm

@@ -1,17 +1,19 @@
 package pedidos;
 
-public class ServicoExpresso extends Pedido {
+import java.io.Serializable;
+
+public class ServicoExpresso extends Pedido implements Serializable {
     private String idServicoE;
     private Tipo tipo;
 
-    public ServicoExpresso(Pedido pedido, String idServicoE){
+    public ServicoExpresso(Pedido pedido, String idServicoE) {
         super(pedido);
         this.idServicoE = idServicoE;
     }
 
-    public ServicoExpresso(ServicoExpresso serE){
+    public ServicoExpresso(ServicoExpresso serE) {
         super(serE.getData(), serE.getIdPedido(), serE.getIdCliente(),
-              serE.getIdEquipamento(), serE.getIdFuncionario(), serE.getEstado());
+                serE.getIdEquipamento(), serE.getIdFuncionario(), serE.getEstado());
         this.idServicoE = serE.getIdServicoE();
     }
 
@@ -23,11 +25,11 @@ public class ServicoExpresso extends Pedido {
 
         private double precoBase;
 
-        Tipo(double precoBase){
+        Tipo(double precoBase) {
             this.precoBase = precoBase;
         }
 
-        public void addPreco(double preco){
+        public void addPreco(double preco) {
             this.precoBase += preco;
         }
 
@@ -52,7 +54,7 @@ public class ServicoExpresso extends Pedido {
         this.tipo = tipo;
     }
 
-    public ServicoExpresso clone(){
+    public ServicoExpresso clone() {
         return new ServicoExpresso(this);
     }
 }

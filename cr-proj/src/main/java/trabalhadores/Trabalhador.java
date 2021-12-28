@@ -1,10 +1,11 @@
 package trabalhadores;
 
-import utils.SecurityUtil;
+import utils.SecurityUtils;
 
+import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
 
-public class Trabalhador {
+public class Trabalhador implements Serializable {
     private String idTrabalhador;
     private String passe;
     private boolean autenticado;
@@ -15,7 +16,7 @@ public class Trabalhador {
         this.autenticado = false;
     }
 
-    public Trabalhador(Trabalhador trabalhador){
+    public Trabalhador(Trabalhador trabalhador) {
         this.idTrabalhador = trabalhador.getIdTrabalhador();
         this.passe = trabalhador.getPasse();
         this.autenticado = trabalhador.isAutenticado();
@@ -29,21 +30,23 @@ public class Trabalhador {
         this.idTrabalhador = idTrabalhador;
     }
 
-    public Trabalhador clone(){
+    public Trabalhador clone() {
         return new Trabalhador(this);
     }
 
-    public String getPasse() { return this.passe; }
-
-    public boolean isAutenticado() {
-        return autenticado;
-    }
-
-    public void setAutenticado(boolean b){
-        this.autenticado = b;
+    public String getPasse() {
+        return this.passe;
     }
 
     public void setPasse(String passe) throws NoSuchAlgorithmException {
-        this.passe = SecurityUtil.getStringSHA1(passe);
+        this.passe = SecurityUtils.getStringSHA1(passe);
+    }
+
+    public boolean isAutenticado() {
+        return this.autenticado;
+    }
+
+    public void setAutenticado(boolean b) {
+        this.autenticado = b;
     }
 }
