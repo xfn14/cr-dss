@@ -60,6 +60,12 @@ public class Reparacao implements Serializable {
         return orcamento > superior;
     }
 
+
+    public void reparacaoAceite (){
+        setEstado(Estado.PAUSA);
+        this.orcamento = this.orcamentoExpectavel;
+    }
+
     public void setIdReparacao(String idReparacao) {
         this.idReparacao = idReparacao;
     }

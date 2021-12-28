@@ -13,6 +13,8 @@ public interface ITrabalhadores {
 
     List<String> getListTecnicos();
 
+    List<String> getListFuncionarios ();
+
     List<String> getListReparacoesByTecnico();
 
     List<String> getListIntervencoesByTecnico();

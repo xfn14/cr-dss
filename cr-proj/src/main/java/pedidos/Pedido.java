@@ -98,6 +98,10 @@ public class Pedido implements Serializable {
         return this.contactos.stream().map(Contacto::clone).collect(Collectors.toList());
     }
 
+    public LocalDateTime getData() {
+        return data;
+    }
+
     public Pedido clone() {
         return new Pedido(this);
     }

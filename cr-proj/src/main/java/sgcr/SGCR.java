@@ -13,7 +13,9 @@ import trabalhadores.Trabalhador;
 import trabalhadores.Trabalhadores;
 
 import java.io.Serializable;
+import java.security.SecureRandom;
 import java.time.Duration;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -170,8 +172,8 @@ public class SGCR implements Serializable {
         }
     }
 
-    public void addPasso(String idPlano, double horas, double custoPecas) throws InvalidIdException {
-        this.reparacoes.addPasso(idPlano, horas, custoPecas);
+    public void addPasso(String idPlano, double horas, double custoPecas, String descricao) throws InvalidIdException {
+        this.reparacoes.addPasso(idPlano, horas, custoPecas,descricao);
     }
 
     public PlanoTrabalho getPlanoDeTrabalho(String idPedido) {
@@ -207,7 +209,20 @@ public class SGCR implements Serializable {
     }
 
     public int getNrRececaoEntregaByFuncionario() {
+        List<String> funcionarioList = trabalhadores.getListFuncionarios();
+        for (String funcionario : funcionarioList){
+
+        }
         return 0;
+    }
+
+    public void registaAceitacaoPlanoCliente(String idPedido){
+        pedidos.registaAceitacaoCliente(idPedido);
+    }
+
+
+    public void registaAceitacaoReparacaoCliente(String idReparacao){
+        reparacoes.reparacaoAceite(idReparacao);
     }
 
     public List<Map.Entry<String,String>> listPedidosAguardaAceitacao(){
@@ -219,7 +234,8 @@ public class SGCR implements Serializable {
         List<Map.Entry<String,String>> resultList = new ArrayList<>();
         for (String id: list){
             String email = pedidos.getNomeEmailCliente(id).getValue();
-            resultList.add(Map.entry(id,email));
+            AbstractMap.SimpleEntry<String, String> entry = new AbstractMap.SimpleEntry<>(id, email);
+            resultList.add(entry);
         }
         return resultList;
     }

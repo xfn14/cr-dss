@@ -9,15 +9,14 @@ import java.util.*;
 import javax.mail.*;
 import javax.mail.internet.*;
 
-public class Email implements Runnable{
+public class Email implements Runnable {
     private boolean running = true;
     private SGCR sgcr;
 
 
-    public Email (SGCR sgcr){
-        this.sgcr= sgcr;
+    public Email(SGCR sgcr) {
+        this.sgcr = sgcr;
     }
-
 
 
     private static String password = "grupoG35";
@@ -45,10 +44,12 @@ public class Email implements Runnable{
         return "SGCR - " + result;
     }
 
-    private static String mesageOrcamento(String nome,double orcamento,Duration duration){
+    private static String mesageOrcamento(String nome, double orcamento, Duration duration) {
+        String days = duration.toDays() == 0? "" : duration.toDays() + " dia(s) ";
+        String hours = duration.toHours() == 0? "" : duration.toHoursPart() + " horas";
         return "Caro " + nome + ",\n\n" +
-                "Informamos que o orçamento relativo ao seu pedido será " + orcamento + ".\n" +
-                "E que serão necessárias aproximadamente " + duration + ".\n" +
+                "Informamos que o orçamento relativo ao seu pedido será " + orcamento + " euros.\n" +
+                "E que serão necessárias aproximadamente " + days + hours + " de trabalho.\n" +
                 "Responda a este email caso aceite.\n" +
                 "Ignore caso contrário. E faça o levantamento do equipamento na loja\n" +
                 "\nCumprimentos, SGCR.";
@@ -78,32 +79,31 @@ public class Email implements Runnable{
     }
 
 
-
     public static void pedidoOrcamento(String email, String nome, double orcamento, Duration duration) {
-        String message = mesageOrcamento(nome,orcamento,duration);
+        String message = mesageOrcamento(nome, orcamento, duration);
         String subject = subject(pedidoOrcamento);
-        sendEmail(email,message,subject);
+        sendEmail(email, message, subject);
     }
 
     public static void naoPodeSerReparado(String email, String nome) {
-        String message = message(naoPodeSerReparado,nome);
+        String message = message(naoPodeSerReparado, nome);
         String subject = subject(naoPodeSerReparado);
-        sendEmail(email,message,subject);
+        sendEmail(email, message, subject);
     }
 
     public static void prontoALevantar(String email, String nome) {
-        String message = message(prontoaLevantar,nome);
+        String message = message(prontoaLevantar, nome);
         String subject = subject(prontoaLevantar);
-        sendEmail(email,message,subject);
+        sendEmail(email, message, subject);
     }
 
     public static void valorSuperiorOrcamento(String email, String nome) {
-        String message = message(valorSuperiorOrcamento,nome);
+        String message = message(valorSuperiorOrcamento, nome);
         String subject = subject(valorSuperiorOrcamento);
-        sendEmail(email,message,subject);
+        sendEmail(email, message, subject);
     }
 
-    private static void sendEmail(String email, String messageText,String subject) {
+    private static void sendEmail(String email, String messageText, String subject) {
         Session session = startSessionSend();
         try {
             MimeMessage message = new MimeMessage(session);
@@ -120,16 +120,15 @@ public class Email implements Runnable{
     }
 
 
-
-
-
     private static Session startSessionSend() {
         Properties properties = new Properties();
-        properties.put("mail.smtp.auth", true);
         properties.put("mail.smtp.host", "smtp.gmail.com");
-        properties.put("mail.smtp.port", 587);
-        properties.put("mail.smtp.starttls.enable", true);
-        properties.put("mail.transport.protocol", "smtp");
+        properties.put("mail.smtp.port", "465");
+        properties.put("mail.smtp.auth", "true");
+        properties.put("mail.smtp.starttls.enable", "true");
+        properties.put("mail.smtp.starttls.required", "true");
+        properties.put("mail.smtp.ssl.protocols", "TLSv1.2");
+        properties.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
 
         return Session.getDefaultInstance(properties,
                 new Authenticator() {
@@ -149,31 +148,26 @@ public class Email implements Runnable{
     }
 
 
-    private Message[] getMessage(){
-        try {
-            Properties properties = new Properties();
-            //
-            String host = "pop.gmail.com";
-            properties.put("mail.pop3.host", host);
-            properties.put("mail.pop3.port", "995");
-            properties.put("mail.pop3.starttls.enable", "true");
-            Session emailSession = Session.getInstance(properties);
+    private Message[] getMessage() throws MessagingException {
+        Properties properties = new Properties();
+        //
+        String host = "pop.gmail.com";
+        properties.put("mail.pop3.host", host);
+        properties.put("mail.pop3.port", "995");
+        properties.put("mail.pop3.starttls.enable", "true");
+        Session emailSession = Session.getInstance(properties);
 
-            //create the POP3 store object and connect with the pop server
-            Store store = emailSession.getStore("pop3s");
+        //create the POP3 store object and connect with the pop server
+        Store store = emailSession.getStore("pop3s");
 
-            store.connect(host, user, password);
+        store.connect(host, user, password);
 
-            //create the folder object and open it
-            Folder emailFolder = store.getFolder("INBOX");
-            emailFolder.open(Folder.READ_ONLY);
+        //create the folder object and open it
+        Folder emailFolder = store.getFolder("INBOX");
+        emailFolder.open(Folder.READ_ONLY);
 
-            // retrieve the messages from the folder in an array and print it
-            return emailFolder.getMessages();
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
+        // retrieve the messages from the folder in an array and print it
+        return emailFolder.getMessages();
     }
 
     private static boolean checkIfRespond(String email, String subjectName) {
@@ -229,21 +223,54 @@ public class Email implements Runnable{
     //https://www.tutorialspoint.com/javamail_api/javamail_api_deleting_emails.htm
 
     public static void main(String[] args) {
-        String email = "andre.vaz1411@gmail.com";
-        //pedidoOrcamento(email,"Andre",50);
+        String email = "jdmartinsvieira63@gmail.com";
+        pedidoOrcamento(email,"Diogo",50,Duration.ofHours(37));
         //naoPodeSerReparado("jdmartinsvieira63@gmail.com","Diogo");
         //valorSuperiorOrcamento("jdmartinsvieira63@gmail.com","Diogo");
-        boolean resposta = checkRespostaPedidoOrcamento(email);
-        System.out.println(resposta);
+        //boolean resposta = checkRespostaPedidoOrcamento(email);
+
     }
 
 
-    public void run (){
-        while(running){
-            List<Map.Entry<String,String>> pedidosAguardarEmail = sgcr.listPedidosAguardaAceitacao();
-            List<Map.Entry<String,String>> reparacoesAguardarEmail = sgcr.listReparacoesAguardaAceitacao();
+    public void run() {
+        while (running) {
+            List<Map.Entry<String, String>> pedidosAguardarEmail = sgcr.listPedidosAguardaAceitacao();
+            List<Map.Entry<String, String>> reparacoesAguardarEmail = sgcr.listReparacoesAguardaAceitacao();
+            
+            try {
+                Message[] messagesArray = getMessage();
+                for (Message message : messagesArray){
+                    Address address = message.getFrom()[0];
+                    String adressString = address.toString();
+                    adressString = adressString.substring(adressString.indexOf('<') + 1);
+                    adressString = adressString.substring(0, adressString.length() - 1);
+                    String subject = message.getSubject();
 
+                    for(Map.Entry<String,String> entry : pedidosAguardarEmail){
+                        String email = entry.getValue();
+                        String idPedido = entry.getKey();
+                        if (email.equals(adressString)){
+                            String subjectCompare = subject(pedidoOrcamento);
+                            if (subject.equals("Re: "+ subjectCompare)){
+                                sgcr.registaAceitacaoPlanoCliente(idPedido);
+                            }
+                        }
+                    }
 
+                    for (Map.Entry<String,String> entry : reparacoesAguardarEmail){
+                        String reparacao = entry.getKey();
+                        String email = entry.getValue();
+                        if (email.equals(adressString)){
+                            String subjectCompare = subject(valorSuperiorOrcamento);
+                            if (subject.equals("Re: "+ subjectCompare)){
+                                sgcr. registaAceitacaoReparacaoCliente(reparacao);
+                            }
+                        }
+                    }
+                }
+            } catch (MessagingException e) {
+                e.printStackTrace();
+            }
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException e) {

@@ -110,6 +110,13 @@ public class Trabalhadores implements ITrabalhadores, Serializable {
         return null;
     }
 
+    public List<String> getListFuncionarios (){
+        return trabalhadores.values().stream().
+                filter(trabalhador -> trabalhador instanceof Funcionario).
+                map(Trabalhador::getIdTrabalhador).
+                collect(Collectors.toList());
+    }
+
     @Override
     public List<String> getListIntervencoesByTecnico() {
         return null;

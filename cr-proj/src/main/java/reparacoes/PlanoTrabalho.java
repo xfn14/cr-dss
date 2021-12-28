@@ -26,9 +26,9 @@ public class PlanoTrabalho implements Serializable {
         this.orcamento = 0;
     }
 
-    public void addPasso(double horas, double custoPecas) {
+    public void addPasso(double horas, double custoPecas,String descricao) {
         this.duracaoTotal= this.duracaoTotal.plus(Duration.ofHours((long)horas));
-        Passo passo = new Passo(horas,custoPecas);
+        Passo passo = new Passo(horas,custoPecas,descricao);
         this.passos.add(passo);
         this.orcamento += passo.getCustoPecas();
     }

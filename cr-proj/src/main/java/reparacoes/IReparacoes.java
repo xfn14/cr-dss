@@ -16,7 +16,7 @@ public interface IReparacoes {
 
     PlanoTrabalho getPlanoDeTrabalho(String idPedido);
 
-    void addPasso(String idPlano, double horas, double custoPecas) throws InvalidIdException;
+    void addPasso(String idPlano, double horas, double custoPecas,String descricao) throws InvalidIdException;
 
     void reparacaoParaEspera(String idReparacao) throws InvalidIdException;
 
@@ -32,4 +32,7 @@ public interface IReparacoes {
 
     List<String> listAguardaAceitacao();
 
-}
+    void reparacaoAceite(String idReparacao);
+
+
+    }

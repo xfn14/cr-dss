@@ -3,10 +3,8 @@ package pedidos;
 import exceptions.InvalidIdException;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Pedidos implements IPedidos, Serializable {
@@ -182,7 +180,7 @@ public class Pedidos implements IPedidos, Serializable {
         Pedido pedido = pedidoMap.get(idPedido);
         String idCliente = pedido.getIdCliente();
         Cliente cliente = clientesMap.get(idCliente);
-        return Map.entry(cliente.getNome(), cliente.getEmail());
+        return new AbstractMap.SimpleEntry<>(cliente.getNome(), cliente.getEmail());
     }
     
     public boolean existCliente(String idCliente){
@@ -198,7 +196,8 @@ public class Pedidos implements IPedidos, Serializable {
                 String idCliente = pedido.getIdCliente();
                 Cliente cliente = clientesMap.get(idCliente);
                 String email = cliente.getEmail();
-                resultList.add(Map.entry(idPedido,email));
+                AbstractMap.SimpleEntry<String, String> entry = new AbstractMap.SimpleEntry<>(idPedido, email);
+                resultList.add(entry);
 
             }
         }
@@ -209,6 +208,37 @@ public class Pedidos implements IPedidos, Serializable {
     public void conclusaoPlanoTrabalho(String idPedido){
         Pedido pedido= pedidoMap.get(idPedido);
         pedido.setEstado(Pedido.Estado.AGUARDA_ACEITACAO);
+    }
+
+    public void getNrPedidosByFuncionario (LocalDateTime month){
+        
+        Map<String,Integer> pedidosResult = new TreeMap<>();
+        for (Pedido pedido: pedidoMap.values()){
+            LocalDateTime date = pedido.getData();
+            if(date.getYear() == month.getYear() && date.getMonth().equals(month.getMonth())) {
+                String funcionario = pedido.getIdFuncionario();
+                if (!pedidosResult.containsKey(funcionario)) {
+                    pedidosResult.put(funcionario, 0);
+                }
+                int value = pedidosResult.get(funcionario) + 1;
+                pedidosResult.put(funcionario, value);
+            }
+        }
+    }
+
+    public void getNrEntregasByFuncionario (LocalDateTime month){
+        Map<String,Integer> entregasResult = new TreeMap<>();
+        for (Entrega entrega: entregaMap.values()){
+            LocalDateTime date = entrega.getData();
+            if(date.getYear() == month.getYear() && date.getMonth().equals(month.getMonth())) {
+                String funcionario = entrega.getIdFuncionario();
+                if (!entregasResult.containsKey(funcionario)) {
+                    entregasResult.put(funcionario, 0);
+                }
+                int value = 1 +entregasResult.get(funcionario);
+                entregasResult.put(funcionario, value);
+            }
+        }
     }
 
 }

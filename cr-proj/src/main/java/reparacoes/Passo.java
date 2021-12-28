@@ -9,6 +9,7 @@ public class Passo implements Serializable {
     private double custoPecas;
     private Duration duration;
     private List<Passo> subPassos;
+    private String descricao;
 
 
     public Passo(double custoPecas, Duration duration, List<Passo> subPassos) {
@@ -21,6 +22,13 @@ public class Passo implements Serializable {
         this.custoPecas = custoPecas;
         this.duration = Duration.ofHours((long) horas);
         this.subPassos = new ArrayList<>();
+    }
+
+    public Passo(double horas, double custoPecas,String descricao) {
+        this.custoPecas = custoPecas;
+        this.duration = Duration.ofHours((long) horas);
+        this.subPassos = new ArrayList<>();
+        this.descricao = descricao;
     }
 
     public void addSubPasso(double horas, double custoPecas) {

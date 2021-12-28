@@ -5,10 +5,7 @@ import exceptions.ValorSuperior;
 
 import java.io.Serializable;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Reparacoes implements IReparacoes, Serializable {
     private final Map<String, Reparacao> reparacaoMap;
@@ -48,11 +45,11 @@ public class Reparacoes implements IReparacoes, Serializable {
     }
 
     @Override
-    public void addPasso(String idPlano, double horas, double custoPecas) throws InvalidIdException {
+    public void addPasso(String idPlano, double horas, double custoPecas,String descricao) throws InvalidIdException {
         if (planoTrabalhoMap.containsKey(idPlano))
             throw new InvalidIdException(idPlano, InvalidIdException.Type.PLANO_TRABALHO);
         PlanoTrabalho planoTrabalho = planoTrabalhoMap.get(idPlano);
-        planoTrabalho.addPasso(horas,custoPecas);
+        planoTrabalho.addPasso(horas,custoPecas,descricao);
     }
 
     public void addSubPasso(String idPlano,int indexPasso ,double horas, double custoPecas) {
@@ -96,7 +93,7 @@ public class Reparacoes implements IReparacoes, Serializable {
         PlanoTrabalho planoTrabalho = planoTrabalhoMap.get(idPlano);
         double orcamento = planoTrabalho.getOrcamento();
         Duration duration = planoTrabalho.getDuracaoTotal();
-        return Map.entry(orcamento,duration);
+        return new AbstractMap.SimpleEntry<>(orcamento,duration);
     }
     @Override
     public void reparacaoAguardaAceitacao(String idReparacao){
@@ -112,6 +109,11 @@ public class Reparacoes implements IReparacoes, Serializable {
             }
         });
         return resultList;
+    }
+
+    public void reparacaoAceite(String idReparacao){
+        Reparacao reparacao = reparacaoMap.get(idReparacao);
+        reparacao.reparacaoAceite();
     }
 
 
