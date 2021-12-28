@@ -13,7 +13,7 @@ public class LoginFrame extends JFrame implements Runnable, ActionListener {
     private final Logger LOGGER = Logger.getLogger("CR");
     private final int WIDTH = 600, HEIGHT = 400;
     private final SGCR sgcr;
-    private final JPanel panel;
+    private JPanel panel;
     private JLabel status;
     private JTextField usernameInput;
     private JPasswordField passwordInput;
@@ -23,10 +23,7 @@ public class LoginFrame extends JFrame implements Runnable, ActionListener {
         super("Centro de Reparações");
 
         this.sgcr = sgcr;
-        this.panel = new JPanel(new GridBagLayout());
-        this.panel.setSize(new Dimension(this.WIDTH, this.HEIGHT));
-        this.panel.setVisible(true);
-        initLoginPanel();
+        this.initLoginPanel();
     }
 
     @Override
@@ -40,15 +37,19 @@ public class LoginFrame extends JFrame implements Runnable, ActionListener {
     }
 
     private void initLoginPanel() {
-        GridBagConstraints grid = new GridBagConstraints();
-        grid.insets = new Insets(0, 2, 0, 2);
+        this.panel = new JPanel(new GridBagLayout());
+        this.panel.setSize(new Dimension(this.WIDTH, this.HEIGHT));
+        this.panel.setVisible(true);
 
+        GridBagConstraints grid = new GridBagConstraints();
+        grid.insets = new Insets(5, 5, 5, 5);
         grid.fill = GridBagConstraints.HORIZONTAL;
+
         this.status = new JLabel("", SwingConstants.CENTER);
         grid.gridx = 0;
         grid.gridy = 0;
         grid.gridwidth = 2;
-        this.panel.add(status, grid);
+        this.panel.add(this.status, grid);
 
         JLabel username = new JLabel("Username");
         grid.gridwidth = 1;

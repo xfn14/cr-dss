@@ -77,8 +77,16 @@ public class SGCR implements Serializable {
         return trabalhadores.doLogin(username, passe);
     }
 
-    public boolean registarTrabalhador(String id, String passe, String confimaPasse) {
-        return trabalhadores.registarTrabalhador(id, passe, confimaPasse);
+    public boolean registarGestor(String id, String pass, String confirmaPass){
+        return this.trabalhadores.registarGestor(id, pass, confirmaPass);
+    }
+
+    public boolean registarTecnico(String id, String pass, String confirmaPass){
+        return this.trabalhadores.registarTecnico(id, pass, confirmaPass);
+    }
+
+    public boolean registarFuncionario(String id, String pass, String confirmaPass){
+        return this.trabalhadores.registarFuncionario(id, pass, confirmaPass);
     }
 
     public List<String> getListTecnicos() {

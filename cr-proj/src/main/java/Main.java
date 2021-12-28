@@ -1,3 +1,4 @@
+import gui.CRFrame;
 import gui.LoginFrame;
 import sgcr.SGCR;
 import utils.FileUtils;
@@ -15,7 +16,7 @@ public class Main {
         loadLoggerSettings();
 
         SGCR sgcr = new SGCR();
-        sgcr.registarTrabalhador("fn14", "1234", "1234");
+        sgcr.registarGestor("fn14", "1234", "1234");
         try {
             FileUtils.objectToFile(sgcr, RESOURCES_PATH + "sgcr.obj");
         } catch (IOException e) {

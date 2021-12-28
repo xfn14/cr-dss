@@ -6,6 +6,10 @@ public class Tecnico extends Trabalhador implements Serializable {
     private boolean available;
     private String idPedido;
 
+    public Tecnico(Trabalhador trabalhador) {
+        super(trabalhador);
+    }
+
     public Tecnico(String idTecnico, String passe) {
         super(idTecnico, passe);
         this.available = false;

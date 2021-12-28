@@ -49,18 +49,41 @@ public class Trabalhadores implements ITrabalhadores, Serializable {
         return null;
     }
 
-    @Override
-    public boolean registarTrabalhador(String id, String passe, String confimaPasse) {
-        if (trabalhadores.containsKey(id) || !passe.equals(confimaPasse)) return false;
-        try {
-            String pass = SecurityUtils.getStringSHA1(passe);
-            Trabalhador t = new Trabalhador(id, pass);
-            trabalhadores.put(id, t);
-            return true;
-        } catch (NoSuchAlgorithmException e) {
+    public Trabalhador criaTrabalhador(String id, String pass, String confirmaPass){
+        if(this.trabalhadores.containsKey(id) || !pass.equals(confirmaPass)) return null;
+        try{
+            String passe = SecurityUtils.getStringSHA1(pass);
+            return new Trabalhador(id, passe);
+        }catch (NoSuchAlgorithmException e){
             LOGGER.warning("Não foi encontrado o algoritmo SHA-1");
-            return false;
-        }
+        } return null;
+    }
+
+    @Override
+    public boolean registarGestor(String id, String pass, String confirmaPass) {
+        Trabalhador t = criaTrabalhador(id, pass, confirmaPass);
+        if (t == null) return false;
+        Gestor g = new Gestor(t);
+        this.trabalhadores.put(id, g);
+        return true;
+    }
+
+    @Override
+    public boolean registarTecnico(String id, String pass, String confirmaPass) {
+        Trabalhador t = criaTrabalhador(id, pass, confirmaPass);
+        if (t == null) return false;
+        Tecnico tec = new Tecnico(t);
+        this.trabalhadores.put(id, tec);
+        return true;
+    }
+
+    @Override
+    public boolean registarFuncionario(String id, String pass, String confirmaPass) {
+        Trabalhador t = criaTrabalhador(id, pass, confirmaPass);
+        if (t == null) return false;
+        Funcionario g = new Funcionario(t);
+        this.trabalhadores.put(id, g);
+        return true;
     }
 
     @Override
