@@ -1,9 +1,11 @@
 package trabalhadores;
 
+import exceptions.SemTecnicosDisponiveis;
 import utils.SecurityUtils;
 
 import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -98,13 +100,15 @@ public class Trabalhadores implements ITrabalhadores, Serializable {
                 .collect(Collectors.toList());
     }
 
-    public boolean verificarDisponibilidadeTecnicos() {
-        return trabalhadores.values().stream()
-                .anyMatch(trabalhador -> (
+    public Trabalhador verificarDisponibilidadeTecnicos() throws SemTecnicosDisponiveis {
+        Trabalhador t = trabalhadores.values().stream()
+                .filter(trabalhador -> (
                         trabalhador instanceof Tecnico &&
-                                trabalhador.isAutenticado() &&
-                                ((Tecnico) trabalhador).isAvailable()
-                ));
+                        trabalhador.isAutenticado() &&
+                        ((Tecnico) trabalhador).isAvailable()
+                )).findAny().orElse(null);
+        if (t == null) throw new SemTecnicosDisponiveis();
+        return t;
     }
 
     @Override
@@ -128,4 +132,30 @@ public class Trabalhadores implements ITrabalhadores, Serializable {
     public int getNrRececaoEntregaByFuncionario() {
         return 0;
     }
+
+    public void addHorasTecnico(String idTecnico, long horas) {
+        Tecnico tecnico = (Tecnico) this.trabalhadores.get(idTecnico);
+        tecnico.addHoras(horas);
+    }
+
+    public void minusHorasTecnico(String idTecnico, long horas) {
+        Tecnico tecnico = (Tecnico) this.trabalhadores.get(idTecnico);
+        tecnico.minusHoras(horas);
+    }
+
+    public Duration getTrabalhoPorRealizarTecnico(String idTecnico) {
+        Tecnico tecnico = (Tecnico) this.trabalhadores.get(idTecnico);
+        return tecnico.getTrabalhoPorRealizar();
+    }
+
+    public void setNotAvailable(String idTecnico) {
+        Tecnico tecnico = (Tecnico) this.trabalhadores.get(idTecnico);
+        tecnico.setAvailable(false);
+    }
+
+    public void setAvailable(String idTecnico) {
+        Tecnico tecnico = (Tecnico) this.trabalhadores.get(idTecnico);
+        tecnico.setAvailable(true);
+    }
+
 }

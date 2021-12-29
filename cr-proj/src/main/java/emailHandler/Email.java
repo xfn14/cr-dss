@@ -1,15 +1,15 @@
 package emailHandler;
 
 import sgcr.SGCR;
+import utils.Constantes;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.sql.Time;
 import java.time.Duration;
 import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 public class Email implements Runnable {
     private static final int pedidoOrcamento = 0;
@@ -28,7 +28,9 @@ public class Email implements Runnable {
     private static String user = "sgcrgrupo35@gmail.com";
     private boolean running = true;
     private SGCR sgcr;
+    private Timer timer;
     public Email(SGCR sgcr) {
+        this.timer= new Timer();
         this.sgcr = sgcr;
     }
 
@@ -42,8 +44,10 @@ public class Email implements Runnable {
     }
 
     private static String mesageOrcamento(String nome, double orcamento, Duration duration) {
-        String days = duration.toDays() == 0 ? "" : duration.toDays() + " dia(s) ";
-        String hours = duration.toHours() == 0 ? "" : duration.toHoursPart() + " horas";
+        long daysValue = duration.toDays();
+        String days = daysValue == 0 ? "" : daysValue+ " dia(s) ";
+        long hoursValue= duration.minusDays(daysValue).toHours();
+        String hours = hoursValue == 0 ? "" : hoursValue + " horas";
         return "Caro " + nome + ",\n\n" +
                 "Informamos que o orçamento relativo ao seu pedido será " + orcamento + " euros.\n" +
                 "E que serão necessárias aproximadamente " + days + hours + " de trabalho.\n" +
@@ -77,7 +81,8 @@ public class Email implements Runnable {
 
 
     public static void pedidoOrcamento(String email, String nome, double orcamento, Duration duration) {
-        String message = mesageOrcamento(nome, orcamento, duration);
+        Duration newDuration = duration.dividedBy(Constantes.horasTrabalhoDia);
+        String message = mesageOrcamento(nome, orcamento, newDuration);
         String subject = subject(pedidoOrcamento);
         sendEmail(email, message, subject);
     }
@@ -227,11 +232,62 @@ public class Email implements Runnable {
         return emailFolder.getMessages();
     }
 
+    public void cancelTimer (){
+        this.timer.cancel();
+    }
+
+    public void checkEmail(){
+        int minutes = 5;
+        timer.scheduleAtFixedRate(new TimerTask() {
+            public void run() {
+                List<Map.Entry<String, String>> pedidosAguardarEmail = sgcr.listPedidosAguardaAceitacao();
+                List<Map.Entry<String, String>> reparacoesAguardarEmail = sgcr.listReparacoesAguardaAceitacao();
+                try {
+                    Message[] messagesArray = getMessage();
+                    for (Message message : messagesArray) {
+                        Address address = message.getFrom()[0];
+                        String adressString = address.toString();
+                        adressString = adressString.substring(adressString.indexOf('<') + 1);
+                        adressString = adressString.substring(0, adressString.length() - 1);
+                        String subject = message.getSubject();
+
+                        for (Map.Entry<String, String> entry : pedidosAguardarEmail) {
+                            String email = entry.getValue();
+                            String idPedido = entry.getKey();
+                            if (email.equals(adressString)) {
+                                String subjectCompare = subject(pedidoOrcamento);
+                                if (subject.equals("Re: " + subjectCompare)) {
+                                    sgcr.registaAceitacaoPlanoCliente(idPedido);
+                                }
+                            }
+                        }
+
+                        for (Map.Entry<String, String> entry : reparacoesAguardarEmail) {
+                            String reparacao = entry.getKey();
+                            String email = entry.getValue();
+                            if (email.equals(adressString)) {
+                                String subjectCompare = subject(valorSuperiorOrcamento);
+                                if (subject.equals("Re: " + subjectCompare)) {
+                                    sgcr.registaAceitacaoReparacaoCliente(reparacao);
+                                }
+                            }
+                        }
+                    }
+                } catch (MessagingException e) {
+                    e.printStackTrace();
+                }
+
+                    }
+        }, 0, minutes * 60 * 1000);
+    }
+
+
     public void run() {
         ZonedDateTime lastRun = null;
         while (this.running) {
+
             ZonedDateTime now = ZonedDateTime.now();
-            if (lastRun == null || now.isAfter(lastRun.plusSeconds(5))) {
+            if (lastRun == null || now.isAfter(lastRun.plusMinutes(5))) {
                 lastRun = now;
                 List<Map.Entry<String, String>> pedidosAguardarEmail = sgcr.listPedidosAguardaAceitacao();
                 List<Map.Entry<String, String>> reparacoesAguardarEmail = sgcr.listReparacoesAguardaAceitacao();

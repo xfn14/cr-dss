@@ -27,6 +27,11 @@ public class Cliente implements Serializable {
         this.pedidos = cliente.getPedidos();
     }
 
+
+    public void addPedido (String pedido){
+        this.pedidos.add(pedido);
+    }
+
     public String getNome() {
         return this.nome;
     }

@@ -1,5 +1,8 @@
 package trabalhadores;
 
+import exceptions.SemTecnicosDisponiveis;
+
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
@@ -24,5 +27,15 @@ public interface ITrabalhadores {
 
     int getNrRececaoEntregaByFuncionario();
 
-    boolean verificarDisponibilidadeTecnicos();
+    Trabalhador verificarDisponibilidadeTecnicos() throws SemTecnicosDisponiveis;
+
+    void addHorasTecnico(String idTecnico, long horas);
+
+    void minusHorasTecnico(String idTecnico, long horas);
+
+    Duration getTrabalhoPorRealizarTecnico(String idTecnico);
+
+    void setNotAvailable(String idTecnico);
+
+    void setAvailable(String idTecnico);
 }

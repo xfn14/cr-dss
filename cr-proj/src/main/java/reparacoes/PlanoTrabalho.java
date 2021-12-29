@@ -7,6 +7,7 @@ import java.util.List;
 
 public class PlanoTrabalho implements Serializable {
     private String idPlanoTrabalho;
+    private String idTecnico;
     private List<Passo> passos;
     private Estado estado;// TODO
     private double orcamento;
@@ -19,7 +20,8 @@ public class PlanoTrabalho implements Serializable {
         this.duracaoTotal=Duration.ZERO;
     }
 
-    public PlanoTrabalho(String idPlanoTrabalho) {
+    public PlanoTrabalho(String idPlanoTrabalho,String idTecnico) {
+        this.idTecnico = idTecnico;
         this.idPlanoTrabalho = idPlanoTrabalho;
         this.passos = new ArrayList<>();
         this.estado = Estado.DECORRER;
@@ -82,5 +84,9 @@ public class PlanoTrabalho implements Serializable {
 
     public Duration getDuracaoTotal() {
         return duracaoTotal;
+    }
+
+    public String getIdTecnico() {
+        return idTecnico;
     }
 }

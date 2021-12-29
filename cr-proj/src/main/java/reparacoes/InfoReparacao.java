@@ -3,19 +3,31 @@ package reparacoes;
 import java.time.Duration;
 
 public class InfoReparacao {
-    private int numeroTotal;
+    private int numeroTotalReparacoes;
     private Duration duracaoTotal;
     private long desvioDuracaoHoras;
 
     public InfoReparacao() {
-        this.numeroTotal = 0;
+        this.numeroTotalReparacoes = 0;
         this.duracaoTotal = Duration.ZERO;
         this.desvioDuracaoHoras = 0;
     }
 
     public void addInfo(Duration duration, long desvio) {
-        this.numeroTotal++;
+        this.numeroTotalReparacoes++;
         this.duracaoTotal = this.duracaoTotal.plus(duration);
         this.desvioDuracaoHoras += desvio;
     }
+
+    public int getNumeroTotalReparacoes() {
+        return numeroTotalReparacoes;
+    }
+
+    public Duration duracaoMedia(){
+        return duracaoTotal.dividedBy(numeroTotalReparacoes);
+    }
+    public long mediaDesvio(){
+        return desvioDuracaoHoras/ numeroTotalReparacoes;
+    }
+
 }

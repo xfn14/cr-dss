@@ -75,6 +75,7 @@ public class RegistarPO extends JFrame implements ActionListener {
         this.status = new JLabel("");
         grid.gridx = 0;
         grid.gridy = 7;
+        grid.gridwidth = 10;
         this.panel.add(this.status, grid);
     }
 

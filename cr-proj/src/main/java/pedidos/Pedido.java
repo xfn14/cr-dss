@@ -43,6 +43,18 @@ public class Pedido implements Serializable {
         return estado.equals(Estado.AGUARDA_ACEITACAO);
     }
 
+    public boolean isFinalizado(){
+        return this.estado.equals(Estado.FINALIZADO);
+    }
+
+    public boolean aguardaPlano(){
+        return this.estado.equals(Estado.AGUARDA_PLANO);
+    }
+
+
+
+
+
     public String getIdFuncionario() {
         return this.idFuncionario;
     }

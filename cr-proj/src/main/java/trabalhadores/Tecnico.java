@@ -1,10 +1,12 @@
 package trabalhadores;
 
 import java.io.Serializable;
+import java.time.Duration;
 
 public class Tecnico extends Trabalhador implements Serializable {
     private boolean available;
     private String idPedido;
+    private Duration trabalhoPorRealizar;
 
     public Tecnico(Trabalhador trabalhador) {
         super(trabalhador);
@@ -14,12 +16,27 @@ public class Tecnico extends Trabalhador implements Serializable {
         super(idTecnico, passe);
         this.available = false;
         this.idPedido = "";
+        this.trabalhoPorRealizar = Duration.ZERO;
     }
 
     public Tecnico(Tecnico tecnico) {
         super(tecnico);
         this.available = tecnico.isAvailable();
         this.idPedido = tecnico.getIdPedido();
+    }
+
+
+    public void addHoras (long horas){
+        this.trabalhoPorRealizar = this.trabalhoPorRealizar.plus(Duration.ofHours(horas));
+    }
+
+    public void minusHoras(long horas){
+        this.trabalhoPorRealizar = this.trabalhoPorRealizar.minus(Duration.ofHours(horas));
+    }
+
+
+    public Duration getTrabalhoPorRealizar() {
+        return trabalhoPorRealizar;
     }
 
     public String getIdPedido() {
@@ -41,4 +58,6 @@ public class Tecnico extends Trabalhador implements Serializable {
     public Tecnico clone() {
         return new Tecnico(this);
     }
+
+
 }

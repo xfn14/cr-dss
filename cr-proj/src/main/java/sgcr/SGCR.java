@@ -2,6 +2,8 @@ package sgcr;
 
 import emailHandler.Email;
 import exceptions.InvalidIdException;
+import exceptions.SemPedidosOrcamento;
+import exceptions.SemTecnicosDisponiveis;
 import exceptions.ValorSuperior;
 import pedidos.IPedidos;
 import pedidos.Pedidos;
@@ -19,6 +21,8 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SGCR implements Serializable {
     private ITrabalhadores trabalhadores;
@@ -57,6 +61,7 @@ public class SGCR implements Serializable {
 
     public void registaConclusaoReparacao(String idReparacao) throws InvalidIdException {
         reparacoes.registaConclusao(idReparacao);
+        pedidos.finalizaPedido(idReparacao);
         Map.Entry<String, String> entry = pedidos.getNomeEmailCliente(idReparacao);
         String email = entry.getValue();
         String nome = entry.getKey();
@@ -75,9 +80,13 @@ public class SGCR implements Serializable {
 
     public void registaConclusaoPlanoTrabalho(String idPlano) {
         this.reparacoes.conclusaoPlanoDeTrabalho(idPlano);
-        Map.Entry<Double, Duration> entry = reparacoes.getOrcamentoEHorasPlano(idPlano);
+        this.pedidos.pedidoAguardaAceitacao(idPlano);
+        this.pedidos.registarContactoPedidoOrcamento(idPlano, "Sistema");
+        Map.Entry<Double, String> entry = reparacoes.getOrcamentoEHorasPlano(idPlano);
         double orcamento = entry.getKey();
-        Duration duration = entry.getValue();
+        String idTecnico = entry.getValue();
+
+        Duration duration = trabalhadores.getTrabalhoPorRealizarTecnico(idTecnico);
 
 
         Map.Entry<String, String> entryContactos = pedidos.getNomeEmailCliente(idPlano);
@@ -107,8 +116,8 @@ public class SGCR implements Serializable {
         return trabalhadores.getListTecnicos();
     }
 
-    public boolean verificarDisponibilidadeTecnicos() {
-        return trabalhadores.verificarDisponibilidadeTecnicos();
+    public Trabalhador verificarDisponibilidadeTecnicos() throws SemTecnicosDisponiveis {
+        return this.trabalhadores.verificarDisponibilidadeTecnicos();
     }
 
     public List<String> getListPedidosOrcamento() {
@@ -121,10 +130,6 @@ public class SGCR implements Serializable {
 
     public double getPrecoSE(String idServicoExpresso) throws InvalidIdException {
         return pedidos.getPrecoSE(idServicoExpresso);
-    }
-
-    public boolean verificarDisponibilidadeSE(String idServicoExpresso) throws InvalidIdException {
-        return pedidos.verificarDisponibilidadeSE(idServicoExpresso);
     }
 
     public void cancelaPedido(String idPedido) throws InvalidIdException {
@@ -144,54 +149,66 @@ public class SGCR implements Serializable {
         this.pedidos.entregaEquipamento(codPedido, idFuncionario);
     }
 
-    public void adicionarParaLevantar(String idPedido) {
-        this.pedidos.adicionarParaLevantar(idPedido);
+    public void criaPlanosTrabalho(String idPedido, String idTecnico) {
+        this.pedidos.pedidoADecorrer(idPedido);
+        this.reparacoes.criaPlanosTrabalho(idPedido, idTecnico);
+        this.trabalhadores.setNotAvailable(idTecnico);
+
     }
 
-    public void registarContactoParaLevantar(String idPedido, String idFuncionario) {
-        //this.pedidos.registarContactoCliente(idPedido,idFuncionario);
+    public void criaReparacao(String idReparacao, String idTecnico) {
+        double orcamento = this.reparacoes.getOrcamento(idReparacao);
+        this.pedidos.pedidoADecorrer(idReparacao);
+        this.reparacoes.criaReparacao(idReparacao, idTecnico, orcamento);
+        this.trabalhadores.setNotAvailable(idTecnico);
     }
 
-    public void createPlanosTrabalho(String idPedido) {
-        this.reparacoes.createPlanosTrabalho(idPedido);
-    }
-
-    public void registaPasso(double horas, double custoPecas, String idReparacao) throws InvalidIdException {
+    public void registaPasso(double horas, double custoPecas, String idReparacao) {
+        Map.Entry<String, Double> entryPasso = null;
         try {
-            this.reparacoes.registaPasso(horas, custoPecas, idReparacao);
+            entryPasso = this.reparacoes.registaPasso(horas, custoPecas, idReparacao);
         } catch (ValorSuperior e) {
             Map.Entry<String, String> entry = pedidos.getNomeEmailCliente(idReparacao);
             String email = entry.getValue();
             String nome = entry.getKey();
             this.reparacoes.reparacaoAguardaAceitacao(idReparacao);
+            //this.pedidos.
             Email.valorSuperiorOrcamento(email, nome);
         }
+        assert entryPasso != null;
+        String idTecnico = entryPasso.getKey();
+        double horasPlano = entryPasso.getValue();
+        trabalhadores.minusHorasTecnico(idTecnico, (long) horasPlano);
     }
 
     public void addPasso(String idPlano, double horas, double custoPecas, String descricao) throws InvalidIdException {
         this.reparacoes.addPasso(idPlano, horas, custoPecas, descricao);
+        String idTecnico = reparacoes.getIdTecnico(idPlano);
+        trabalhadores.addHorasTecnico(idTecnico, (long) horas);
     }
 
     public PlanoTrabalho getPlanoDeTrabalho(String idPedido) {
         return this.reparacoes.getPlanoDeTrabalho(idPedido);
     }
 
-    public void reparacaoParaEspera(String idReparacao) throws InvalidIdException {
+    public void reparacaoParaEspera(String idReparacao) {
         this.reparacoes.reparacaoParaEspera(idReparacao);
     }
 
-    public void registaConclusao(String idReparacao) throws InvalidIdException {
+    public void conclusaoReparacao(String idReparacao) throws InvalidIdException {
+        this.pedidos.finalizaPedido(idReparacao);
         this.reparacoes.registaConclusao(idReparacao);
+        String idTecnico = reparacoes.getIdTecnico(idReparacao);
+        trabalhadores.setAvailable(idTecnico);
+
+
     }
 
-    public void conclusaoPlanoDeTrabalho(String idPedido) throws InvalidIdException {
-        this.pedidos.conclusaoPlanoTrabalho(idPedido);
+    public void conclusaoPlanoDeTrabalho(String idPedido) {
+        this.pedidos.pedidoAguardaAceitacao(idPedido);
         this.reparacoes.conclusaoPlanoDeTrabalho(idPedido);
-    }
-
-    public void criaReparacao(String idReparacao, String idTecnico) {
-        double orcamento = this.reparacoes.getOrcamento(idReparacao);
-        this.reparacoes.criaReparacao(idReparacao, idTecnico, orcamento);
+        String idTecnico = reparacoes.getIdTecnico(idPedido);
+        trabalhadores.setAvailable(idTecnico);
     }
 
     public List<String> getListReparacoesByTecnico(LocalDateTime month) {
@@ -236,4 +253,36 @@ public class SGCR implements Serializable {
         }
         return resultList;
     }
+
+
+    public void reparacaoParaDecorrer(String idReparacao) {
+        reparacoes.reparacaoParaDecorrer(idReparacao);
+    }
+
+    public String getPedidoOrcamentoMaisAntigo() throws SemPedidosOrcamento {
+        return pedidos.getPedidoOrcamentoMaisAntigo();
+
+    }
+
+    public void registarFormatarPC(String idCliente, String idFuncionario, String idTecnico, String descricao) {
+        this.pedidos.registarFormatarPC(idCliente, idFuncionario, idTecnico, descricao);
+    }
+
+    public void registarInstalarOS(String idCliente, String idFuncionario, String idTecnico, String descricao) {
+        this.pedidos.registarInstalarOS(idCliente, idFuncionario, idTecnico, descricao);
+    }
+
+    public void registarSubstituirEcra(String idCliente, String idFuncionario, String idTecnico, String descricao) {
+        this.pedidos.registarSubstituirEcra(idCliente, idFuncionario, idTecnico, descricao);
+    }
+
+    public void registarSubstituirBateria(String idCliente, String idFuncionario, String idTecnico, String descricao) {
+        this.registarSubstituirBateria(idCliente, idFuncionario, idTecnico, descricao);
+    }
+
+    public void registarSubstituirOutro(String idCliente, String idFuncionario, String idTecnico, String descricao) {
+        this.registarSubstituirOutro(idCliente, idFuncionario, idTecnico, descricao);
+    }
+
+
 }

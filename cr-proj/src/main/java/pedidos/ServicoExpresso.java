@@ -3,23 +3,18 @@ package pedidos;
 import java.io.Serializable;
 
 public class ServicoExpresso extends Pedido implements Serializable {
-    private String idServicoE;
-    private String idTecnico;
+    private final String idTecnico;
     private Tipo tipo;
+    private String descricao;
 
-    public ServicoExpresso(String idPedido, String idCliente, String idEquipamento, String idFuncionario, Tipo tipo, String idTecnico) {
+    public ServicoExpresso(String idPedido, String idCliente, String idEquipamento,
+                           String idFuncionario, Tipo tipo, String idTecnico,
+                           String descricao) {
         super(idPedido, idCliente, idEquipamento, idFuncionario);
         this.tipo = tipo;
         this.idTecnico = idTecnico;
         setEstado(Estado.DECORRER);
-    }
-
-    public String getIdServicoE() {
-        return this.idServicoE;
-    }
-
-    public void setIdServicoE(String idServicoE) {
-        this.idServicoE = idServicoE;
+        this.descricao = descricao;
     }
 
     public Tipo getTipo() {
@@ -32,6 +27,14 @@ public class ServicoExpresso extends Pedido implements Serializable {
 
     public String getIdTecnico() {
         return this.idTecnico;
+    }
+
+    public String getDescricao() {
+        return this.descricao;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
     }
 
     public enum Tipo {
@@ -53,6 +56,14 @@ public class ServicoExpresso extends Pedido implements Serializable {
 
         public double getPreco() {
             return this.precoBase;
+        }
+
+        public String getString(){
+            if(this == FORMATAR_PC) return "Formatar PC";
+            else if(this == INSTALAR_OS) return "Instalar OS";
+            else if(this == SUBSTITUIR_ECRA) return "Substituir Ecra";
+            else if(this == SUBSTITUIR_BATERIA) return "Substituir Bateria";
+            else return "Outro";
         }
     }
 }

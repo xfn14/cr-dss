@@ -1,6 +1,7 @@
 package pedidos;
 
 import exceptions.InvalidIdException;
+import exceptions.SemPedidosOrcamento;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,11 +20,7 @@ public interface IPedidos {
 
     void registaAceitacaoCliente(String idReparacao);
 
-    boolean verificarDisponibilidadeSE(String idServicoExpresso) throws InvalidIdException;
-
-    //void atualizaDisponibilidadeSE(int idServicoExpresso);
-
-    void adicionarParaLevantar(String idPedido);
+    void finalizaPedido(String idPedido);
 
     void entregaEquipamento(String codE, String idFuncionario);
 
@@ -41,15 +38,17 @@ public interface IPedidos {
 
     void registarContactoPedidoOrcamento(String idPedido, String idFuncionario);
 
-    void registarFormatarPC(ServicoExpresso.Tipo tipo, String idCliente, String idFuncionario, String idTecnico);
+    void registarFormatarPC(String idCliente, String idFuncionario, String idTecnico, String descricao);
 
-    void registarInstalarOS(ServicoExpresso.Tipo tipo, String idCliente, String idFuncionario, String idTecnico);
+    void registarInstalarOS(String idCliente, String idFuncionario, String idTecnico, String descricao);
 
-    void registarSubstituirEcra(ServicoExpresso.Tipo tipo, String idCliente, String idFuncionario, String idTecnico);
+    void registarSubstituirEcra(String idCliente, String idFuncionario, String idTecnico, String descricao);
 
-    void registarSubstituirBateria(ServicoExpresso.Tipo tipo, String idCliente, String idFuncionario, String idTecnico);
+    void registarSubstituirBateria(String idCliente, String idFuncionario, String idTecnico, String descricao);
 
-    void conclusaoPlanoTrabalho(String idPedido);
+    void registarSubstituirOutro(String idCliente, String idFuncionario, String idTecnico, String descricao);
+
+    void pedidoAguardaAceitacao(String idPedido);
 
     Map<String, Integer> getNrPedidosByFuncionario(LocalDateTime month);
 
@@ -68,4 +67,10 @@ public interface IPedidos {
     List<Pedido> getPedidos();
 
     List<Cliente> getClientes();
-}
+
+    void pedidoADecorrer(String idPedido);
+
+    String getPedidoOrcamentoMaisAntigo() throws SemPedidosOrcamento;
+
+    }
+

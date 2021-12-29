@@ -1,6 +1,7 @@
 package pedidos;
 
 import exceptions.InvalidIdException;
+import exceptions.SemPedidosOrcamento;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ public class Pedidos implements IPedidos, Serializable {
     private Map<String, Pedido> pedidoMap;
     private Map<String, Entrega> entregaMap;
     private Map<String, Cliente> clientesMap;
+
 
     public Pedidos() {
         this.pedidoMap = new HashMap<>();
@@ -54,11 +56,13 @@ public class Pedidos implements IPedidos, Serializable {
 
     @Override
     public List<String> getListEquipamentosLevantar() {
-        List<String> ret = new ArrayList<>();
-        for (Pedido p : this.pedidoMap.values())
-            if (p.getEstado().equals(Pedido.Estado.FINALIZADO))
-                ret.add(p.getIdPedido());
-        return ret;
+        List<String> porLevantarList = new ArrayList<>();
+        for (Pedido pedido : this.pedidoMap.values()) {
+            if (pedido.isFinalizado() && !entregaMap.containsKey(pedido.getIdPedido()))
+                porLevantarList.add(pedido.getIdEquipamento());
+
+        }
+        return porLevantarList;
     }
 
     @Override
@@ -70,13 +74,6 @@ public class Pedidos implements IPedidos, Serializable {
         return se.getTipo().getPreco();
     }
 
-    @Override
-    public boolean verificarDisponibilidadeSE(String idServicoExpresso) throws InvalidIdException {
-        Pedido p = this.pedidoMap.get(idServicoExpresso);
-        if (!(p instanceof ServicoExpresso))
-            throw new InvalidIdException(idServicoExpresso, InvalidIdException.Type.PEDIDO);
-        return true;
-    }
 
     @Override
     public void cancelaPedido(String idPedido) throws InvalidIdException {
@@ -86,48 +83,49 @@ public class Pedidos implements IPedidos, Serializable {
         pedido.setEstado(Pedido.Estado.CANCELADO);
     }
 
-    /*
-    @Override
-    public void registaPedidoOrcamento(String codPedido) throws InvalidIdException {
-        Pedido pedido = this.pedidoMap.get(codPedido);
-        if (pedido == null || pedido instanceof ServicoExpresso)
-            throw new InvalidIdException(codPedido, InvalidIdException.Type.PEDIDO);
-        PedidoOrcamento pedidoOrcamento = new PedidoOrcamento(pedido, -1, codPedido);
-        this.pedidoMap.put(codPedido, pedidoOrcamento);
+
+    private void registarSE(ServicoExpresso.Tipo tipo, String idCliente, String idFuncionario, String idTecnico, String descricao) {
+        String nrPedido = getNovoPedidoNumber();
+        ServicoExpresso servicoExpresso = new ServicoExpresso(nrPedido, idCliente, nrPedido, idFuncionario, tipo, idTecnico, descricao);
+        pedidoMap.put(nrPedido, servicoExpresso);
+        addPedidoCliente(idCliente, nrPedido);
     }
-     */
 
     public void registaPedidoOrcamento(String idCliente, String idFuncionario, String descricao) {
-        //TODO: Equipamento key
-        // TODO Adicionar Pedido a lista de pedidos do cliente
-        String nrPedido = String.valueOf(pedidoMap.size());
+        String nrPedido = getNovoPedidoNumber();
         PedidoOrcamento pedidoOrcamento = new PedidoOrcamento(nrPedido, idCliente, idFuncionario, nrPedido, descricao);
         pedidoMap.put(nrPedido, pedidoOrcamento);
-
+        addPedidoCliente(idCliente, nrPedido);
     }
 
-    public void registarFormatarPC(ServicoExpresso.Tipo tipo, String idCliente, String idFuncionario, String idTecnico) {
-        registarSE(ServicoExpresso.Tipo.FORMATAR_PC, idCliente, idFuncionario, idTecnico);
-    }
-
-    public void registarInstalarOS(ServicoExpresso.Tipo tipo, String idCliente, String idFuncionario, String idTecnico) {
-        registarSE(ServicoExpresso.Tipo.INSTALAR_OS, idCliente, idFuncionario, idTecnico);
-    }
-
-    public void registarSubstituirEcra(ServicoExpresso.Tipo tipo, String idCliente, String idFuncionario, String idTecnico) {
-        registarSE(ServicoExpresso.Tipo.SUBSTITUIR_ECRA, idCliente, idFuncionario, idTecnico);
-    }
-
-    public void registarSubstituirBateria(ServicoExpresso.Tipo tipo, String idCliente, String idFuncionario, String idTecnico) {
-        registarSE(ServicoExpresso.Tipo.SUBSTITUIR_BATERIA, idCliente, idFuncionario, idTecnico);
+    private String getNovoPedidoNumber() {
+        return String.valueOf(pedidoMap.size());
     }
 
 
-    private void registarSE(ServicoExpresso.Tipo tipo, String idCliente, String idFuncionario, String idTecnico) {
-        //TODO: Equipamento key
-        String nrPedido = String.valueOf(pedidoMap.size());
-        ServicoExpresso servicoExpresso = new ServicoExpresso(nrPedido, idCliente, nrPedido, idFuncionario, tipo, idTecnico);
-        pedidoMap.put(nrPedido, servicoExpresso);
+    private void addPedidoCliente(String idCliente, String idPedido) {
+        Cliente cliente = clientesMap.get(idCliente);
+        cliente.addPedido(idPedido);
+    }
+
+    public void registarFormatarPC(String idCliente, String idFuncionario, String idTecnico, String descricao) {
+        registarSE(ServicoExpresso.Tipo.FORMATAR_PC, idCliente, idFuncionario, idTecnico, descricao);
+    }
+
+    public void registarInstalarOS(String idCliente, String idFuncionario, String idTecnico, String descricao) {
+        registarSE(ServicoExpresso.Tipo.INSTALAR_OS, idCliente, idFuncionario, idTecnico, descricao);
+    }
+
+    public void registarSubstituirEcra(String idCliente, String idFuncionario, String idTecnico, String descricao) {
+        registarSE(ServicoExpresso.Tipo.SUBSTITUIR_ECRA, idCliente, idFuncionario, idTecnico, descricao);
+    }
+
+    public void registarSubstituirBateria(String idCliente, String idFuncionario, String idTecnico, String descricao) {
+        registarSE(ServicoExpresso.Tipo.SUBSTITUIR_BATERIA, idCliente, idFuncionario, idTecnico, descricao);
+    }
+
+    public void registarSubstituirOutro(String idCliente, String idFuncionario, String idTecnico, String descricao) {
+        registarSE(ServicoExpresso.Tipo.OUTRO, idCliente, idFuncionario, idTecnico, descricao);
     }
 
 
@@ -164,9 +162,9 @@ public class Pedidos implements IPedidos, Serializable {
 
 
     @Override
-    public void adicionarParaLevantar(String idPedido) {
+    public void finalizaPedido(String idPedido) {
         Pedido p = this.pedidoMap.get(idPedido);
-        p.setEstado(Pedido.Estado.FINALIZADO); //NAO SEI SE ESTA BEM?????
+        p.setEstado(Pedido.Estado.FINALIZADO);
     }
 
     @Override
@@ -180,6 +178,11 @@ public class Pedidos implements IPedidos, Serializable {
         //Pedido p = this.pedidoMap.get(idPedido);
         //if (p.getEstado().equals(Pedido.Estado.FINALIZADO))
 
+    }
+
+    public void pedidoADecorrer(String idPedido) {
+        Pedido pedido = pedidoMap.get(idPedido);
+        pedido.setEstado(Pedido.Estado.DECORRER);
     }
 
     @Override
@@ -217,7 +220,7 @@ public class Pedidos implements IPedidos, Serializable {
     }
 
 
-    public void conclusaoPlanoTrabalho(String idPedido) {
+    public void pedidoAguardaAceitacao(String idPedido) {
         Pedido pedido = pedidoMap.get(idPedido);
         pedido.setEstado(Pedido.Estado.AGUARDA_ACEITACAO);
     }
@@ -291,6 +294,16 @@ public class Pedidos implements IPedidos, Serializable {
             }
         }
         return resultMap;
+    }
+
+    public String getPedidoOrcamentoMaisAntigo() throws SemPedidosOrcamento {
+        List<Pedido> pedidosOrcamento = pedidoMap.values().stream().
+                filter(pedido -> pedido instanceof PedidoOrcamento && pedido.aguardaPlano()).
+                collect(Collectors.toList());
+        List<Pedido> pedidosOrcamentoSorte = pedidosOrcamento.stream().sorted(Comparator.comparing(Pedido::getData)).collect(Collectors.toList());
+        if (pedidosOrcamento.size() == 0) throw new SemPedidosOrcamento();
+        Pedido maisAntigo = pedidosOrcamentoSorte.get(pedidosOrcamento.size() - 1);
+        return maisAntigo.getIdPedido();
     }
 
 

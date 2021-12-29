@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Map;
 
 public interface IReparacoes {
-    void createPlanosTrabalho(String idPedido);
+    void criaPlanosTrabalho(String idPedido,String idTecnico);
 
-    void registaPasso(double horas, double custoPecas, String idReparacao) throws ValorSuperior;
+    Map.Entry<String,Double> registaPasso(double horas, double custoPecas, String idReparacao) throws ValorSuperior;
 
     void conclusaoPlanoDeTrabalho(String codPlanoDeTrabalho);
 
@@ -18,7 +18,9 @@ public interface IReparacoes {
 
     void addPasso(String idPlano, double horas, double custoPecas,String descricao) throws InvalidIdException;
 
-    void reparacaoParaEspera(String idReparacao) throws InvalidIdException;
+    void reparacaoParaEspera(String idReparacao) ;
+
+    void reparacaoParaDecorrer(String idReparacao);
 
     void registaConclusao(String idReparacao) throws InvalidIdException;
 
@@ -26,7 +28,8 @@ public interface IReparacoes {
 
     void criaReparacao(String idReparacao, String idTecnico,double orcamento);
 
-    Map.Entry<Double, Duration> getOrcamentoEHorasPlano(String idPlano);
+    Map.Entry<Double, String> getOrcamentoEHorasPlano(String idPlano);
+
 
     void reparacaoAguardaAceitacao(String idReparacao);
 
@@ -37,6 +40,8 @@ public interface IReparacoes {
     Map<String,InfoReparacao> reparacoesByTecnicoMonth (List<String> reparacaoMonth);
 
 
-    public void reparacoesExaustivaByTecnicoMonth (List<String> reparacaoMonth,Map<String,List<String>> resultMap);
+    void reparacoesExaustivaByTecnicoMonth (List<String> reparacaoMonth,Map<String,List<String>> resultMap);
+
+    public String getIdTecnico (String idReparacao);
 
     }
