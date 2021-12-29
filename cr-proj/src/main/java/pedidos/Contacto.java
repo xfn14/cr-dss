@@ -3,7 +3,7 @@ package pedidos;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class    Contacto implements Serializable {
+public class Contacto implements Serializable {
     private String idTrabalhador;
     private LocalDateTime dateTime;
     private Type type;
@@ -18,13 +18,6 @@ public class    Contacto implements Serializable {
         this.idTrabalhador = contacto.getIdTrabalhador();
         this.dateTime = contacto.getDateTime();
         this.type = contacto.getType();
-    }
-
-    enum Type {
-        PRONTO_LEVANTAR,
-        SEM_REPARACAO,
-        VALOR_SUPERIOR,
-        PEDIDO_ORCAMENTO,
     }
 
     public String getIdTrabalhador() {
@@ -53,5 +46,20 @@ public class    Contacto implements Serializable {
 
     public Contacto clone() {
         return new Contacto(this);
+    }
+
+    @Override
+    public String toString() {
+        return "Contacto{" +
+                "trabalhador=" + this.idTrabalhador +
+                ", tipo=" + this.type.toString() +
+                "}";
+    }
+
+    enum Type {
+        PRONTO_LEVANTAR,
+        SEM_REPARACAO,
+        VALOR_SUPERIOR,
+        PEDIDO_ORCAMENTO
     }
 }

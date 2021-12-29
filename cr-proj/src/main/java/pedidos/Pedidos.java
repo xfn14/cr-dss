@@ -18,8 +18,14 @@ public class Pedidos implements IPedidos, Serializable {
         this.clientesMap = new HashMap<>();
     }
 
-    public List<Cliente> getClientes(){
+    public List<Cliente> getClientes() {
         return new ArrayList<>(this.clientesMap.values());
+    }
+
+    public List<String> getClientesId() {
+        return new ArrayList<>(this.clientesMap.values()).stream()
+                .map(Cliente::getNmrUtente)
+                .collect(Collectors.toList());
     }
 
     public void addPedido(Pedido pedido) {
@@ -91,55 +97,58 @@ public class Pedidos implements IPedidos, Serializable {
     }
      */
 
-    public void registaPedidoOrcamento(String idCliente,String idFuncionario,String descricao){
+    public void registaPedidoOrcamento(String idCliente, String idFuncionario, String descricao) {
+        //TODO: Equipamento key
+        // TODO Adicionar Pedido a lista de pedidos do cliente
+        String nrPedido = String.valueOf(pedidoMap.size());
+        PedidoOrcamento pedidoOrcamento = new PedidoOrcamento(nrPedido, idCliente, idFuncionario, nrPedido, descricao);
+        pedidoMap.put(nrPedido, pedidoOrcamento);
+
+    }
+
+    public void registarFormatarPC(ServicoExpresso.Tipo tipo, String idCliente, String idFuncionario, String idTecnico) {
+        registarSE(ServicoExpresso.Tipo.FORMATAR_PC, idCliente, idFuncionario, idTecnico);
+    }
+
+    public void registarInstalarOS(ServicoExpresso.Tipo tipo, String idCliente, String idFuncionario, String idTecnico) {
+        registarSE(ServicoExpresso.Tipo.INSTALAR_OS, idCliente, idFuncionario, idTecnico);
+    }
+
+    public void registarSubstituirEcra(ServicoExpresso.Tipo tipo, String idCliente, String idFuncionario, String idTecnico) {
+        registarSE(ServicoExpresso.Tipo.SUBSTITUIR_ECRA, idCliente, idFuncionario, idTecnico);
+    }
+
+    public void registarSubstituirBateria(ServicoExpresso.Tipo tipo, String idCliente, String idFuncionario, String idTecnico) {
+        registarSE(ServicoExpresso.Tipo.SUBSTITUIR_BATERIA, idCliente, idFuncionario, idTecnico);
+    }
+
+
+    private void registarSE(ServicoExpresso.Tipo tipo, String idCliente, String idFuncionario, String idTecnico) {
         //TODO: Equipamento key
         String nrPedido = String.valueOf(pedidoMap.size());
-        PedidoOrcamento pedidoOrcamento = new PedidoOrcamento(nrPedido,idCliente,nrPedido,idFuncionario,descricao);
-        pedidoMap.put(nrPedido,pedidoOrcamento);
-
-    }
-
-    public void registarFormatarPC(ServicoExpresso.Tipo tipo, String idCliente, String idFuncionario,String idTecnico) {
-        registarSE(ServicoExpresso.Tipo.FORMATAR_PC,idCliente,idFuncionario,idTecnico);
-    }
-
-    public void registarInstalarOS(ServicoExpresso.Tipo tipo, String idCliente, String idFuncionario,String idTecnico) {
-        registarSE(ServicoExpresso.Tipo.INSTALAR_OS,idCliente,idFuncionario,idTecnico);
-    }
-
-    public void registarSubstituirEcra(ServicoExpresso.Tipo tipo, String idCliente, String idFuncionario,String idTecnico) {
-        registarSE(ServicoExpresso.Tipo.SUBSTITUIR_ECRA,idCliente,idFuncionario,idTecnico);
-    }
-
-    public void registarSubstituirBateria(ServicoExpresso.Tipo tipo, String idCliente, String idFuncionario,String idTecnico) {
-        registarSE(ServicoExpresso.Tipo.SUBSTITUIR_BATERIA,idCliente,idFuncionario,idTecnico);
-    }
-
-
-    private void registarSE(ServicoExpresso.Tipo tipo, String idCliente, String idFuncionario,String idTecnico) {
-        //TODO: Equipamento key
-        String nrPedido = String.valueOf(pedidoMap.size());
-        ServicoExpresso servicoExpresso = new ServicoExpresso(nrPedido,idCliente,nrPedido,idFuncionario,tipo,idTecnico);
-        pedidoMap.put(nrPedido,servicoExpresso);
+        ServicoExpresso servicoExpresso = new ServicoExpresso(nrPedido, idCliente, nrPedido, idFuncionario, tipo, idTecnico);
+        pedidoMap.put(nrPedido, servicoExpresso);
     }
 
 
     @Override
-    public void registarContactoParaLevantar(String idPedido,String idFuncionario){
-        registarContactoCliente(idPedido, Contacto.Type.PRONTO_LEVANTAR,idFuncionario);
+    public void registarContactoParaLevantar(String idPedido, String idFuncionario) {
+        registarContactoCliente(idPedido, Contacto.Type.PRONTO_LEVANTAR, idFuncionario);
     }
 
     @Override
-    public void registarContactoSemReparacao(String idPedido,String idFuncionario){
-        registarContactoCliente(idPedido, Contacto.Type.SEM_REPARACAO,idFuncionario);
+    public void registarContactoSemReparacao(String idPedido, String idFuncionario) {
+        registarContactoCliente(idPedido, Contacto.Type.SEM_REPARACAO, idFuncionario);
     }
+
     @Override
-    public void registarContactoValorSuperior(String idPedido,String idFuncionario){
-        registarContactoCliente(idPedido, Contacto.Type.VALOR_SUPERIOR,idFuncionario);
+    public void registarContactoValorSuperior(String idPedido, String idFuncionario) {
+        registarContactoCliente(idPedido, Contacto.Type.VALOR_SUPERIOR, idFuncionario);
     }
+
     @Override
-    public void registarContactoPedidoOrcamento(String idPedido,String idFuncionario){
-        registarContactoCliente(idPedido, Contacto.Type.PEDIDO_ORCAMENTO,idFuncionario);
+    public void registarContactoPedidoOrcamento(String idPedido, String idFuncionario) {
+        registarContactoCliente(idPedido, Contacto.Type.PEDIDO_ORCAMENTO, idFuncionario);
     }
 
     private void registarContactoCliente(String idPedido, Contacto.Type tipo, String idFuncionario) {
@@ -152,7 +161,6 @@ public class Pedidos implements IPedidos, Serializable {
         Pedido pedido = this.pedidoMap.get(idReparacao);
         pedido.setEstado(Pedido.Estado.AGUARDA_REPARACAO);
     }
-
 
 
     @Override
@@ -176,7 +184,7 @@ public class Pedidos implements IPedidos, Serializable {
 
     @Override
     public void criarFichaCliente(String nome, String email, String nmr, String nif) {
-        this.clientesMap.put(nif, new Cliente(nome, email, nmr, nif));
+        this.clientesMap.put(nif, new Cliente(nome, nif, nmr, email));
     }
 
     @Override
@@ -186,16 +194,16 @@ public class Pedidos implements IPedidos, Serializable {
         Cliente cliente = clientesMap.get(idCliente);
         return new AbstractMap.SimpleEntry<>(cliente.getNome(), cliente.getEmail());
     }
-    
-    public boolean existCliente(String idCliente){
+
+    public boolean existCliente(String idCliente) {
         return clientesMap.containsKey(idCliente);
     }
 
 
-    public List<Map.Entry<String,String>> aguardaResposta (){
-        List<Map.Entry<String,String >> resultList = new ArrayList<>();
-        for (Pedido pedido: pedidoMap.values()){
-            if (pedido.aguardaReparacao()){
+    public List<Map.Entry<String, String>> aguardaResposta() {
+        List<Map.Entry<String, String>> resultList = new ArrayList<>();
+        for (Pedido pedido : pedidoMap.values()) {
+            if (pedido.aguardaReparacao()) {
                 String idPedido = pedido.getIdPedido();
                 String idCliente = pedido.getIdCliente();
                 Cliente cliente = clientesMap.get(idCliente);
@@ -209,19 +217,19 @@ public class Pedidos implements IPedidos, Serializable {
     }
 
 
-    public void conclusaoPlanoTrabalho(String idPedido){
-        Pedido pedido= pedidoMap.get(idPedido);
+    public void conclusaoPlanoTrabalho(String idPedido) {
+        Pedido pedido = pedidoMap.get(idPedido);
         pedido.setEstado(Pedido.Estado.AGUARDA_ACEITACAO);
     }
 
-    public Map<String, Integer> getNrPedidosByFuncionario (LocalDateTime month){
-        
-        Map<String,Integer> pedidosResult = new TreeMap<>();
-        for (Pedido pedido: pedidoMap.values()){
+    public Map<String, Integer> getNrPedidosByFuncionario(LocalDateTime month) {
+
+        Map<String, Integer> pedidosResult = new TreeMap<>();
+        for (Pedido pedido : pedidoMap.values()) {
             LocalDateTime date = pedido.getData();
-            if(date.getYear() == month.getYear() && date.getMonth().equals(month.getMonth())) {
+            if (date.getYear() == month.getYear() && date.getMonth().equals(month.getMonth())) {
                 String funcionario = pedido.getIdFuncionario();
-                pedidosResult.putIfAbsent(funcionario,0);
+                pedidosResult.putIfAbsent(funcionario, 0);
                 int value = pedidosResult.get(funcionario) + 1;
                 pedidosResult.put(funcionario, value);
             }
@@ -229,54 +237,54 @@ public class Pedidos implements IPedidos, Serializable {
         return pedidosResult;
     }
 
-    public Map<String, Integer> getNrEntregasByFuncionario (LocalDateTime month){
-        Map<String,Integer> entregasResult = new TreeMap<>();
-        for (Entrega entrega: entregaMap.values()){
+    public Map<String, Integer> getNrEntregasByFuncionario(LocalDateTime month) {
+        Map<String, Integer> entregasResult = new TreeMap<>();
+        for (Entrega entrega : entregaMap.values()) {
             LocalDateTime date = entrega.getData();
-            if(date.getYear() == month.getYear() && date.getMonth().equals(month.getMonth())) {
+            if (date.getYear() == month.getYear() && date.getMonth().equals(month.getMonth())) {
                 String funcionario = entrega.getIdFuncionario();
-                entregasResult.putIfAbsent(funcionario,0);
-                int value = 1 +entregasResult.get(funcionario);
+                entregasResult.putIfAbsent(funcionario, 0);
+                int value = 1 + entregasResult.get(funcionario);
                 entregasResult.put(funcionario, value);
             }
         }
         return entregasResult;
     }
 
-    public List<String> getPedidosConcluidosMonth(LocalDateTime month){
+    public List<String> getPedidosConcluidosMonth(LocalDateTime month) {
         return pedidoMap.values().stream().
                 filter(pedido -> pedido.getData().getMonth().equals(month.getMonth()) && pedido.getData().getYear() == month.getYear()).
                 filter(pedido -> pedido.getEstado().equals(Pedido.Estado.FINALIZADO)).
                 map(Pedido::getIdPedido).collect(Collectors.toList());
     }
 
-    public Map<String,Integer> getNrServicosExpressoMonth(LocalDateTime month, List<String> pedidos){
-        Map<String,Integer> resultMap = new TreeMap<>();
+    public Map<String, Integer> getNrServicosExpressoMonth(LocalDateTime month, List<String> pedidos) {
+        Map<String, Integer> resultMap = new TreeMap<>();
         //iterating backwards to remove element
-        for (int i = pedidos.size() -1; i>=0;i--){
+        for (int i = pedidos.size() - 1; i >= 0; i--) {
             String idPedido = pedidos.get(i);
             Pedido pedido = pedidoMap.get(idPedido);
-            if (pedido instanceof ServicoExpresso){
+            if (pedido instanceof ServicoExpresso) {
                 String tecnico = ((ServicoExpresso) pedido).getIdTecnico();
-                resultMap.putIfAbsent(tecnico,0);
+                resultMap.putIfAbsent(tecnico, 0);
                 int value = 1 + resultMap.get(tecnico);
-                resultMap.put(tecnico,value);
+                resultMap.put(tecnico, value);
                 pedidos.remove(i);
             }
         }
         return resultMap;
     }
 
-    public Map<String,List<String>> getServicosExpressoByTecnico (List<String> pedidos){
-        Map<String,List<String>> resultMap = new TreeMap<>();
+    public Map<String, List<String>> getServicosExpressoByTecnico(List<String> pedidos) {
+        Map<String, List<String>> resultMap = new TreeMap<>();
         //iterating backwards to remove element
-        for (int i = pedidos.size() -1; i>=0;i--){
+        for (int i = pedidos.size() - 1; i >= 0; i--) {
             String idPedido = pedidos.get(i);
             Pedido pedido = pedidoMap.get(idPedido);
-            if (pedido instanceof ServicoExpresso){
+            if (pedido instanceof ServicoExpresso) {
                 String tecnico = ((ServicoExpresso) pedido).getIdTecnico();
-                resultMap.putIfAbsent(tecnico,new ArrayList<>());
-                List<String> list =resultMap.get(tecnico);
+                resultMap.putIfAbsent(tecnico, new ArrayList<>());
+                List<String> list = resultMap.get(tecnico);
                 String tipoSE = ((ServicoExpresso) pedido).getTipo().toString();
                 list.add(tipoSE);
                 pedidos.remove(i);

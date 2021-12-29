@@ -22,15 +22,15 @@ public class Reparacoes implements IReparacoes, Serializable {
         this.planoTrabalhoMap.put(idPedido, planoTrabalho);
     }
 
-    public double getOrcamento (String idPlano){
+    public double getOrcamento(String idPlano) {
         PlanoTrabalho planoTrabalho = planoTrabalhoMap.get(idPlano);
         return planoTrabalho.getOrcamento();
     }
 
 
-    public void criaReparacao(String idReparacao, String idTecnico,double orcamento){
-        Reparacao reparacao = new Reparacao(idReparacao,idTecnico,orcamento);
-        this.reparacaoMap.put(idReparacao,reparacao);
+    public void criaReparacao(String idReparacao, String idTecnico, double orcamento) {
+        Reparacao reparacao = new Reparacao(idReparacao, idTecnico, orcamento);
+        this.reparacaoMap.put(idReparacao, reparacao);
     }
 
     @Override
@@ -39,22 +39,22 @@ public class Reparacoes implements IReparacoes, Serializable {
         int indexPasso = reparacao.registaPasso(horas, custoPecas);
         PlanoTrabalho planoTrabalho = planoTrabalhoMap.get(idReparacao);
         double expectavel = planoTrabalho.getCustoPecasPasso(indexPasso);
-        double diferenca = custoPecas-expectavel;
+        double diferenca = custoPecas - expectavel;
         reparacao.changeOrcamento(diferenca);
         if (reparacao.checkSuperior120()) throw new ValorSuperior();
     }
 
     @Override
-    public void addPasso(String idPlano, double horas, double custoPecas,String descricao) throws InvalidIdException {
+    public void addPasso(String idPlano, double horas, double custoPecas, String descricao) throws InvalidIdException {
         if (planoTrabalhoMap.containsKey(idPlano))
             throw new InvalidIdException(idPlano, InvalidIdException.Type.PLANO_TRABALHO);
         PlanoTrabalho planoTrabalho = planoTrabalhoMap.get(idPlano);
-        planoTrabalho.addPasso(horas,custoPecas,descricao);
+        planoTrabalho.addPasso(horas, custoPecas, descricao);
     }
 
-    public void addSubPasso(String idPlano,int indexPasso ,double horas, double custoPecas) {
+    public void addSubPasso(String idPlano, int indexPasso, double horas, double custoPecas) {
         PlanoTrabalho planoTrabalho = planoTrabalhoMap.get(idPlano);
-        planoTrabalho.addSubPasso(indexPasso,horas, custoPecas);
+        planoTrabalho.addSubPasso(indexPasso, horas, custoPecas);
     }
 
     @Override
@@ -78,7 +78,7 @@ public class Reparacoes implements IReparacoes, Serializable {
     }
 
     @Override
-    public void conclusaoPlanoDeTrabalho(String idPedido){
+    public void conclusaoPlanoDeTrabalho(String idPedido) {
         this.planoTrabalhoMap.get(idPedido).setEstado(PlanoTrabalho.Estado.AGUARDA_ACEITACAO);
     }
 
@@ -89,19 +89,20 @@ public class Reparacoes implements IReparacoes, Serializable {
         this.planoTrabalhoMap.get(idPlano).setEstado(PlanoTrabalho.Estado.PAUSA);
     }
 
-    public Map.Entry<Double,Duration> getOrcamentoEHorasPlano(String idPlano){
+    public Map.Entry<Double, Duration> getOrcamentoEHorasPlano(String idPlano) {
         PlanoTrabalho planoTrabalho = planoTrabalhoMap.get(idPlano);
         double orcamento = planoTrabalho.getOrcamento();
         Duration duration = planoTrabalho.getDuracaoTotal();
-        return new AbstractMap.SimpleEntry<>(orcamento,duration);
+        return new AbstractMap.SimpleEntry<>(orcamento, duration);
     }
+
     @Override
-    public void reparacaoAguardaAceitacao(String idReparacao){
+    public void reparacaoAguardaAceitacao(String idReparacao) {
         Reparacao reparacao = reparacaoMap.get(idReparacao);
         reparacao.setEstado(Reparacao.Estado.AGURDA_ACEITACAO);
     }
 
-    public List<String> listAguardaAceitacao () {
+    public List<String> listAguardaAceitacao() {
         List<String> resultList = new ArrayList<>();
         reparacaoMap.forEach((key, value) -> {
             if (value.aguardaAceitacao()) {
@@ -111,42 +112,40 @@ public class Reparacoes implements IReparacoes, Serializable {
         return resultList;
     }
 
-    public void reparacaoAceite(String idReparacao){
+    public void reparacaoAceite(String idReparacao) {
         Reparacao reparacao = reparacaoMap.get(idReparacao);
         reparacao.reparacaoAceite();
     }
 
 
-    public Map<String,InfoReparacao> reparacoesByTecnicoMonth (List<String> reparacaoMonth){
-        Map<String,InfoReparacao> resultMap = new TreeMap<>();
-        for (String idReparacao : reparacaoMonth){
+    public Map<String, InfoReparacao> reparacoesByTecnicoMonth(List<String> reparacaoMonth) {
+        Map<String, InfoReparacao> resultMap = new TreeMap<>();
+        for (String idReparacao : reparacaoMonth) {
             Reparacao reparacao = reparacaoMap.get(idReparacao);
             PlanoTrabalho planoTrabalho = planoTrabalhoMap.get(idReparacao);
             Duration duracaoReal = reparacao.getDuracaoTotal();
             Duration duracaoPrevista = planoTrabalho.getDuracaoTotal();
             long desvio = duracaoReal.toHours() - duracaoPrevista.toHours();
             String idTecnico = reparacao.getIdTecnico();
-            if (!resultMap.containsKey(idTecnico)){
+            if (!resultMap.containsKey(idTecnico)) {
                 InfoReparacao infoReparacao = new InfoReparacao();
-                resultMap.put(idTecnico,infoReparacao);
+                resultMap.put(idTecnico, infoReparacao);
             }
             InfoReparacao infoReparacao = resultMap.get(idTecnico);
-            infoReparacao.addInfo(duracaoReal,desvio);
+            infoReparacao.addInfo(duracaoReal, desvio);
         }
         return resultMap;
     }
 
-    public void reparacoesExaustivaByTecnicoMonth (List<String> reparacaoMonth,Map<String,List<String>> resultMap){
-        for (String idReparacao : reparacaoMonth){
+    public void reparacoesExaustivaByTecnicoMonth(List<String> reparacaoMonth, Map<String, List<String>> resultMap) {
+        for (String idReparacao : reparacaoMonth) {
             Reparacao reparacao = reparacaoMap.get(idReparacao);
             String idTecnico = reparacao.getIdTecnico();
-            resultMap.putIfAbsent(idTecnico,new ArrayList<>());
+            resultMap.putIfAbsent(idTecnico, new ArrayList<>());
             List<String> list = resultMap.get(idTecnico);
             reparacao.addDescricoesToList(list);
         }
     }
-
-
 
 
 }

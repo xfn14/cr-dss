@@ -33,15 +33,15 @@ public class ClientesPanel extends JPanel implements ActionListener {
         grid.gridy = 0;
         super.add(this.list, grid);
 
-        super.setBackground(new Color(255, 255, 0, 255));
+        super.setBackground(new Color(0, 255, 255, 255));
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource().equals(this.registar)){
+        if (e.getSource().equals(this.registar)) {
             RegistarCliente registarCliente = new RegistarCliente(this.sgcr);
             registarCliente.setAlwaysOnTop(true);
-        }else if(e.getSource().equals(this.list)){
+        } else if (e.getSource().equals(this.list)) {
             ListClientes listClientes = new ListClientes(this.sgcr);
             listClientes.setAlwaysOnTop(true);
         }

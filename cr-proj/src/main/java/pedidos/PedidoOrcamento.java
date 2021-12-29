@@ -8,8 +8,8 @@ public class PedidoOrcamento extends Pedido implements Serializable {
     private String descricaoProblema;
 
 
-    public PedidoOrcamento(String idPedido,String idCliente,String idFuncionario,String idEquipamento,String descricao){
-        super(idPedido,idCliente,idFuncionario,idEquipamento);
+    public PedidoOrcamento(String idPedido, String idCliente, String idFuncionario, String idEquipamento, String descricao) {
+        super(idPedido, idCliente, idEquipamento, idFuncionario);
         this.descricaoProblema = descricao;
         setEstado(Estado.AGUARDA_PLANO);
     }

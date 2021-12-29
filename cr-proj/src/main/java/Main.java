@@ -10,24 +10,24 @@ import java.util.logging.*;
 
 public class Main {
     public static final Logger LOGGER = Logger.getLogger("CR");
-    public static final String RESOURCES_PATH = "src/main/resources/";
 
     public static void main(String[] args) {
         loadLoggerSettings();
 
-        SGCR sgcr = new SGCR();
-        sgcr.registarGestor("fn14", "", "");
+        SGCR sgcr;
         try {
-            FileUtils.objectToFile(sgcr, RESOURCES_PATH + "sgcr.obj");
-        } catch (IOException e) {
-            LOGGER.severe("Erro ao converter SGCR para ficheiro.");
+            sgcr = (SGCR) FileUtils.fileToObject(LoginFrame.RESOURCES_PATH + "sgcr.obj");
+        } catch (IOException | ClassNotFoundException e) {
+            sgcr = new SGCR();
+            sgcr.registarGestor("fn14", "", "");
+            LOGGER.log(Level.SEVERE, "WARNING! SGCR couldn't be loaded.", e);
         }
 
-        LoginFrame loginFrame = new LoginFrame(sgcr);
+        Email email = new Email(sgcr);
+        LoginFrame loginFrame = new LoginFrame(sgcr, email);
         Thread thread = new Thread(loginFrame);
         thread.start();
 
-        Email email = new Email(sgcr);
         Thread emailThread = new Thread(email);
         emailThread.start();
     }

@@ -1,6 +1,6 @@
-package gui.clientes;
+package gui.pedidos;
 
-import pedidos.Cliente;
+import pedidos.Pedido;
 import sgcr.SGCR;
 import utils.gui.HintTextField;
 
@@ -12,7 +12,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class ListClientes extends JFrame implements ActionListener {
+public class ListPedido extends JFrame implements ActionListener {
     private final SGCR sgcr;
 
     private JPanel panel;
@@ -21,14 +21,14 @@ public class ListClientes extends JFrame implements ActionListener {
     private TableModel model;
     private TableRowSorter<TableModel> sorter;
 
-    public ListClientes(SGCR sgcr) {
-        super("Listar Clientes");
+    public ListPedido(SGCR sgcr) {
+        super("Listar Pedidos");
         this.sgcr = sgcr;
 
         this.initPanel();
         super.add(this.panel, BorderLayout.CENTER);
 
-        super.setSize(800, 500);
+        super.setSize(1100, 750);
         super.setResizable(false);
         super.setLocationRelativeTo(null);
         super.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -42,13 +42,20 @@ public class ListClientes extends JFrame implements ActionListener {
         this.search.addActionListener(this);
         this.panel.add(this.search, BorderLayout.NORTH);
 
-        java.util.List<Cliente> lista = this.sgcr.getPedidos().getClientes();
+        java.util.List<Pedido> lista = this.sgcr.getPedidos().getPedidos();
         Object[][] data = new Object[lista.size()][];
         int i = 0;
-        for (Cliente c : lista) {
-            data[i++] = new Object[]{c.getNome(), c.getNmrUtente(), c.getNmr(), c.getEmail(), c.getPedidos().toString()};
+        for (Pedido c : lista) {
+            data[i++] = new Object[]{
+                    c.getIdPedido(),
+                    c.getIdCliente(),
+                    c.getIdEquipamento(),
+                    c.getIdFuncionario(),
+                    c.getEstado().toString(),
+                    c.getContactos().toString()
+            };
         }
-        String[] cols = {"Nome", "NIF", "Numero", "Email", "Pedidos"};
+        String[] cols = {"ID", "Cliente_NIF", "ID_Equipamento", "Criado Por", "Estado", "Contactos"};
         this.model = new DefaultTableModel(data, cols);
         this.list = new JTable(this.model);
         this.sorter = new TableRowSorter<>(this.model);

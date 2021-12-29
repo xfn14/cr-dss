@@ -50,14 +50,15 @@ public class Trabalhadores implements ITrabalhadores, Serializable {
         return null;
     }
 
-    public Trabalhador criaTrabalhador(String id, String pass, String confirmaPass){
-        if(this.trabalhadores.containsKey(id) || !pass.equals(confirmaPass)) return null;
-        try{
+    public Trabalhador criaTrabalhador(String id, String pass, String confirmaPass) {
+        if (this.trabalhadores.containsKey(id) || !pass.equals(confirmaPass)) return null;
+        try {
             String passe = SecurityUtils.getStringSHA1(pass);
             return new Trabalhador(id, passe);
-        }catch (NoSuchAlgorithmException e){
+        } catch (NoSuchAlgorithmException e) {
             LOGGER.warning("Não foi encontrado o algoritmo SHA-1");
-        } return null;
+        }
+        return null;
     }
 
     @Override
@@ -101,8 +102,8 @@ public class Trabalhadores implements ITrabalhadores, Serializable {
         return trabalhadores.values().stream()
                 .anyMatch(trabalhador -> (
                         trabalhador instanceof Tecnico &&
-                        trabalhador.isAutenticado() &&
-                        ((Tecnico) trabalhador).isAvailable()
+                                trabalhador.isAutenticado() &&
+                                ((Tecnico) trabalhador).isAvailable()
                 ));
     }
 
@@ -111,7 +112,7 @@ public class Trabalhadores implements ITrabalhadores, Serializable {
         return null;
     }
 
-    public List<String> getListFuncionarios (){
+    public List<String> getListFuncionarios() {
         return trabalhadores.values().stream().
                 filter(trabalhador -> trabalhador instanceof Funcionario).
                 map(Trabalhador::getIdTrabalhador).

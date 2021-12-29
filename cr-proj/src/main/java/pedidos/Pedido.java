@@ -3,7 +3,6 @@ package pedidos;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,14 +15,15 @@ public class Pedido implements Serializable {
     private Estado estado;
     private List<Contacto> contactos;
 
-
-    public Pedido(String idPedido,String idCliente,String idEquipamento,String idFuncionario){
-        this.idPedido= idPedido;
-        this.idCliente=idCliente;
-        this.idEquipamento=idEquipamento;
-        this.idFuncionario=idFuncionario;
+    public Pedido(String idPedido, String idCliente, String idEquipamento, String idFuncionario) {
+        this.data = LocalDateTime.now();
+        this.idPedido = idPedido;
+        this.idCliente = idCliente;
+        this.idEquipamento = idEquipamento;
+        this.idFuncionario = idFuncionario;
+        this.estado = Estado.AGUARDA_PLANO;
+        this.contactos = new ArrayList<>();
     }
-
 
     public Pedido(Pedido pedido) {
         this.idPedido = pedido.getIdPedido();
@@ -34,25 +34,14 @@ public class Pedido implements Serializable {
         this.contactos = pedido.getContactos();
     }
 
-    public enum Estado {
-        DECORRER,
-        AGUARDA_PLANO,
-        AGUARDA_ACEITACAO,
-        AGUARDA_REPARACAO,
-        FINALIZADO,
-        CANCELADO
-    }
-
     public void registaContacto(Contacto.Type tipo, String idFuncionario) {
         Contacto contacto = new Contacto(idFuncionario, tipo);
         contactos.add(contacto);
     }
 
-
-    public boolean aguardaReparacao(){
+    public boolean aguardaReparacao() {
         return estado.equals(Estado.AGUARDA_ACEITACAO);
     }
-
 
     public String getIdFuncionario() {
         return this.idFuncionario;
@@ -104,5 +93,14 @@ public class Pedido implements Serializable {
 
     public Pedido clone() {
         return new Pedido(this);
+    }
+
+    public enum Estado {
+        DECORRER,
+        AGUARDA_PLANO,
+        AGUARDA_ACEITACAO,
+        AGUARDA_REPARACAO,
+        FINALIZADO,
+        CANCELADO
     }
 }

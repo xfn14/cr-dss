@@ -33,7 +33,7 @@ public class CRFrame extends JFrame implements Runnable, ActionListener {
     private PedidosPanel pedidosPanel;
     private AdminPanel adminPanel;
 
-    public CRFrame(LoginFrame loginFrame, Trabalhador trabalhador){
+    public CRFrame(LoginFrame loginFrame, Trabalhador trabalhador) {
         Dimension dimension = new Dimension(this.WIDTH, this.HEIGHT);
 
         this.loginFrame = loginFrame;
@@ -50,12 +50,13 @@ public class CRFrame extends JFrame implements Runnable, ActionListener {
         super.setSize(dimension);
         super.setResizable(false);
         super.setLocationRelativeTo(null);
-        super.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        super.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         super.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
                 loginFrame.setVisible(true);
+                loginFrame.setLocationRelativeTo(null);
             }
         });
     }
@@ -66,10 +67,10 @@ public class CRFrame extends JFrame implements Runnable, ActionListener {
         this.cardLayout.show(this.mainPanel, "pedidosPanel");
     }
 
-    public void initSidePanel(){
+    public void initSidePanel() {
         this.sidePanel = new JPanel(new GridBagLayout());
         this.sidePanel.setSize(new Dimension(this.WIDTH / 4, this.HEIGHT));
-        this.sidePanel.setBackground(new Color(255,0,0,255));
+        this.sidePanel.setBackground(new Color(255, 0, 0, 255));
         this.sidePanel.setVisible(true);
 
         GridBagConstraints grid = new GridBagConstraints();
@@ -98,7 +99,7 @@ public class CRFrame extends JFrame implements Runnable, ActionListener {
         grid.gridy = 2;
         this.sidePanel.add(this.clientesButton, grid);
 
-        if(this.trabalhador instanceof Gestor){
+        if (this.trabalhador instanceof Gestor) {
             this.adminButton = new JRadioButton("Admin");
             this.adminButton.setSelected(false);
             this.adminButton.setActionCommand("adminButton");
@@ -113,29 +114,29 @@ public class CRFrame extends JFrame implements Runnable, ActionListener {
     }
 
     private void initMainPanel() {
-        this.pedidosPanel = new PedidosPanel(this.loginFrame.getSgcr());
+        this.pedidosPanel = new PedidosPanel(this.loginFrame.getSgcr(), this.trabalhador);
         this.clientesPanel = new ClientesPanel(this.loginFrame.getSgcr());
         this.adminPanel = new AdminPanel(this.loginFrame.getSgcr());
         this.cardLayout = new CardLayout();
         this.mainPanel = new JPanel(cardLayout);
         this.mainPanel.add(this.clientesPanel, "clientesPanel");
         this.mainPanel.add(this.pedidosPanel, "pedidosPanel");
-        if(this.trabalhador instanceof Gestor)
+        if (this.trabalhador instanceof Gestor)
             this.mainPanel.add(this.adminPanel, "adminPanel");
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getActionCommand().equals("pedidosButton")){
+        if (e.getActionCommand().equals("pedidosButton")) {
             this.cardLayout.show(this.mainPanel, "pedidosPanel");
-        }else if(e.getActionCommand().equals("clientesButton")){
+        } else if (e.getActionCommand().equals("clientesButton")) {
             this.cardLayout.show(this.mainPanel, "clientesPanel");
-        }else if(e.getActionCommand().equals("adminButton")){
+        } else if (e.getActionCommand().equals("adminButton")) {
             this.cardLayout.show(this.mainPanel, "adminPanel");
         }
     }
 
-    public void stop(){
+    public void stop() {
         this.running = false;
     }
 }

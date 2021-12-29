@@ -7,17 +7,15 @@ public class InfoReparacao {
     private Duration duracaoTotal;
     private long desvioDuracaoHoras;
 
-    public InfoReparacao(){
+    public InfoReparacao() {
         this.numeroTotal = 0;
         this.duracaoTotal = Duration.ZERO;
         this.desvioDuracaoHoras = 0;
     }
 
-    public void addInfo(Duration duration, long desvio){
+    public void addInfo(Duration duration, long desvio) {
         this.numeroTotal++;
-        this.duracaoTotal= this.duracaoTotal.plus(duration);
+        this.duracaoTotal = this.duracaoTotal.plus(duration);
         this.desvioDuracaoHoras += desvio;
     }
-
-
 }

@@ -18,7 +18,7 @@ public class RegistarCliente extends JFrame implements ActionListener {
     private JButton confirm;
 
     public RegistarCliente(SGCR sgcr) {
-        super("Registar Funcionario");
+        super("Registar Cliente");
         this.sgcr = sgcr;
 
         this.initPanel();

@@ -1,16 +1,23 @@
 package gui;
 
+import emailHandler.Email;
 import sgcr.SGCR;
 import trabalhadores.Trabalhador;
+import utils.FileUtils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class LoginFrame extends JFrame implements Runnable, ActionListener {
     private final Logger LOGGER = Logger.getLogger("CR");
+    public static final String RESOURCES_PATH = "src/main/resources/";
     private final int WIDTH = 600, HEIGHT = 400;
     private final SGCR sgcr;
     private JPanel panel;
@@ -19,7 +26,7 @@ public class LoginFrame extends JFrame implements Runnable, ActionListener {
     private JPasswordField passwordInput;
     private JButton login;
 
-    public LoginFrame(SGCR sgcr) {
+    public LoginFrame(SGCR sgcr, Email email) {
         super("Centro de Reparações");
 
         this.sgcr = sgcr;
@@ -31,6 +38,18 @@ public class LoginFrame extends JFrame implements Runnable, ActionListener {
         super.setResizable(false);
         super.setLocationRelativeTo(null);
         super.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+
+        super.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                email.stop();
+                try {
+                    FileUtils.objectToFile(sgcr, RESOURCES_PATH + "sgcr.obj");
+                } catch (IOException ex) {
+                    LOGGER.log(Level.SEVERE, "Erro ao converter SGCR para ficheiro.", ex);
+                }
+            }
+        });
     }
 
     @Override
@@ -86,7 +105,7 @@ public class LoginFrame extends JFrame implements Runnable, ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource().equals(this.login) || e.getSource().equals(this.usernameInput) || e.getSource().equals(this.passwordInput)){
+        if (e.getSource().equals(this.login) || e.getSource().equals(this.usernameInput) || e.getSource().equals(this.passwordInput)) {
             Trabalhador trabalhador = this.sgcr.doLogin(
                     this.usernameInput.getText(),
                     String.valueOf(this.passwordInput.getPassword())

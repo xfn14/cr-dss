@@ -13,7 +13,6 @@ import trabalhadores.Trabalhador;
 import trabalhadores.Trabalhadores;
 
 import java.io.Serializable;
-import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.AbstractMap;
@@ -85,22 +84,22 @@ public class SGCR implements Serializable {
         String email = entryContactos.getValue();
         String nome = entryContactos.getKey();
 
-        Email.pedidoOrcamento(email,nome,orcamento,duration);
+        Email.pedidoOrcamento(email, nome, orcamento, duration);
     }
 
     public Trabalhador doLogin(String username, String passe) {
         return trabalhadores.doLogin(username, passe);
     }
 
-    public boolean registarGestor(String id, String pass, String confirmaPass){
+    public boolean registarGestor(String id, String pass, String confirmaPass) {
         return this.trabalhadores.registarGestor(id, pass, confirmaPass);
     }
 
-    public boolean registarTecnico(String id, String pass, String confirmaPass){
+    public boolean registarTecnico(String id, String pass, String confirmaPass) {
         return this.trabalhadores.registarTecnico(id, pass, confirmaPass);
     }
 
-    public boolean registarFuncionario(String id, String pass, String confirmaPass){
+    public boolean registarFuncionario(String id, String pass, String confirmaPass) {
         return this.trabalhadores.registarFuncionario(id, pass, confirmaPass);
     }
 
@@ -132,8 +131,8 @@ public class SGCR implements Serializable {
         this.pedidos.cancelaPedido(idPedido);
     }
 
-    public void registaPedidoOrcamento(String idCliente,String idFuncionario,String descricao) throws InvalidIdException {
-        this.pedidos.registaPedidoOrcamento(idCliente,idFuncionario,descricao);
+    public void registaPedidoOrcamento(String idCliente, String idFuncionario, String descricao) {
+        this.pedidos.registaPedidoOrcamento(idCliente, idFuncionario, descricao);
     }
 
     public void criarFichaCliente(String nome, String email, String nmr, String nmrUtente) {
@@ -149,12 +148,9 @@ public class SGCR implements Serializable {
         this.pedidos.adicionarParaLevantar(idPedido);
     }
 
-
-
-    public void registarContactoParaLevantar  (String idPedido, String idFuncionario) {
+    public void registarContactoParaLevantar(String idPedido, String idFuncionario) {
         //this.pedidos.registarContactoCliente(idPedido,idFuncionario);
     }
-
 
     public void createPlanosTrabalho(String idPedido) {
         this.reparacoes.createPlanosTrabalho(idPedido);
@@ -163,18 +159,17 @@ public class SGCR implements Serializable {
     public void registaPasso(double horas, double custoPecas, String idReparacao) throws InvalidIdException {
         try {
             this.reparacoes.registaPasso(horas, custoPecas, idReparacao);
-        }
-        catch (ValorSuperior e){
+        } catch (ValorSuperior e) {
             Map.Entry<String, String> entry = pedidos.getNomeEmailCliente(idReparacao);
             String email = entry.getValue();
             String nome = entry.getKey();
             this.reparacoes.reparacaoAguardaAceitacao(idReparacao);
-            Email.valorSuperiorOrcamento(email,nome);
+            Email.valorSuperiorOrcamento(email, nome);
         }
     }
 
     public void addPasso(String idPlano, double horas, double custoPecas, String descricao) throws InvalidIdException {
-        this.reparacoes.addPasso(idPlano, horas, custoPecas,descricao);
+        this.reparacoes.addPasso(idPlano, horas, custoPecas, descricao);
     }
 
     public PlanoTrabalho getPlanoDeTrabalho(String idPedido) {
@@ -194,57 +189,51 @@ public class SGCR implements Serializable {
         this.reparacoes.conclusaoPlanoDeTrabalho(idPedido);
     }
 
-
-    public void criaReparacao (String idReparacao,String idTecnico){
+    public void criaReparacao(String idReparacao, String idTecnico) {
         double orcamento = this.reparacoes.getOrcamento(idReparacao);
-        this.reparacoes.criaReparacao(idReparacao,idTecnico,orcamento);
+        this.reparacoes.criaReparacao(idReparacao, idTecnico, orcamento);
     }
-
 
     public List<String> getListReparacoesByTecnico(LocalDateTime month) {
         List<String> pedidosMonth = pedidos.getPedidosConcluidosMonth(month);
-        Map<String,Integer> servicosExpressoMap = pedidos.getNrServicosExpressoMonth(month,pedidosMonth);
+        Map<String, Integer> servicosExpressoMap = pedidos.getNrServicosExpressoMonth(month, pedidosMonth);
 
         return null;
     }
 
-    public Map<String,List<String>> getListIntervencoesByTecnico(LocalDateTime month) {
+    public Map<String, List<String>> getListIntervencoesByTecnico(LocalDateTime month) {
         List<String> pedidosMonth = pedidos.getPedidosConcluidosMonth(month);
-        Map<String,List<String>> resultMap = pedidos.getServicosExpressoByTecnico(pedidosMonth);
-        reparacoes.reparacoesExaustivaByTecnicoMonth(pedidosMonth,resultMap);
+        Map<String, List<String>> resultMap = pedidos.getServicosExpressoByTecnico(pedidosMonth);
+        reparacoes.reparacoesExaustivaByTecnicoMonth(pedidosMonth, resultMap);
         return resultMap;
     }
 
     public int getNrRececaoEntregaByFuncionario(LocalDateTime month) {
-        Map<String,Integer> pedidosMap  = pedidos.getNrPedidosByFuncionario(month);
-        Map<String,Integer> entregasMap = pedidos.getNrEntregasByFuncionario(month);
+        Map<String, Integer> pedidosMap = pedidos.getNrPedidosByFuncionario(month);
+        Map<String, Integer> entregasMap = pedidos.getNrEntregasByFuncionario(month);
         return 0;
     }
 
-    public void registaAceitacaoPlanoCliente(String idPedido){
+    public void registaAceitacaoPlanoCliente(String idPedido) {
         pedidos.registaAceitacaoCliente(idPedido);
     }
 
-
-    public void registaAceitacaoReparacaoCliente(String idReparacao){
+    public void registaAceitacaoReparacaoCliente(String idReparacao) {
         reparacoes.reparacaoAceite(idReparacao);
     }
 
-    public List<Map.Entry<String,String>> listPedidosAguardaAceitacao(){
+    public List<Map.Entry<String, String>> listPedidosAguardaAceitacao() {
         return pedidos.aguardaResposta();
     }
 
-    public List<Map.Entry<String,String>> listReparacoesAguardaAceitacao(){
+    public List<Map.Entry<String, String>> listReparacoesAguardaAceitacao() {
         List<String> list = reparacoes.listAguardaAceitacao();
-        List<Map.Entry<String,String>> resultList = new ArrayList<>();
-        for (String id: list){
+        List<Map.Entry<String, String>> resultList = new ArrayList<>();
+        for (String id : list) {
             String email = pedidos.getNomeEmailCliente(id).getValue();
             AbstractMap.SimpleEntry<String, String> entry = new AbstractMap.SimpleEntry<>(id, email);
             resultList.add(entry);
         }
         return resultList;
     }
-
-
-
 }

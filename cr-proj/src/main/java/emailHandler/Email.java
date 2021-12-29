@@ -2,26 +2,22 @@ package emailHandler;
 
 import sgcr.SGCR;
 
-import java.io.IOException;
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import java.time.Duration;
 import java.time.ZonedDateTime;
-import java.util.*;
-import javax.mail.*;
-import javax.mail.internet.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 public class Email implements Runnable {
-    private boolean running = true;
-    private SGCR sgcr;
+    private static final int pedidoOrcamento = 0;
+    private static final int naoPodeSerReparado = 1;
     //private LocalDate date  TODO: Ver o dia e se ainda não tiver corrido neste dia, correr a verificação para ausência de resposta| Arquivar Pedido
-
-
-    public Email(SGCR sgcr) {
-        this.sgcr = sgcr;
-    }
-
-
+    private static final int prontoaLevantar = 2;
+    private static final int valorSuperiorOrcamento = 3;
     private static String password = "grupoG35";
-    private static String user = "sgcrgrupo35@gmail.com";
     /*
         Mensages:
         - Equipamento não pode ser reparado
@@ -29,12 +25,12 @@ public class Email implements Runnable {
         - Valor da reparação superior 120% do valor orçamentado
         - Resposta plano Trabalho
      */
-
-    private static final int pedidoOrcamento = 0;
-    private static final int naoPodeSerReparado = 1;
-    private static final int prontoaLevantar = 2;
-    private static final int valorSuperiorOrcamento = 3;
-
+    private static String user = "sgcrgrupo35@gmail.com";
+    private boolean running = true;
+    private SGCR sgcr;
+    public Email(SGCR sgcr) {
+        this.sgcr = sgcr;
+    }
 
     private static String subject(int tipo) {
         String result = "";
@@ -46,8 +42,8 @@ public class Email implements Runnable {
     }
 
     private static String mesageOrcamento(String nome, double orcamento, Duration duration) {
-        String days = duration.toDays() == 0? "" : duration.toDays() + " dia(s) ";
-        String hours = duration.toHours() == 0? "" : duration.toHoursPart() + " horas";
+        String days = duration.toDays() == 0 ? "" : duration.toDays() + " dia(s) ";
+        String hours = duration.toHours() == 0 ? "" : duration.toHoursPart() + " horas";
         return "Caro " + nome + ",\n\n" +
                 "Informamos que o orçamento relativo ao seu pedido será " + orcamento + " euros.\n" +
                 "E que serão necessárias aproximadamente " + days + hours + " de trabalho.\n" +
@@ -148,29 +144,6 @@ public class Email implements Runnable {
         return checkIfRespond(email, subject(valorSuperiorOrcamento));
     }
 
-
-    private Message[] getMessage() throws MessagingException {
-        Properties properties = new Properties();
-        //
-        String host = "pop.gmail.com";
-        properties.put("mail.pop3.host", host);
-        properties.put("mail.pop3.port", "995");
-        properties.put("mail.pop3.starttls.enable", "true");
-        Session emailSession = Session.getInstance(properties);
-
-        //create the POP3 store object and connect with the pop server
-        Store store = emailSession.getStore("pop3s");
-
-        store.connect(host, user, password);
-
-        //create the folder object and open it
-        Folder emailFolder = store.getFolder("INBOX");
-        emailFolder.open(Folder.READ_ONLY);
-
-        // retrieve the messages from the folder in an array and print it
-        return emailFolder.getMessages();
-    }
-
     private static boolean checkIfRespond(String email, String subjectName) {
         try {
             Properties properties = new Properties();
@@ -220,12 +193,9 @@ public class Email implements Runnable {
         return false;
     }
 
-
-    //https://www.tutorialspoint.com/javamail_api/javamail_api_deleting_emails.htm
-
     public static void main(String[] args) {
         String email = "jdmartinsvieira63@gmail.com";
-        pedidoOrcamento(email,"Diogo",50,Duration.ofHours(37));
+        pedidoOrcamento(email, "Diogo", 50, Duration.ofHours(37));
         //naoPodeSerReparado("jdmartinsvieira63@gmail.com","Diogo");
         //valorSuperiorOrcamento("jdmartinsvieira63@gmail.com","Diogo");
         //boolean resposta = checkRespostaPedidoOrcamento(email);
@@ -233,51 +203,85 @@ public class Email implements Runnable {
     }
 
 
+    //https://www.tutorialspoint.com/javamail_api/javamail_api_deleting_emails.htm
+
+    private Message[] getMessage() throws MessagingException {
+        Properties properties = new Properties();
+        //
+        String host = "pop.gmail.com";
+        properties.put("mail.pop3.host", host);
+        properties.put("mail.pop3.port", "995");
+        properties.put("mail.pop3.starttls.enable", "true");
+        Session emailSession = Session.getInstance(properties);
+
+        //create the POP3 store object and connect with the pop server
+        Store store = emailSession.getStore("pop3s");
+
+        store.connect(host, user, password);
+
+        //create the folder object and open it
+        Folder emailFolder = store.getFolder("INBOX");
+        emailFolder.open(Folder.READ_ONLY);
+
+        // retrieve the messages from the folder in an array and print it
+        return emailFolder.getMessages();
+    }
+
     public void run() {
-        while (running) {
-            List<Map.Entry<String, String>> pedidosAguardarEmail = sgcr.listPedidosAguardaAceitacao();
-            List<Map.Entry<String, String>> reparacoesAguardarEmail = sgcr.listReparacoesAguardaAceitacao();
-            
-            try {
-                Message[] messagesArray = getMessage();
-                for (Message message : messagesArray){
-                    Address address = message.getFrom()[0];
-                    String adressString = address.toString();
-                    adressString = adressString.substring(adressString.indexOf('<') + 1);
-                    adressString = adressString.substring(0, adressString.length() - 1);
-                    String subject = message.getSubject();
+        ZonedDateTime lastRun = null;
+        while (this.running) {
+            ZonedDateTime now = ZonedDateTime.now();
+            if (lastRun == null || now.isAfter(lastRun.plusSeconds(5))) {
+                lastRun = now;
+                List<Map.Entry<String, String>> pedidosAguardarEmail = sgcr.listPedidosAguardaAceitacao();
+                List<Map.Entry<String, String>> reparacoesAguardarEmail = sgcr.listReparacoesAguardaAceitacao();
 
-                    for(Map.Entry<String,String> entry : pedidosAguardarEmail){
-                        String email = entry.getValue();
-                        String idPedido = entry.getKey();
-                        if (email.equals(adressString)){
-                            String subjectCompare = subject(pedidoOrcamento);
-                            if (subject.equals("Re: "+ subjectCompare)){
-                                sgcr.registaAceitacaoPlanoCliente(idPedido);
+                try {
+                    Message[] messagesArray = getMessage();
+                    for (Message message : messagesArray) {
+                        Address address = message.getFrom()[0];
+                        String adressString = address.toString();
+                        adressString = adressString.substring(adressString.indexOf('<') + 1);
+                        adressString = adressString.substring(0, adressString.length() - 1);
+                        String subject = message.getSubject();
+
+                        for (Map.Entry<String, String> entry : pedidosAguardarEmail) {
+                            String email = entry.getValue();
+                            String idPedido = entry.getKey();
+                            if (email.equals(adressString)) {
+                                String subjectCompare = subject(pedidoOrcamento);
+                                if (subject.equals("Re: " + subjectCompare)) {
+                                    sgcr.registaAceitacaoPlanoCliente(idPedido);
+                                }
+                            }
+                        }
+
+                        for (Map.Entry<String, String> entry : reparacoesAguardarEmail) {
+                            String reparacao = entry.getKey();
+                            String email = entry.getValue();
+                            if (email.equals(adressString)) {
+                                String subjectCompare = subject(valorSuperiorOrcamento);
+                                if (subject.equals("Re: " + subjectCompare)) {
+                                    sgcr.registaAceitacaoReparacaoCliente(reparacao);
+                                }
                             }
                         }
                     }
-
-                    for (Map.Entry<String,String> entry : reparacoesAguardarEmail){
-                        String reparacao = entry.getKey();
-                        String email = entry.getValue();
-                        if (email.equals(adressString)){
-                            String subjectCompare = subject(valorSuperiorOrcamento);
-                            if (subject.equals("Re: "+ subjectCompare)){
-                                sgcr. registaAceitacaoReparacaoCliente(reparacao);
-                            }
-                        }
-                    }
+                } catch (MessagingException e) {
+                    e.printStackTrace();
                 }
-            } catch (MessagingException e) {
-                e.printStackTrace();
             }
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+
+//            try {
+//                Thread.sleep(5000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
         }
+    }
+
+    public void stop() {
+        this.running = false;
     }
 
     /*

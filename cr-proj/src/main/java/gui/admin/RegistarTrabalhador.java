@@ -19,7 +19,7 @@ public class RegistarTrabalhador extends JFrame implements ActionListener {
     private JLabel status;
 
     public RegistarTrabalhador(SGCR sgcr) {
-        super("Registar Funcionario");
+        super("Registar Trabalhadores");
         this.sgcr = sgcr;
 
         this.initPanel();

@@ -63,5 +63,9 @@ public interface IPedidos {
 
     Map<String, List<String>> getServicosExpressoByTecnico(List<String> pedidos);
 
+    List<String> getClientesId();
+
+    List<Pedido> getPedidos();
+
     List<Cliente> getClientes();
 }
