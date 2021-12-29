@@ -28,8 +28,8 @@ public class Main {
         Thread thread = new Thread(loginFrame);
         thread.start();
 
-        Thread emailThread = new Thread(email);
-        emailThread.start();
+        //Thread emailThread = new Thread(email);
+        //emailThread.start();
     }
 
     private static void loadLoggerSettings() {

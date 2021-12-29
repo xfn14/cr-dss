@@ -24,18 +24,18 @@ public class Passo implements Serializable {
         this.subPassos = new ArrayList<>();
     }
 
-    public Passo(double horas, double custoPecas,String descricao) {
+    public Passo(double horas, double custoPecas, String descricao) {
         this.custoPecas = custoPecas;
         this.duration = Duration.ofHours((long) horas);
         this.subPassos = new ArrayList<>();
         this.descricao = descricao;
     }
 
-    public void addSubPasso(double horas, double custoPecas) {
-        this.custoPecas+= custoPecas;
+    public void addSubPasso(double horas, double custoPecas,String descricao) {
+        this.custoPecas += custoPecas;
         this.duration  = this.duration.plusHours((long) horas);
-        Passo passo = new Passo(horas, custoPecas);
-        subPassos.add(passo);
+        Passo passo = new Passo(horas, custoPecas, descricao);
+        this.subPassos.add(passo);
     }
 
     public double getCustoPecas() {

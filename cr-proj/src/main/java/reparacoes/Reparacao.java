@@ -7,30 +7,24 @@ import java.util.List;
 
 public class Reparacao implements Serializable {
     private String idReparacao;
-    private String idTecnico;
+    private final String idTecnico;
     private Estado estado;
     private Duration duracaoTotal;
     private List<Passo> passos; //TODO: Registar passos
     private double orcamento;
-    private double orcamentoExpectavel;
-
-
-    public Reparacao() {
-        this.idReparacao = "";
-        this.estado = Estado.DECORRER;
-        this.passos = new ArrayList<>();
-        this.orcamentoExpectavel = 0;
-        this.duracaoTotal=Duration.ZERO;
-    }
+    private final double orcamentoExpectavel;
 
     public Reparacao(String idReparacao, String idTecnico,double orcamento) {
+        this.idTecnico = idTecnico;
         this.idReparacao = idReparacao;
         this.orcamento = orcamento;
         this.orcamentoExpectavel = orcamento;
         this.duracaoTotal = Duration.ZERO;
+        this.estado=Estado.AGUARDA_INICIO;
     }
 
     public enum Estado {
+        AGUARDA_INICIO,
         DECORRER,
         PAUSA,
         AGURDA_ACEITACAO,
@@ -79,6 +73,12 @@ public class Reparacao implements Serializable {
     }
 
 
+    public boolean emPausa(){
+        return this.estado.equals(Estado.PAUSA);
+    }
+
+
+
     public void setIdReparacao(String idReparacao) {
         this.idReparacao = idReparacao;
     }
@@ -106,6 +106,7 @@ public class Reparacao implements Serializable {
     public String getIdTecnico() {
         return idTecnico;
     }
+
 
 
 

@@ -101,14 +101,12 @@ public class Trabalhadores implements ITrabalhadores, Serializable {
     }
 
     public Trabalhador verificarDisponibilidadeTecnicos() throws SemTecnicosDisponiveis {
-        Trabalhador t = trabalhadores.values().stream()
+        return trabalhadores.values().stream()
                 .filter(trabalhador -> (
                         trabalhador instanceof Tecnico &&
-                        trabalhador.isAutenticado() &&
                         ((Tecnico) trabalhador).isAvailable()
-                )).findAny().orElse(null);
-        if (t == null) throw new SemTecnicosDisponiveis();
-        return t;
+                )).findFirst().orElseThrow(SemTecnicosDisponiveis::new);
+//        return t;
     }
 
     @Override

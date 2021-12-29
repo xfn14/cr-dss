@@ -58,7 +58,8 @@ public class ServicoExpresso extends Pedido implements Serializable {
             return this.precoBase;
         }
 
-        public String getString(){
+        @Override
+        public String toString(){
             if(this == FORMATAR_PC) return "Formatar PC";
             else if(this == INSTALAR_OS) return "Instalar OS";
             else if(this == SUBSTITUIR_ECRA) return "Substituir Ecra";

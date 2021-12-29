@@ -45,9 +45,8 @@ public class ListClientes extends JFrame implements ActionListener {
         java.util.List<Cliente> lista = this.sgcr.getPedidos().getClientes();
         Object[][] data = new Object[lista.size()][];
         int i = 0;
-        for (Cliente c : lista) {
+        for (Cliente c : lista)
             data[i++] = new Object[]{c.getNome(), c.getNmrUtente(), c.getNmr(), c.getEmail(), c.getPedidos().toString()};
-        }
         String[] cols = {"Nome", "NIF", "Numero", "Email", "Pedidos"};
         this.model = new DefaultTableModel(data, cols);
         this.list = new JTable(this.model);

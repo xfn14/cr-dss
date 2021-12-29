@@ -81,6 +81,7 @@ public class Pedidos implements IPedidos, Serializable {
         if (pedido == null)
             throw new InvalidIdException(idPedido, InvalidIdException.Type.PEDIDO);
         pedido.setEstado(Pedido.Estado.CANCELADO);
+        // TODO rever
     }
 
 
@@ -109,23 +110,23 @@ public class Pedidos implements IPedidos, Serializable {
     }
 
     public void registarFormatarPC(String idCliente, String idFuncionario, String idTecnico, String descricao) {
-        registarSE(ServicoExpresso.Tipo.FORMATAR_PC, idCliente, idFuncionario, idTecnico, descricao);
+        this.registarSE(ServicoExpresso.Tipo.FORMATAR_PC, idCliente, idFuncionario, idTecnico, descricao);
     }
 
     public void registarInstalarOS(String idCliente, String idFuncionario, String idTecnico, String descricao) {
-        registarSE(ServicoExpresso.Tipo.INSTALAR_OS, idCliente, idFuncionario, idTecnico, descricao);
+        this.registarSE(ServicoExpresso.Tipo.INSTALAR_OS, idCliente, idFuncionario, idTecnico, descricao);
     }
 
     public void registarSubstituirEcra(String idCliente, String idFuncionario, String idTecnico, String descricao) {
-        registarSE(ServicoExpresso.Tipo.SUBSTITUIR_ECRA, idCliente, idFuncionario, idTecnico, descricao);
+        this.registarSE(ServicoExpresso.Tipo.SUBSTITUIR_ECRA, idCliente, idFuncionario, idTecnico, descricao);
     }
 
     public void registarSubstituirBateria(String idCliente, String idFuncionario, String idTecnico, String descricao) {
-        registarSE(ServicoExpresso.Tipo.SUBSTITUIR_BATERIA, idCliente, idFuncionario, idTecnico, descricao);
+        this.registarSE(ServicoExpresso.Tipo.SUBSTITUIR_BATERIA, idCliente, idFuncionario, idTecnico, descricao);
     }
 
-    public void registarSubstituirOutro(String idCliente, String idFuncionario, String idTecnico, String descricao) {
-        registarSE(ServicoExpresso.Tipo.OUTRO, idCliente, idFuncionario, idTecnico, descricao);
+    public void registarOutro(String idCliente, String idFuncionario, String idTecnico, String descricao) {
+        this.registarSE(ServicoExpresso.Tipo.OUTRO, idCliente, idFuncionario, idTecnico, descricao);
     }
 
 
@@ -304,6 +305,10 @@ public class Pedidos implements IPedidos, Serializable {
         if (pedidosOrcamento.size() == 0) throw new SemPedidosOrcamento();
         Pedido maisAntigo = pedidosOrcamentoSorte.get(pedidosOrcamento.size() - 1);
         return maisAntigo.getIdPedido();
+    }
+
+    public boolean isClienteAutenticado (String idCliente){
+        return clientesMap.containsKey(idCliente);
     }
 
 

@@ -1,6 +1,7 @@
 package reparacoes;
 
 import exceptions.InvalidIdException;
+import exceptions.SemReparacoesException;
 import exceptions.ValorSuperior;
 
 import java.time.Duration;
@@ -26,10 +27,7 @@ public interface IReparacoes {
 
     double getOrcamento(String idPlano);
 
-    void criaReparacao(String idReparacao, String idTecnico,double orcamento);
-
     Map.Entry<Double, String> getOrcamentoEHorasPlano(String idPlano);
-
 
     void reparacaoAguardaAceitacao(String idReparacao);
 
@@ -39,9 +37,18 @@ public interface IReparacoes {
 
     Map<String,InfoReparacao> reparacoesByTecnicoMonth (List<String> reparacaoMonth);
 
-
     void reparacoesExaustivaByTecnicoMonth (List<String> reparacaoMonth,Map<String,List<String>> resultMap);
 
-    public String getIdTecnico (String idReparacao);
+    String getIdTecnico (String idReparacao);
+
+    void cancelaPedido (String idPedido);
+
+    void iniciaReparacao (String idReparacao);
+
+    void planoTrabalhoAceite(String idPlano);
+
+    String getReparacaoMaisUrgente(String idTecnico) throws SemReparacoesException;
+
+    void addSubPasso(String idPlano, int indexPasso, double horas, double custoPecas,String descricao);
 
     }

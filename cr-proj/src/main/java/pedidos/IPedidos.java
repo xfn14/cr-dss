@@ -46,7 +46,7 @@ public interface IPedidos {
 
     void registarSubstituirBateria(String idCliente, String idFuncionario, String idTecnico, String descricao);
 
-    void registarSubstituirOutro(String idCliente, String idFuncionario, String idTecnico, String descricao);
+    void registarOutro(String idCliente, String idFuncionario, String idTecnico, String descricao);
 
     void pedidoAguardaAceitacao(String idPedido);
 
@@ -71,6 +71,8 @@ public interface IPedidos {
     void pedidoADecorrer(String idPedido);
 
     String getPedidoOrcamentoMaisAntigo() throws SemPedidosOrcamento;
+
+    boolean isClienteAutenticado (String idCliente);
 
     }
 

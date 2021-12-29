@@ -1,0 +1,4 @@
+## Funcionario
+
+- [] Criar pedidos
+- [] Cancelar pedido

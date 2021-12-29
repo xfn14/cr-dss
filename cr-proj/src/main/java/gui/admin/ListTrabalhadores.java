@@ -1,5 +1,6 @@
 package gui.admin;
 
+import gui.PrettyFrame;
 import sgcr.SGCR;
 import trabalhadores.Gestor;
 import trabalhadores.Tecnico;
@@ -31,7 +32,7 @@ public class ListTrabalhadores extends JFrame implements ActionListener {
         this.initPanel();
         super.add(this.panel, BorderLayout.CENTER);
 
-        super.setSize(700, 500);
+        super.setSize(800, 500);
         super.setResizable(false);
         super.setLocationRelativeTo(null);
         super.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -40,7 +41,6 @@ public class ListTrabalhadores extends JFrame implements ActionListener {
 
     private void initPanel() {
         this.panel = new JPanel(new BorderLayout());
-
         this.search = new HintTextField("Procurar");
         this.search.addActionListener(this);
         this.panel.add(this.search, BorderLayout.NORTH);

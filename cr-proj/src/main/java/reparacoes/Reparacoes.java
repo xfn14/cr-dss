@@ -1,7 +1,9 @@
 package reparacoes;
 
 import exceptions.InvalidIdException;
+import exceptions.SemReparacoesException;
 import exceptions.ValorSuperior;
+import pedidos.Pedido;
 import trabalhadores.Tecnico;
 
 import java.io.Serializable;
@@ -11,7 +13,7 @@ import java.util.*;
 public class Reparacoes implements IReparacoes, Serializable {
     private final Map<String, Reparacao> reparacaoMap;
     private final Map<String, PlanoTrabalho> planoTrabalhoMap;
-    private Map<String,Queue<String>> queueMap;
+    private Map<String,List<String>> queueMap;
 
     public Reparacoes() {
         this.reparacaoMap = new HashMap<>();
@@ -25,7 +27,12 @@ public class Reparacoes implements IReparacoes, Serializable {
         this.planoTrabalhoMap.put(idPedido, planoTrabalho);
     }
 
-    public void criaReparacao(String idReparacao, String idTecnico, double orcamento) {
+    public void iniciaReparacao (String idReparacao){
+        Reparacao reparacao = reparacaoMap.get(idReparacao);
+        reparacao.setEstado(Reparacao.Estado.DECORRER);
+    }
+
+    private void criaReparacao(String idReparacao, String idTecnico, double orcamento) {
         Reparacao reparacao = new Reparacao(idReparacao, idTecnico, orcamento);
         this.reparacaoMap.put(idReparacao, reparacao);
     }
@@ -57,9 +64,9 @@ public class Reparacoes implements IReparacoes, Serializable {
         planoTrabalho.addPasso(horas, custoPecas, descricao);
     }
 
-    public void addSubPasso(String idPlano, int indexPasso, double horas, double custoPecas) {
+    public void addSubPasso(String idPlano, int indexPasso, double horas, double custoPecas,String descricao) {
         PlanoTrabalho planoTrabalho = planoTrabalhoMap.get(idPlano);
-        planoTrabalho.addSubPasso(indexPasso, horas, custoPecas);
+        planoTrabalho.addSubPasso(indexPasso, horas, custoPecas,descricao);
     }
 
     @Override
@@ -73,8 +80,8 @@ public class Reparacoes implements IReparacoes, Serializable {
         Reparacao reparacao =  this.reparacaoMap.get(idReparacao);
         reparacao.setEstado(Reparacao.Estado.FINALIZADA);
         String idTecnico = reparacao.getIdTecnico();
-        Queue<String> queueTecnico = queueMap.get(idTecnico);
-        queueTecnico.poll();
+        List<String> queueTecnico = queueMap.get(idTecnico);
+        queueTecnico.remove(idReparacao);
     }
 
     @Override
@@ -122,8 +129,10 @@ public class Reparacoes implements IReparacoes, Serializable {
         PlanoTrabalho planoTrabalho = planoTrabalhoMap.get(idPlano);
         planoTrabalho.setEstado(PlanoTrabalho.Estado.FINALIZADO);
         String idTecnico = planoTrabalho.getIdTecnico();
-        queueMap.putIfAbsent(idTecnico,new LinkedList<>());
-        Queue<String> queueTecnico = queueMap.get(idTecnico);
+        double orcamento = planoTrabalho.getOrcamento();
+        criaReparacao(idPlano,idTecnico,orcamento);
+        queueMap.putIfAbsent(idTecnico,new ArrayList<>());
+        List<String> queueTecnico = queueMap.get(idTecnico);
         queueTecnico.add(idPlano);
     }
 
@@ -168,6 +177,28 @@ public class Reparacoes implements IReparacoes, Serializable {
 
     public String getIdTecnico (String idReparacao){
         return reparacaoMap.get(idReparacao).getIdTecnico();
+    }
+
+    public void cancelaPedido (String idPedido){
+        if (planoTrabalhoMap.containsKey(idPedido)){
+            PlanoTrabalho planoTrabalho =planoTrabalhoMap.get(idPedido);
+            planoTrabalho.setEstado(PlanoTrabalho.Estado.CANCELADO);
+        }
+        if (reparacaoMap.containsKey(idPedido)){
+            Reparacao reparacao = reparacaoMap.get(idPedido);
+            reparacao.setEstado(Reparacao.Estado.CANCELADA);
+        }
+    }
+
+    public String getReparacaoMaisUrgente(String idTecnico) throws SemReparacoesException {
+        List<String> queueTecnico = queueMap.get(idTecnico);
+        for (String idPedido : queueTecnico){
+            Reparacao reparacao = reparacaoMap.get(idPedido);
+            if (reparacao.emPausa())continue;
+            //reparacaoParaDecorrer(idPedido); TODO: Not sure about this
+            return idPedido;
+        }
+        throw new SemReparacoesException();
     }
 
 

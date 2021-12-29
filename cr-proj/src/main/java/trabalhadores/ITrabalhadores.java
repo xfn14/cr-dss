@@ -38,4 +38,5 @@ public interface ITrabalhadores {
     void setNotAvailable(String idTecnico);
 
     void setAvailable(String idTecnico);
-}
+
+    }

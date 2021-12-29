@@ -17,10 +17,10 @@ public class PlanoTrabalho implements Serializable {
         this.idPlanoTrabalho = idPlanoTrabalho;
         this.passos = passos;
         this.orcamento = 0;
-        this.duracaoTotal=Duration.ZERO;
+        this.duracaoTotal = Duration.ZERO;
     }
 
-    public PlanoTrabalho(String idPlanoTrabalho,String idTecnico) {
+    public PlanoTrabalho(String idPlanoTrabalho, String idTecnico) {
         this.idTecnico = idTecnico;
         this.idPlanoTrabalho = idPlanoTrabalho;
         this.passos = new ArrayList<>();
@@ -28,9 +28,13 @@ public class PlanoTrabalho implements Serializable {
         this.orcamento = 0;
     }
 
-    public void addPasso(double horas, double custoPecas,String descricao) {
-        this.duracaoTotal= this.duracaoTotal.plus(Duration.ofHours((long)horas));
-        Passo passo = new Passo(horas,custoPecas,descricao);
+    public PlanoTrabalho(PlanoTrabalho planoTrabalho) {
+        this.idPlanoTrabalho = planoTrabalho.getIdPlanoTrabalho();
+    }
+
+    public void addPasso(double horas, double custoPecas, String descricao) {
+        this.duracaoTotal = this.duracaoTotal.plus(Duration.ofHours((long) horas));
+        Passo passo = new Passo(horas, custoPecas, descricao);
         this.passos.add(passo);
         this.orcamento += passo.getCustoPecas();
     }
@@ -39,30 +43,17 @@ public class PlanoTrabalho implements Serializable {
         this.estado = estado;
     }
 
-    public void addSubPasso(int indexPasso,double horas, double custoPecas){
-        if (indexPasso >= passos.size()){
-            Passo passo = new Passo(0,0);
+    public void addSubPasso(List<Integer> indexs, double horas, double custoPecas, String descricao) {
+        if (indexPasso >= passos.size()) {
+            Passo passo = new Passo(0, 0, descricao);
             passos.add(passo);
         }
         Passo passo = passos.get(indexPasso);
-        passo.addSubPasso(horas, custoPecas);
+        passo.addSubPasso(horas, custoPecas, descricao);
     }
 
-
-    public double getCustoPecasPasso(int indexPasso){
+    public double getCustoPecasPasso(int indexPasso) {
         return this.passos.get(indexPasso).getCustoPecas();
-    }
-
-    public enum Estado {
-        AGUARDA_ACEITACAO,
-        DECORRER,
-        PAUSA,
-        FINALIZADO,
-        CANCELADO
-    }
-
-    public PlanoTrabalho(PlanoTrabalho planoTrabalho) {
-        this.idPlanoTrabalho = planoTrabalho.getIdPlanoTrabalho();
     }
 
     public String getIdPlanoTrabalho() {
@@ -88,5 +79,13 @@ public class PlanoTrabalho implements Serializable {
 
     public String getIdTecnico() {
         return idTecnico;
+    }
+
+    public enum Estado {
+        AGUARDA_ACEITACAO,
+        DECORRER,
+        PAUSA,
+        FINALIZADO,
+        CANCELADO
     }
 }

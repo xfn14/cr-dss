@@ -1,13 +1,11 @@
 package sgcr;
 
 import emailHandler.Email;
-import exceptions.InvalidIdException;
-import exceptions.SemPedidosOrcamento;
-import exceptions.SemTecnicosDisponiveis;
-import exceptions.ValorSuperior;
+import exceptions.*;
 import pedidos.IPedidos;
 import pedidos.Pedidos;
 import reparacoes.IReparacoes;
+import reparacoes.Passo;
 import reparacoes.PlanoTrabalho;
 import reparacoes.Reparacoes;
 import trabalhadores.ITrabalhadores;
@@ -71,6 +69,7 @@ public class SGCR implements Serializable {
 
     public void registaEquipamentoSemReparacao(String idPedido) throws InvalidIdException {
         pedidos.cancelaPedido(idPedido);
+        reparacoes.cancelaPedido(idPedido);
         Map.Entry<String, String> entry = pedidos.getNomeEmailCliente(idPedido);
         String email = entry.getValue();
         String nome = entry.getKey();
@@ -82,12 +81,12 @@ public class SGCR implements Serializable {
         this.reparacoes.conclusaoPlanoDeTrabalho(idPlano);
         this.pedidos.pedidoAguardaAceitacao(idPlano);
         this.pedidos.registarContactoPedidoOrcamento(idPlano, "Sistema");
+
         Map.Entry<Double, String> entry = reparacoes.getOrcamentoEHorasPlano(idPlano);
         double orcamento = entry.getKey();
         String idTecnico = entry.getValue();
 
         Duration duration = trabalhadores.getTrabalhoPorRealizarTecnico(idTecnico);
-
 
         Map.Entry<String, String> entryContactos = pedidos.getNomeEmailCliente(idPlano);
         String email = entryContactos.getValue();
@@ -134,6 +133,7 @@ public class SGCR implements Serializable {
 
     public void cancelaPedido(String idPedido) throws InvalidIdException {
         this.pedidos.cancelaPedido(idPedido);
+        this.reparacoes.cancelaPedido(idPedido);
     }
 
     public void registaPedidoOrcamento(String idCliente, String idFuncionario, String descricao) {
@@ -156,10 +156,9 @@ public class SGCR implements Serializable {
 
     }
 
-    public void criaReparacao(String idReparacao, String idTecnico) {
-        double orcamento = this.reparacoes.getOrcamento(idReparacao);
+    public void iniciaReparacao(String idReparacao, String idTecnico) {
         this.pedidos.pedidoADecorrer(idReparacao);
-        this.reparacoes.criaReparacao(idReparacao, idTecnico, orcamento);
+        this.reparacoes.iniciaReparacao(idReparacao);
         this.trabalhadores.setNotAvailable(idTecnico);
     }
 
@@ -233,6 +232,7 @@ public class SGCR implements Serializable {
 
     public void registaAceitacaoPlanoCliente(String idPedido) {
         pedidos.registaAceitacaoCliente(idPedido);
+        reparacoes.planoTrabalhoAceite(idPedido);
     }
 
     public void registaAceitacaoReparacaoCliente(String idReparacao) {
@@ -261,7 +261,10 @@ public class SGCR implements Serializable {
 
     public String getPedidoOrcamentoMaisAntigo() throws SemPedidosOrcamento {
         return pedidos.getPedidoOrcamentoMaisAntigo();
+    }
 
+    public String getReparacaoMaisUrgente(String idTecnico)throws SemReparacoesException{
+        return reparacoes.getReparacaoMaisUrgente(idTecnico);
     }
 
     public void registarFormatarPC(String idCliente, String idFuncionario, String idTecnico, String descricao) {
@@ -277,12 +280,16 @@ public class SGCR implements Serializable {
     }
 
     public void registarSubstituirBateria(String idCliente, String idFuncionario, String idTecnico, String descricao) {
-        this.registarSubstituirBateria(idCliente, idFuncionario, idTecnico, descricao);
+        this.pedidos.registarSubstituirBateria(idCliente, idFuncionario, idTecnico, descricao);
     }
 
-    public void registarSubstituirOutro(String idCliente, String idFuncionario, String idTecnico, String descricao) {
-        this.registarSubstituirOutro(idCliente, idFuncionario, idTecnico, descricao);
+    public void registarOutro(String idCliente, String idFuncionario, String idTecnico, String descricao) {
+        this.pedidos.registarOutro(idCliente, idFuncionario, idTecnico, descricao);
     }
 
+    public boolean isClienteAutenticado(String idCliente){
+        return pedidos.isClienteAutenticado(idCliente);
+        //return true;
+    }
 
 }
