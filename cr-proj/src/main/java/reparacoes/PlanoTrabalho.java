@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 public class PlanoTrabalho implements Serializable {
     private String idPlanoTrabalho;
     private String idTecnico;
-    private List<Passo> passos;
+    private List<Passo> passos; //TODO: Adicionar para um par de Passo,Bool que indica se já foi feito ou não
     private Estado estado;
     private double orcamento;
     private Duration duracaoTotal;

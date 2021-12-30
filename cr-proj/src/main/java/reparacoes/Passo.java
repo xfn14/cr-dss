@@ -11,6 +11,7 @@ public class Passo implements Serializable {
     private Duration duration;
     private List<Passo> subPassos;
     private String descricao;
+    // TODO Adicionar bool para verificar se foi feito ou não
 
 
     public Passo(double custoPecas, Duration duration, List<Passo> subPassos) {

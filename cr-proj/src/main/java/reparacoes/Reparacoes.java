@@ -230,8 +230,6 @@ public class Reparacoes implements IReparacoes, Serializable {
             planoTrabalho.setEstado(PlanoTrabalho.Estado.CANCELADO);
         }
     }
-
-
-
+    
 
 }

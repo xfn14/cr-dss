@@ -11,7 +11,7 @@ public class Reparacao implements Serializable {
     private final double orcamentoExpectavel;
     private Estado estado;
     private Duration duracaoTotal;
-    private List<Passo> passos; //TODO: Registar passos
+    private List<Passo> passos;
     private double orcamento;
 
     public Reparacao(String idReparacao, String idTecnico, double orcamento) {
