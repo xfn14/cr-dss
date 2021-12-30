@@ -1,5 +1,6 @@
 package gui.tecnico;
 
+import exceptions.InvalidIdException;
 import gui.PrettyFrame;
 import sgcr.SGCR;
 import utils.gui.HintTextArea;
@@ -21,17 +22,39 @@ public class CriaPlanoTrabalho extends PrettyFrame implements ActionListener {
     private JTextArea descricao;
     private JButton confirm;
     private JLabel status;
+    private JButton semReparacao;
 
+
+
+    private boolean cancelado;
     private int passoIndex = 0;
-    private boolean subPasso = false;
+    private boolean subPasso;
 
-    public CriaPlanoTrabalho(SGCR sgcr, String idPedido, String tecnico) {
+    public CriaPlanoTrabalho(SGCR sgcr, String idPedido, String tecnico, boolean subpasso) {
         super("Cria Plano Trabalho", 500, 400);
         this.sgcr = sgcr;
         this.idPedido = idPedido;
+        this.subPasso = subpasso;
+        this.cancelado = false;
         this.descricaoPO = this.sgcr.getDescricaoPedido(this.idPedido);
         this.sgcr.criaPlanosTrabalho(idPedido, tecnico);
         super.addComponent(new JLabel(this.descricaoPO), 0, 0, 2, 1);
+
+        this.confirm = new JButton(this.subPasso ? "Adicionar sub-passo" : "Adicioar passo");
+        super.addComponent(this.confirm, 4, 0, 2, 1);
+        this.confirm.addActionListener(this);
+
+        this.semReparacao = new JButton("Sem reparacao");
+        super.addComponent(this.semReparacao,5,0,2,1);
+        this.semReparacao.addActionListener(this);
+
+        super.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                System.out.println(sgcr.getPlanoDeTrabalho(idPedido).toString());
+                if (!cancelado)sgcr.registaConclusaoPlanoTrabalho(idPedido);
+            }
+        });
     }
 
     @Override
@@ -39,7 +62,6 @@ public class CriaPlanoTrabalho extends PrettyFrame implements ActionListener {
         this.horas = new HintTextField("Horas");
         this.custo = new HintTextField("Custo");
         this.descricao = new HintTextArea("Introduza uma descrição");
-        this.confirm = new JButton("Adicionar Passo");
         this.status = new JLabel("");
 
         super.addComponent(new JLabel("Horas"), 1, 0);
@@ -48,20 +70,12 @@ public class CriaPlanoTrabalho extends PrettyFrame implements ActionListener {
         super.addComponent(this.custo, 2, 1);
         super.addComponent(new JLabel("Descrição"), 3, 0);
         super.addComponent(this.descricao, 3, 1);
-        super.addComponent(this.confirm, 4, 0, 2, 1);
         super.addComponent(this.status, 5, 0, 2, 1);
-
-        super.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosed(WindowEvent e) {
-                System.out.println(sgcr.getPlanoDeTrabalho(idPedido).toString());
-            }
-        });
     }
 
     @Override
     public void addActionListener() {
-        this.confirm.addActionListener(this);
+
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -82,6 +96,7 @@ public class CriaPlanoTrabalho extends PrettyFrame implements ActionListener {
                         this.clearFields();
                         if (option != 0) {
                             this.subPasso = false;
+                            this.confirm.setText("Adicioar passo");
                             int option2 = JOptionPane.showConfirmDialog(
                                     new JFrame(),
                                     "Pretende adicionar mais passos",
@@ -96,15 +111,17 @@ public class CriaPlanoTrabalho extends PrettyFrame implements ActionListener {
                         this.status.setText("<html><font color=greeb>Passo adicionado!</font></html>");
                         int option = JOptionPane.showConfirmDialog(
                                 new JFrame(),
-                                "Pretende adicionar sub-passos",
+                                "Quer dividir em sub-passos?",
                                 "Criar Passo",
                                 JOptionPane.YES_NO_OPTION
                         );
                         this.clearFields();
                         if (option == 0) {
                             this.subPasso = true;
+                            this.confirm.setText("Adicionar sub-passo");
                         } else {
                             this.subPasso = false;
+                            this.confirm.setText("Adicioar passo");
                             this.passoIndex++;
                             int option2 = JOptionPane.showConfirmDialog(
                                     new JFrame(),
@@ -120,6 +137,14 @@ public class CriaPlanoTrabalho extends PrettyFrame implements ActionListener {
                 } else this.status.setText("<html><font color=red>Input Invalido!</font></html>");
             } catch (NumberFormatException ex) {
                 this.status.setText("<html><font color=red>Input Invalido!</font></html>");
+            }
+        }
+        if (e.getSource().equals(this.semReparacao)){
+            this.cancelado = true;
+            try {
+                sgcr.registaEquipamentoSemReparacao(idPedido);
+            } catch (InvalidIdException ex) {
+                ex.printStackTrace();
             }
         }
     }

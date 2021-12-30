@@ -29,11 +29,11 @@ public class ClientesPanel extends JPanel implements ActionListener {
 
         this.list = new JButton("Listar Clientes");
         this.list.addActionListener(this);
-        grid.gridx = 1;
-        grid.gridy = 0;
+        grid.gridx = 0;
+        grid.gridy = 1;
         super.add(this.list, grid);
 
-        super.setBackground(new Color(0, 255, 255, 255));
+//        super.setBackground(new Color(0, 255, 255, 255));
     }
 
     @Override

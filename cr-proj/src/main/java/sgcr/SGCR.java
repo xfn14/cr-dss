@@ -12,7 +12,6 @@ import trabalhadores.Trabalhador;
 import trabalhadores.Trabalhadores;
 
 import java.io.Serializable;
-import java.net.Inet4Address;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -58,7 +57,9 @@ public class SGCR implements Serializable {
 
     public void registaConclusaoReparacao(String idReparacao) throws InvalidIdException {
         reparacoes.registaConclusao(idReparacao);
-        pedidos.finalizaPedido(idReparacao);
+        pedidos.conclusaoReparacao(idReparacao);
+        String idTecnico = reparacoes.getIdTecnico(idReparacao);
+        trabalhadores.setAvailable(idTecnico);
         Map.Entry<String, String> entry = pedidos.getNomeEmailCliente(idReparacao);
         String email = entry.getValue();
         String nome = entry.getKey();
@@ -86,6 +87,7 @@ public class SGCR implements Serializable {
 
         reparacoes.getOrcamento(idPlano);
         double orcamento = reparacoes.getOrcamento(idPlano);
+        this.pedidos.changeOrcamento(idPlano,orcamento);
 
         Duration duration = trabalhadores.getTrabalhoPorRealizarTecnico(idTecnico);
 
@@ -150,37 +152,45 @@ public class SGCR implements Serializable {
 
     public void entregaEquipamento(String codPedido, String idFuncionario) {
         this.pedidos.entregaEquipamento(codPedido, idFuncionario);
+        this.pedidos.finalizaPedido(codPedido);
     }
 
     public void criaPlanosTrabalho(String idPedido, String idTecnico) {
+        this.pedidos.pedidoAtualizaIdPlano(idPedido);
         this.pedidos.pedidoADecorrer(idPedido);
         this.reparacoes.criaPlanosTrabalho(idPedido, idTecnico);
         this.trabalhadores.setNotAvailable(idTecnico);
-
     }
 
-    public void iniciaReparacao(String idReparacao, String idTecnico) {
+    public void iniciaReparacao(String idReparacao,String idTecnico) {
         this.pedidos.pedidoADecorrer(idReparacao);
         this.reparacoes.iniciaReparacao(idReparacao);
         this.trabalhadores.setNotAvailable(idTecnico);
     }
 
-    public void registaPasso(double horas, double custoPecas, String idReparacao) {
-        Map.Entry<String, Double> entryPasso = null;
+    public void registaPasso(double horas, double custoPecas, String descricao, String idReparacao) throws ValorSuperior {
+        String idTecnico = reparacoes.getIdTecnico(idReparacao);
         try {
-            entryPasso = this.reparacoes.registaPasso(horas, custoPecas, idReparacao);
+            this.reparacoes.registaPasso(horas, custoPecas, descricao, idReparacao);
+            double horasExpectavel = reparacoes.getLastExpectavel(idReparacao);
+            removeHorasTecnico(idTecnico,horasExpectavel);
         } catch (ValorSuperior e) {
+            double horasExpectavel = reparacoes.getLastExpectavel(idReparacao);
+            removeHorasTecnico(idTecnico,horasExpectavel);
+
             Map.Entry<String, String> entry = pedidos.getNomeEmailCliente(idReparacao);
             String email = entry.getValue();
             String nome = entry.getKey();
             this.reparacoes.reparacaoAguardaAceitacao(idReparacao);
-            //this.pedidos.
-            Email.valorSuperiorOrcamento(email, nome);
+            double orcamento = reparacoes.getOrcamento(idReparacao);
+            Email.valorSuperiorOrcamento(email, nome,orcamento);
+            throw new ValorSuperior();
         }
-        assert entryPasso != null;
-        String idTecnico = entryPasso.getKey();
-        double horasPlano = entryPasso.getValue();
-        trabalhadores.minusHorasTecnico(idTecnico, (long) horasPlano);
+
+    }
+
+    private void removeHorasTecnico(String idTecnico, double horas){
+        trabalhadores.minusHorasTecnico(idTecnico, (long) horas);
     }
 
     public void addPasso(String idPlano, double horas, double custoPecas, String descricao) {
@@ -197,22 +207,16 @@ public class SGCR implements Serializable {
         return this.reparacoes.getPlanoDeTrabalho(idPedido);
     }
 
-    public void reparacaoParaEspera(String idReparacao) {
-        this.reparacoes.reparacaoParaEspera(idReparacao);
-    }
-
-    public void conclusaoReparacao(String idReparacao) {
-        // TODO ao concluir reperacao tambem conclui plano de trabalho
-        this.pedidos.finalizaPedido(idReparacao);
-        try {
-            this.reparacoes.registaConclusao(idReparacao);
-        } catch (InvalidIdException e) {
-            this.logger.log(Level.WARNING, "Id de reparação invalido. (SGCR:conclusaoReparacao)");
-        }
+    public void reparacaoParaEsperaTempo(String idReparacao) {
+        this.pedidos.pedidoParaPausa(idReparacao);
+        this.reparacoes.reparacaoParaEsperaTempo(idReparacao);
         String idTecnico = reparacoes.getIdTecnico(idReparacao);
         trabalhadores.setAvailable(idTecnico);
-
-
+    }
+    public void reparacaoParaEsperaPecas(String idReparacao) {
+        this.reparacoes.reparacaoParaEsperaPecas(idReparacao);
+        String idTecnico = reparacoes.getIdTecnico(idReparacao);
+        trabalhadores.setAvailable(idTecnico);
     }
 
     public Object[][] getListPedidoOrcamento(){
@@ -384,7 +388,7 @@ public class SGCR implements Serializable {
     public String getPedidoOrcamentoMaisAntigo(String idTecnico) throws SemPedidosOrcamento {
         try {
             return reparacoes.checkPlanoTrabalhoPausa(idTecnico);
-        }catch (SemReparacoesException e){
+        }catch (SemPlanoTrabalhoException e){
             return pedidos.getPedidoOrcamentoMaisAntigo();
         }
     }
@@ -395,22 +399,27 @@ public class SGCR implements Serializable {
 
     public void registarFormatarPC(String idCliente, String idFuncionario, String idTecnico, String descricao) {
         this.pedidos.registarFormatarPC(idCliente, idFuncionario, idTecnico, descricao);
+        this.trabalhadores.setNotAvailable(idTecnico);
     }
 
     public void registarInstalarOS(String idCliente, String idFuncionario, String idTecnico, String descricao) {
         this.pedidos.registarInstalarOS(idCliente, idFuncionario, idTecnico, descricao);
+        this.trabalhadores.setNotAvailable(idTecnico);
     }
 
     public void registarSubstituirEcra(String idCliente, String idFuncionario, String idTecnico, String descricao) {
         this.pedidos.registarSubstituirEcra(idCliente, idFuncionario, idTecnico, descricao);
+        this.trabalhadores.setNotAvailable(idTecnico);
     }
 
     public void registarSubstituirBateria(String idCliente, String idFuncionario, String idTecnico, String descricao) {
         this.pedidos.registarSubstituirBateria(idCliente, idFuncionario, idTecnico, descricao);
+        this.trabalhadores.setNotAvailable(idTecnico);
     }
 
     public void registarOutro(String idCliente, String idFuncionario, String idTecnico, String descricao) {
         this.pedidos.registarOutro(idCliente, idFuncionario, idTecnico, descricao);
+        this.trabalhadores.setNotAvailable(idTecnico);
     }
 
     public boolean isClienteAutenticado(String idCliente) {
@@ -450,5 +459,11 @@ public class SGCR implements Serializable {
     public void arquivarPedido (String idPedido){
         pedidos.arquivarPedido(idPedido);
         reparacoes.arquivarPedido(idPedido);
+    }
+
+    public void terminaServicoExpresso (String idPedido) throws InvalidIdException {
+        String idTecnico = pedidos.getIdTecnicoSE(idPedido);
+        this.pedidos.finalizaPedido(idPedido);
+        this.trabalhadores.setAvailable(idTecnico);
     }
 }

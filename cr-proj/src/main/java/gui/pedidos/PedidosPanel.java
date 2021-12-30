@@ -71,7 +71,7 @@ public class PedidosPanel extends JPanel implements ActionListener {
             super.add(this.registaEntrega, grid);
         }
 
-        super.setBackground(new Color(0, 255, 0, 255));
+//        super.setBackground(new Color(0, 255, 0, 255));
     }
 
     @Override

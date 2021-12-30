@@ -43,12 +43,17 @@ public class PlanoTrabalho implements Serializable {
 
     public Map.Entry<String,String[]> passoToEntry(int index){
         Passo passo = this.passos.get(index);
+        if(passo.getSubPassos().size() == 0)
+            return new AbstractMap.SimpleEntry<>(
+                    "(" + passo.getDuration() + "/" + passo.getCustoPecas() + ") " + passo.getDescricao(), null
+            );
+
         String[] subPassos = new String[passo.getSubPassos().size()];
         int i = 0;
         for(Passo p : passo.getSubPassos())
-            subPassos[i] = "(" + passo.getDuration() + "/" + passo.getCustoPecas() + ") " + p.getDescricao();
+            subPassos[i++] = "(" + passo.getDuration() + "/" + passo.getCustoPecas() + ") " + p.getDescricao();
         return new AbstractMap.SimpleEntry<>(
-                "(" + (index + 1) + "/" + this.passos.size() + ") " + passo.getDescricao(),
+                "(" + (index + 1) + "/" + this.passos.size() + ")",
                 subPassos
         );
     }
@@ -57,7 +62,7 @@ public class PlanoTrabalho implements Serializable {
         this.duracaoTotal = this.duracaoTotal.plus(Duration.ofHours((long) horas));
         Passo passo = new Passo(horas, custoPecas, descricao);
         this.passos.add(passo);
-        this.orcamento += passo.getCustoPecas();
+        this.orcamento += custoPecas;
     }
 
     public void setEstado(Estado estado) {
@@ -69,6 +74,7 @@ public class PlanoTrabalho implements Serializable {
             Passo passo = new Passo(0, 0, descricao);
             passos.add(passo);
         }
+        this.orcamento+=custoPecas;
         Passo passo = passos.get(indexPasso);
         passo.addSubPasso(horas, custoPecas, descricao);
     }

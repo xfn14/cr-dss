@@ -1,6 +1,7 @@
 package reparacoes;
 
 import exceptions.InvalidIdException;
+import exceptions.SemPlanoTrabalhoException;
 import exceptions.SemReparacoesException;
 import exceptions.ValorSuperior;
 import pedidos.Pedido;
@@ -8,6 +9,7 @@ import pedidos.Pedido;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Reparacoes implements IReparacoes, Serializable {
     private final Map<String, Reparacao> reparacaoMap;
@@ -46,27 +48,33 @@ public class Reparacoes implements IReparacoes, Serializable {
     }
 
     public int getPassoAtualIndex(String idReparacao){
-        return this.reparacaoMap.get(idReparacao).getPassos().size();
+        return this.reparacaoMap.get(idReparacao).passoAtual();
     }
 
     public Map.Entry<String, String[]> getPassoAtualDescricao(String idReparacao) {
-        // TODO Verificar
         Reparacao reparacao = reparacaoMap.get(idReparacao);
         PlanoTrabalho planoTrabalho = this.planoTrabalhoMap.get(idReparacao);
-        return planoTrabalho.passoToEntry(reparacao.nPassoAtual());
+        return planoTrabalho.passoToEntry(reparacao.passoAtual());
     }
 
     @Override
-    public Map.Entry<String, Double> registaPasso(double horas, double custoPecas, String idReparacao) throws ValorSuperior {
+    public void registaPasso(double horas, double custoPecas,String descricao ,String idReparacao) throws ValorSuperior {
         Reparacao reparacao = reparacaoMap.get(idReparacao);
-        int indexPasso = reparacao.registaPasso(horas, custoPecas); // TODO indexPasso é o len dos passos da reparaçao, nao fica ao contrario para o plano de trabalho?
+        reparacao.registaPasso(horas, custoPecas,descricao);
+        int indexPasso = reparacao.passoAtual();
         PlanoTrabalho planoTrabalho = planoTrabalhoMap.get(idReparacao);
         double expectavel = planoTrabalho.getCustoPecasPasso(indexPasso);
         double diferenca = custoPecas - expectavel;
         reparacao.changeOrcamento(diferenca);
-        String idTecnico = reparacao.getIdTecnico();
         if (reparacao.checkSuperior120()) throw new ValorSuperior();
-        return new AbstractMap.SimpleEntry<>(idTecnico, expectavel);
+    }
+
+    public double getLastExpectavel(String idPlano){
+        Reparacao reparacao = reparacaoMap.get(idPlano);
+        int index = reparacao.passoAtual();
+        PlanoTrabalho planoTrabalho = planoTrabalhoMap.get(idPlano);
+        planoTrabalho.getCustoPecasPasso(index);
+        return planoTrabalho.getCustoPecasPasso(index);
     }
 
     @Override
@@ -177,8 +185,13 @@ public class Reparacoes implements IReparacoes, Serializable {
         reparacaoMap.get(idReparacao).setEstado(Reparacao.Estado.DECORRER);
     }
 
-    public void reparacaoParaEspera(String idReparacao) {
-        this.reparacaoMap.get(idReparacao).setEstado(Reparacao.Estado.PAUSA);
+    public void reparacaoParaEsperaTempo(String idReparacao) {
+        this.reparacaoMap.get(idReparacao).setEstado(Reparacao.Estado.PAUSA_TEMPO);
+        System.out.println(this.reparacaoMap.get(idReparacao).getEstado());
+    }
+
+    public void reparacaoParaEsperaPecas(String idReparacao) {
+        this.reparacaoMap.get(idReparacao).setEstado(Reparacao.Estado.PAUSA_PECAS);
     }
 
     public String getIdTecnico(String idReparacao) {
@@ -194,6 +207,9 @@ public class Reparacoes implements IReparacoes, Serializable {
             Reparacao reparacao = reparacaoMap.get(idPedido);
             reparacao.setEstado(Reparacao.Estado.CANCELADA);
         }
+        String idTecnico = getIdTecnico(idPedido);
+        List<String> queueList = queueMap.get(idTecnico);
+        queueList.remove(idPedido);
     }
 
     public String getReparacaoMaisUrgente(String idTecnico) throws SemReparacoesException {
@@ -203,20 +219,20 @@ public class Reparacoes implements IReparacoes, Serializable {
             Reparacao reparacao = reparacaoMap.get(idPedido);
             // TODO em pausa ta quando o tecnico tbm n esta a trabalhar nela ou quando mete em pausa
             // quando volta a abrir volta a meter em decorrer
-            if (reparacao.emPausa()) continue;
+            if (reparacao.getEstado().equals(Reparacao.Estado.PAUSA_PECAS)) continue;
             if (reparacao.aguardaAceitacao()) continue;
-            reparacaoParaDecorrer(idPedido); //TODO: Not sure about this
+            if (reparacao.getEstado().equals(Reparacao.Estado.CANCELADA)) continue;
+            reparacaoParaDecorrer(idPedido);
             return idPedido;
         }
         throw new SemReparacoesException();
     }
 
-    //TODO Change to SemPlanoTrabalhoException
-    public String checkPlanoTrabalhoPausa (String idTecnico) throws SemReparacoesException {
+    public String checkPlanoTrabalhoPausa (String idTecnico) throws SemPlanoTrabalhoException {
         return planoTrabalhoMap.values().stream().
                 filter(planoTrabalho -> planoTrabalho.getIdTecnico().equals(idTecnico) && planoTrabalho.getEstado().equals(PlanoTrabalho.Estado.PAUSA)).
                 map(PlanoTrabalho::getIdPlanoTrabalho).
-                findFirst().orElseThrow(SemReparacoesException::new);
+                findFirst().orElseThrow(SemPlanoTrabalhoException::new);
     }
 
 
@@ -230,6 +246,8 @@ public class Reparacoes implements IReparacoes, Serializable {
             planoTrabalho.setEstado(PlanoTrabalho.Estado.CANCELADO);
         }
     }
-    
+
+
+
 
 }

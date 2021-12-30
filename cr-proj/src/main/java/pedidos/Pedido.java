@@ -124,9 +124,11 @@ public class Pedido implements Serializable {
 
     public enum Estado {
         DECORRER,
+        PAUSA,
         AGUARDA_PLANO,
         AGUARDA_ACEITACAO,
         AGUARDA_REPARACAO,
+        AGUARDA_ENTREGA,
         FINALIZADO,
         ARQUIVADO,
         CANCELADO

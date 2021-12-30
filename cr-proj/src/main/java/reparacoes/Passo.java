@@ -11,19 +11,20 @@ public class Passo implements Serializable {
     private Duration duration;
     private List<Passo> subPassos;
     private String descricao;
-    // TODO Adicionar bool para verificar se foi feito ou não
 
 
     public Passo(double custoPecas, Duration duration, List<Passo> subPassos) {
         this.custoPecas = custoPecas;
         this.duration = duration;
         this.subPassos = new ArrayList<>(subPassos);
+        this.descricao = "";
     }
 
     public Passo(double horas, double custoPecas) {
         this.custoPecas = custoPecas;
         this.duration = Duration.ofHours((long) horas);
         this.subPassos = new ArrayList<>();
+        this.descricao="";
     }
 
     public Passo(double horas, double custoPecas, String descricao) {

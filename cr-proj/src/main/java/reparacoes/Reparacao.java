@@ -19,6 +19,7 @@ public class Reparacao implements Serializable {
         this.idTecnico = idTecnico;
         this.orcamento = orcamento;
         this.orcamentoExpectavel = orcamento;
+        this.passos = new ArrayList<>();
         this.duracaoTotal = Duration.ZERO;
         this.estado = Estado.AGUARDA_INICIO;
     }
@@ -27,10 +28,10 @@ public class Reparacao implements Serializable {
     public enum Estado {
         AGUARDA_INICIO,
         DECORRER,
-        PAUSA,
+        //PAUSA,
         //TODO: Modificar Pausa, quando dá logout, passar as DECORRER para PAUSA_TEMPO
-        //PAUSA_TEMPO ->
-        //PAUSA_PECAS
+        PAUSA_TEMPO,
+        PAUSA_PECAS,
         AGUARDA_ACEITACAO,
         FINALIZADA,
         CANCELADA;
@@ -38,8 +39,12 @@ public class Reparacao implements Serializable {
 
 
 
-    public int nPassoAtual(){
-        return this.passos.size()-1;
+    public int passoAtual (){
+        return this.passos.isEmpty() ? 0 : this.passos.size() - 1;
+    }
+
+    public int getSizePassos(){
+        return this.passos.size();
     }
 
     public boolean aguardaAceitacao() {
@@ -54,11 +59,10 @@ public class Reparacao implements Serializable {
         this.idReparacao = idReparacao;
     }
 
-    public int registaPasso(double horas, double custoPecas) {
-        Passo passo = new Passo(horas, custoPecas);
+    public void registaPasso(double horas, double custoPecas,String descricao) {
+        Passo passo = new Passo(horas, custoPecas,descricao);
         this.duracaoTotal = this.duracaoTotal.plus(Duration.ofHours((long) horas));
         this.passos.add(passo);
-        return passos.size() - 1;
     }
 
     public void changeOrcamento(double diff) {
@@ -71,7 +75,7 @@ public class Reparacao implements Serializable {
     }
 
     public void reparacaoAceite() {
-        setEstado(Estado.PAUSA);
+        setEstado(Estado.PAUSA_TEMPO);
         this.orcamento = this.orcamentoExpectavel;
     }
 
@@ -81,7 +85,7 @@ public class Reparacao implements Serializable {
     }
 
     public boolean emPausa() {
-        return this.estado.equals(Estado.PAUSA);
+        return this.estado.equals(Estado.PAUSA_PECAS) || this.estado.equals(Estado.PAUSA_TEMPO);
     }
 
     public Estado getEstado() {

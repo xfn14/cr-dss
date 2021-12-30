@@ -1,6 +1,5 @@
 package gui.pedidos;
 
-import gui.PrettyFrame;
 import sgcr.SGCR;
 import utils.gui.HintTextField;
 

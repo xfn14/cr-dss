@@ -33,8 +33,6 @@ public class Main {
 
         Email email = new Email(sgcr);
         email.checkEmail();
-        //Thread emailThread = new Thread(email);
-        //emailThread.start();
 
         LoginFrame loginFrame = new LoginFrame(sgcr, email);
         Thread thread = new Thread(loginFrame);

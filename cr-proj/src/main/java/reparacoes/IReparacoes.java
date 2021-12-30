@@ -1,6 +1,7 @@
 package reparacoes;
 
 import exceptions.InvalidIdException;
+import exceptions.SemPlanoTrabalhoException;
 import exceptions.SemReparacoesException;
 import exceptions.ValorSuperior;
 
@@ -10,7 +11,7 @@ import java.util.Map;
 public interface IReparacoes {
     void criaPlanosTrabalho(String idPedido, String idTecnico);
 
-    Map.Entry<String, Double> registaPasso(double horas, double custoPecas, String idReparacao) throws ValorSuperior;
+    void registaPasso(double horas, double custoPecas, String descricao, String idReparacao) throws ValorSuperior;
 
     void conclusaoPlanoDeTrabalho(String codPlanoDeTrabalho);
 
@@ -18,7 +19,9 @@ public interface IReparacoes {
 
     void addPasso(String idPlano, double horas, double custoPecas, String descricao) throws InvalidIdException;
 
-    void reparacaoParaEspera(String idReparacao);
+    void reparacaoParaEsperaTempo(String idReparacao);
+
+    void reparacaoParaEsperaPecas(String idReparacao);
 
     void reparacaoParaDecorrer(String idReparacao);
 
@@ -54,7 +57,10 @@ public interface IReparacoes {
 
     int getPassoAtualIndex(String idReparacao);
 
-    String checkPlanoTrabalhoPausa (String idTecnico) throws SemReparacoesException;
+    String checkPlanoTrabalhoPausa (String idTecnico) throws SemPlanoTrabalhoException;
 
     void arquivarPedido(String idPedido);
-}
+
+    double getLastExpectavel(String idPlano);
+
+    }

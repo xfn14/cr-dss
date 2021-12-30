@@ -73,12 +73,12 @@ public class CRFrame extends JFrame implements Runnable, ActionListener {
 
     public void initSidePanel() {
         this.sidePanel = new JPanel(new GridBagLayout());
-        this.sidePanel.setSize(new Dimension(this.WIDTH / 4, this.HEIGHT));
-        this.sidePanel.setBackground(new Color(255, 0, 0, 255));
+        this.sidePanel.setSize(new Dimension(this.WIDTH / 3, this.HEIGHT));
+        this.sidePanel.setBackground(new Color(150, 150, 150, 255));
         this.sidePanel.setVisible(true);
 
         GridBagConstraints grid = new GridBagConstraints();
-        grid.insets = new Insets(5, 2, 5, 2);
+        grid.insets = new Insets(5, 8, 5, 8);
         grid.fill = GridBagConstraints.HORIZONTAL;
         grid.anchor = GridBagConstraints.NORTH;
 

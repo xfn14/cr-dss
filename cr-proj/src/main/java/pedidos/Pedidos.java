@@ -313,7 +313,7 @@ public class Pedidos implements IPedidos, Serializable {
         if (p instanceof PedidoOrcamento) {
             return ((PedidoOrcamento) p).getDescricaoProblema();
         }
-        return ""; // TODO Invalid Id Exception ???
+        return "";
     }
 
     public boolean isValidPedidoID(String idPedido) {
@@ -334,5 +334,29 @@ public class Pedidos implements IPedidos, Serializable {
         pedido.setEstado(Pedido.Estado.ARQUIVADO);
     }
 
+    public void pedidoAtualizaIdPlano(String idPedido){
+        Pedido pedido = pedidoMap.get(idPedido);
+        if (pedido instanceof PedidoOrcamento) ((PedidoOrcamento) pedido).setIdPlanoTrabalho(idPedido);
+    }
 
+    public String getIdTecnicoSE(String idPedido) throws InvalidIdException{
+        Pedido pedido = pedidoMap.get(idPedido);
+        if (pedido instanceof ServicoExpresso) return ((ServicoExpresso) pedido).getIdTecnico();
+        throw new InvalidIdException(idPedido, InvalidIdException.Type.SERVICO_EXPRESSO);
+    }
+
+    public void pedidoParaPausa (String idPedido){
+        Pedido pedido = pedidoMap.get(idPedido);
+        pedido.setEstado(Pedido.Estado.PAUSA);
+    }
+
+    public void changeOrcamento(String idPlano,double orcamento) {
+        Pedido pedido = pedidoMap.get(idPlano);
+        if (pedido instanceof PedidoOrcamento) ((PedidoOrcamento) pedido).setOrcamento(orcamento);
+    }
+
+    public void conclusaoReparacao (String idPlano){
+        Pedido pedido = pedidoMap.get(idPlano);
+        pedido.setEstado(Pedido.Estado.AGUARDA_ENTREGA);
+    }
 }

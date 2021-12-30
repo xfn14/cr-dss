@@ -58,7 +58,7 @@ public class AdminPanel extends JPanel implements ActionListener {
         grid.gridy = 2;
         super.add(this.listIntervencoesTecnico, grid);
 
-        super.setBackground(new Color(255, 255, 0, 255));
+        super.setBackground(new Color(255, 100, 100, 255));
     }
 
     @Override
@@ -67,18 +67,18 @@ public class AdminPanel extends JPanel implements ActionListener {
             new RegistarTrabalhador(this.sgcr);
         } else if (e.getSource().equals(this.listTrabalhadores)) {
             new ListTrabalhadores(this.sgcr);
-        } else if(e.getSource().equals(this.listReparacoesTecnico)){
+        } else if (e.getSource().equals(this.listReparacoesTecnico)) {
             LocalDateTime date = getMesAno();
             System.out.println(date);
-            if(date != null)
+            if (date != null)
                 new ListReparacoesTecnico(this.sgcr, date);
-        }else if(e.getSource().equals(this.listFuncionarioTrabalho)){
+        } else if (e.getSource().equals(this.listFuncionarioTrabalho)) {
             LocalDateTime date = getMesAno();
-            if(date != null)
+            if (date != null)
                 new ListFuncionarioTrabalho(this.sgcr, date);
-        }else if(e.getSource().equals(this.listIntervencoesTecnico)){
+        } else if (e.getSource().equals(this.listIntervencoesTecnico)) {
             LocalDateTime date = getMesAno();
-            if(date != null)
+            if (date != null)
                 new ListIntervencoesTecnico(this.sgcr, date);
         }
     }
@@ -91,19 +91,19 @@ public class AdminPanel extends JPanel implements ActionListener {
                 "Listar Reparações por Tecnico",
                 JOptionPane.YES_NO_OPTION
         );
-        if(option == 0){
+        if (option == 0) {
             String s = mes.getText();
-            if(!s.isBlank() & s.contains("/")){
+            if (!s.isBlank() & s.contains("/")) {
                 String[] vals = s.split("/");
-                try{
+                try {
                     int m = Integer.parseInt(vals[0]);
                     int a = Integer.parseInt(vals[1]);
-                    if(0 < m && m <= 12){
+                    if (0 < m && m <= 12) {
                         return LocalDateTime.of(LocalDate.of(a, m, 1), LocalTime.now());
-                    }else{
+                    } else {
                         this.showMesAnoInvalido();
                     }
-                }catch (NumberFormatException ex){
+                } catch (NumberFormatException ex) {
                     this.showMesAnoInvalido();
                 }
             }
@@ -111,7 +111,7 @@ public class AdminPanel extends JPanel implements ActionListener {
         return null;
     }
 
-    private void showMesAnoInvalido(){
+    private void showMesAnoInvalido() {
         JOptionPane.showConfirmDialog(
                 new JFrame(),
                 "Mes ou ano invalido",

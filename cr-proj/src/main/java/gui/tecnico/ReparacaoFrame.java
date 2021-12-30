@@ -1,6 +1,7 @@
 package gui.tecnico;
 
 import exceptions.InvalidIdException;
+import exceptions.ValorSuperior;
 import gui.PrettyFrame;
 import sgcr.SGCR;
 import utils.gui.HintTextField;
@@ -13,60 +14,64 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ReparacaoFrame extends PrettyFrame implements ActionListener, Runnable {
+    private final Logger logger = Logger.getLogger("CR");
     private final SGCR sgcr;
     private final String idReparacao;
     private final JTextArea currentPasso;
-    private final JScrollPane scrollPane;
-    private final JTextField horasInput;
-    private final JTextField custoInput;
-    private final JTextField info;
-    private final JButton pausaRetomar;
-    private final JButton finalizarPasso;
     private final JLabel currentTime;
+    //    private final JScrollPane scrollPane;
+    private JTextField horasInput;
+    private JTextField custoInput;
+    private JTextField info;
+    private JButton pausaRetomar;
+    private JButton finalizarPasso;
     private java.util.Timer timer;
     private int current, total;
 
-    public ReparacaoFrame(SGCR sgcr, String idReparacao) {
+    public ReparacaoFrame(SGCR sgcr, String idReparacao, String idTecnico) {
         super("Reparação | ID: " + idReparacao, 1200, 900);
         this.sgcr = sgcr;
         this.idReparacao = idReparacao;
 
         this.timer = new java.util.Timer();
 
-        this.sgcr.reparacaoParaDecorrer(idReparacao);
+        this.sgcr.iniciaReparacao(idReparacao, idTecnico);
 
         this.currentPasso = new JTextArea();
         this.setCurrentPasso();
         this.currentPasso.setLineWrap(true);
         this.currentPasso.setWrapStyleWord(true);
         this.currentPasso.setEditable(false);
-        this.currentPasso.setOpaque(false);
-        this.scrollPane = new JScrollPane(this.currentPasso);
-        this.scrollPane.setPreferredSize(new Dimension(600, 300));
-        this.scrollPane.setOpaque(false);
+        this.currentPasso.setSize(new Dimension(600, 300));
+//        this.scrollPane = new JScrollPane(this.currentPasso);
+//        this.scrollPane.setPreferredSize(new Dimension(600, 300));
+        super.addComponent(this.currentPasso, 0, 0, 2, 1);
 
-        this.horasInput = new HintTextField("Tempo do passo atual");
-        this.custoInput = new HintTextField("Custo do passo atual");
-        this.info = new HintTextField("Informação sobre o que foi feito");
-        this.pausaRetomar = new JButton("Pausa");
-        this.finalizarPasso = new JButton("Finalizar Passo");
         this.currentTime = new JLabel(currentTime());
 
         super.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
-                // TODO Mete em espera quando sai
-                if(current + 1 != total)
-                    sgcr.reparacaoParaEspera(idReparacao);
+                if (current + 1 <= total) {
+                    sgcr.reparacaoParaEsperaTempo(idReparacao);
+                    System.out.println("oi");
+                }
             }
         });
     }
 
     @Override
     public void addComponents() {
-        super.addComponent(this.currentPasso, 0, 0, 2, 1);
+        this.horasInput = new HintTextField("Tempo do passo atual");
+        this.custoInput = new HintTextField("Custo do passo atual");
+        this.info = new HintTextField("Informação sobre o que foi feito");
+        this.pausaRetomar = new JButton("Pausa");
+        this.finalizarPasso = new JButton("Finalizar Passo");
+
         super.addComponent(new JLabel("Horas"), 1, 0);
         super.addComponent(this.horasInput, 1, 1);
         super.addComponent(new JLabel("Custo"), 2, 0);
@@ -88,29 +93,47 @@ public class ReparacaoFrame extends PrettyFrame implements ActionListener, Runna
         if (e.getSource().equals(this.pausaRetomar)) {
             if (this.pausaRetomar.getText().equals("Pausa")) {
                 this.pausaRetomar.setText("Retomar");
-                this.sgcr.reparacaoParaEspera(this.idReparacao);
+                this.sgcr.reparacaoParaEsperaPecas(this.idReparacao);
             } else {
                 this.pausaRetomar.setText("Pausa");
                 this.sgcr.reparacaoParaDecorrer(this.idReparacao);
             }
         } else if (e.getSource().equals(this.finalizarPasso) && this.pausaRetomar.getText().equals("Pausa")) {
-            if(this.horasInput.getText().isBlank() || this.custoInput.getText().isBlank()){
+            if (this.horasInput.getText().isBlank() || this.custoInput.getText().isBlank()) {
                 this.inputInvalido();
-            }else{
-                try{
+            } else {
+                try {
                     int h = Integer.parseInt(this.horasInput.getText());
                     int c = Integer.parseInt(this.custoInput.getText());
-                    if(h < 0 || c < 0){
+                    if (h < 0 || c < 0) {
                         this.inputInvalido();
                         return;
                     }
-                    this.sgcr.addPasso(this.idReparacao, h, c, this.info.getText());
-                    if(this.current + 1 == total){
-                        this.sgcr.conclusaoReparacao(this.idReparacao);
-                    }else{
-                        this.setCurrentPasso();
+                    try {
+                        if (this.current + 1 == total) {
+                            this.sgcr.registaPasso(h, c, this.info.getText(), this.idReparacao);
+                            this.clearFields();
+                            try {
+                                this.sgcr.registaConclusaoReparacao(this.idReparacao);
+                                this.current++;
+                                this.dispose();
+                            } catch (InvalidIdException ex) {
+                                this.logger.log(Level.SEVERE, "Id de reparação invalido.");
+                            }
+                        } else {
+                            this.setCurrentPasso();
+                        }
+                    } catch (ValorSuperior ex) {
+                        JOptionPane.showConfirmDialog(
+                                new JFrame(),
+                                "Orçamento excedido, aguarde resposta do cliente",
+                                "Reparação",
+                                JOptionPane.DEFAULT_OPTION,
+                                JOptionPane.PLAIN_MESSAGE
+                        );
+                        super.dispose();
                     }
-                }catch (NumberFormatException ex){
+                } catch (NumberFormatException ex) {
                     this.inputInvalido();
                 }
             }
@@ -132,19 +155,21 @@ public class ReparacaoFrame extends PrettyFrame implements ActionListener, Runna
         return new SimpleDateFormat("HH:mm:ss").format(new Date());
     }
 
-    private void setCurrentPasso(){
-        this.currentPasso.setText(this.sgcr.getPassoAtualDescricao(this.idReparacao));
+    private void setCurrentPasso() {
+        String desc = this.sgcr.getPassoAtualDescricao(this.idReparacao);
+        this.currentPasso.setText(desc == null ? "" : desc);
         this.current = this.sgcr.getPassoAtualIndex(this.idReparacao);
         this.total = this.sgcr.getTotalPassos(this.idReparacao);
+        System.out.println(this.current + " " + this.total);
     }
 
-    private void clearFields(){
+    private void clearFields() {
         this.horasInput.setText("");
         this.custoInput.setText("");
         this.info.setText("");
     }
 
-    private void inputInvalido(){
+    private void inputInvalido() {
         JOptionPane.showConfirmDialog(
                 new JFrame(),
                 "Input Invalido! Por favor preencha todas as caixas.",
