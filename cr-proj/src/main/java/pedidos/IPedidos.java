@@ -24,7 +24,6 @@ public interface IPedidos {
 
     void entregaEquipamento(String codE, String idFuncionario);
 
-    void imprimirComprovativo(String cdPedido);
 
     void criarFichaCliente(String nome, String email, String nmr, String nif);
 
@@ -72,7 +71,12 @@ public interface IPedidos {
 
     String getPedidoOrcamentoMaisAntigo() throws SemPedidosOrcamento;
 
-    boolean isClienteAutenticado (String idCliente);
+    boolean isClienteAutenticado(String idCliente);
 
-    }
+    String getDescricaoPedido(String idPedido);
+
+    boolean isValidPedidoID(String idPedido);
+
+    boolean hasEquipamenteEntregue(String idPedido);
+}
 

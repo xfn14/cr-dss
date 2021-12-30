@@ -174,12 +174,6 @@ public class Pedidos implements IPedidos, Serializable {
         this.entregaMap.put(codPedido, entrega);
     }
 
-    @Override
-    public void imprimirComprovativo(String idPedido) {
-        //Pedido p = this.pedidoMap.get(idPedido);
-        //if (p.getEstado().equals(Pedido.Estado.FINALIZADO))
-
-    }
 
     public void pedidoADecorrer(String idPedido) {
         Pedido pedido = pedidoMap.get(idPedido);
@@ -203,7 +197,6 @@ public class Pedidos implements IPedidos, Serializable {
         return clientesMap.containsKey(idCliente);
     }
 
-
     public List<Map.Entry<String, String>> aguardaResposta() {
         List<Map.Entry<String, String>> resultList = new ArrayList<>();
         for (Pedido pedido : pedidoMap.values()) {
@@ -219,7 +212,6 @@ public class Pedidos implements IPedidos, Serializable {
         }
         return resultList;
     }
-
 
     public void pedidoAguardaAceitacao(String idPedido) {
         Pedido pedido = pedidoMap.get(idPedido);
@@ -307,9 +299,23 @@ public class Pedidos implements IPedidos, Serializable {
         return maisAntigo.getIdPedido();
     }
 
-    public boolean isClienteAutenticado (String idCliente){
+    public boolean isClienteAutenticado(String idCliente) {
         return clientesMap.containsKey(idCliente);
     }
 
+    public String getDescricaoPedido(String idPedido) {
+        Pedido p = this.pedidoMap.get(idPedido);
+        if (p instanceof PedidoOrcamento) {
+            return ((PedidoOrcamento) p).getDescricaoProblema();
+        }
+        return ""; // TODO Invalid Id Exception ???
+    }
 
+    public boolean isValidPedidoID(String idPedido) {
+        return this.pedidoMap.containsKey(idPedido);
+    }
+
+    public boolean hasEquipamenteEntregue(String idPedido) {
+        return this.entregaMap.containsKey(idPedido);
+    }
 }

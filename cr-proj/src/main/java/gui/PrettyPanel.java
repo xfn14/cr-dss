@@ -3,18 +3,12 @@ package gui;
 import javax.swing.*;
 import java.awt.*;
 
-public abstract class PrettyFrame extends JFrame {
+public abstract class PrettyPanel extends JPanel {
     private final GridBagLayout layout;
     private final GridBagConstraints constraints;
 
-    public PrettyFrame(String name, int width, int height){
-        super(name);
-        super.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        super.setResizable(false);
-        super.setLocationRelativeTo(null);
-        super.setSize(new Dimension(width, height));
-        super.setVisible(true);
-
+    public PrettyPanel(){
+        super();
         this.layout = new GridBagLayout();
         this.constraints = new GridBagConstraints();
         this.constraints.weightx = 1.0;
@@ -40,7 +34,7 @@ public abstract class PrettyFrame extends JFrame {
     }
 
     public void addComponent(Component component, int row, int column,
-                              int width, int height) {
+                             int width, int height) {
         this.constraints.gridy = row;                        // set gridy
         this.constraints.gridx = column;                     // set gridx
         this.constraints.gridwidth = width;                  // set width

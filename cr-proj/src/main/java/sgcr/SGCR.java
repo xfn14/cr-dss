@@ -2,10 +2,9 @@ package sgcr;
 
 import emailHandler.Email;
 import exceptions.*;
-import pedidos.IPedidos;
-import pedidos.Pedidos;
+import pedidos.*;
 import reparacoes.IReparacoes;
-import reparacoes.Passo;
+import reparacoes.InfoReparacao;
 import reparacoes.PlanoTrabalho;
 import reparacoes.Reparacoes;
 import trabalhadores.ITrabalhadores;
@@ -15,14 +14,13 @@ import trabalhadores.Trabalhadores;
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class SGCR implements Serializable {
+    private transient final Logger logger = Logger.getLogger("CR");
     private ITrabalhadores trabalhadores;
     private IPedidos pedidos;
     private IReparacoes reparacoes;
@@ -180,10 +178,14 @@ public class SGCR implements Serializable {
         trabalhadores.minusHorasTecnico(idTecnico, (long) horasPlano);
     }
 
-    public void addPasso(String idPlano, double horas, double custoPecas, String descricao) throws InvalidIdException {
-        this.reparacoes.addPasso(idPlano, horas, custoPecas, descricao);
-        String idTecnico = reparacoes.getIdTecnico(idPlano);
-        trabalhadores.addHorasTecnico(idTecnico, (long) horas);
+    public void addPasso(String idPlano, double horas, double custoPecas, String descricao) {
+        try {
+            this.reparacoes.addPasso(idPlano, horas, custoPecas, descricao);
+            String idTecnico = reparacoes.getIdTecnico(idPlano);
+            trabalhadores.addHorasTecnico(idTecnico, (long) horas);
+        } catch (InvalidIdException e) {
+            this.logger.log(Level.WARNING, "Id de tecnico invalido", e);
+        }
     }
 
     public PlanoTrabalho getPlanoDeTrabalho(String idPedido) {
@@ -194,9 +196,14 @@ public class SGCR implements Serializable {
         this.reparacoes.reparacaoParaEspera(idReparacao);
     }
 
-    public void conclusaoReparacao(String idReparacao) throws InvalidIdException {
+    public void conclusaoReparacao(String idReparacao) {
+        // TODO ao concluir reperacao tambem conclui plano de trabalho
         this.pedidos.finalizaPedido(idReparacao);
-        this.reparacoes.registaConclusao(idReparacao);
+        try {
+            this.reparacoes.registaConclusao(idReparacao);
+        } catch (InvalidIdException e) {
+            this.logger.log(Level.WARNING, "Id de reparação invalido. (SGCR:conclusaoReparacao)");
+        }
         String idTecnico = reparacoes.getIdTecnico(idReparacao);
         trabalhadores.setAvailable(idTecnico);
 
@@ -210,11 +217,91 @@ public class SGCR implements Serializable {
         trabalhadores.setAvailable(idTecnico);
     }
 
-    public List<String> getListReparacoesByTecnico(LocalDateTime month) {
+    public Object[][] getListPedidoOrcamento(){
+        List<Pedido> pedidos = this.pedidos.getPedidos().stream()
+                .filter(p -> p instanceof PedidoOrcamento)
+                .collect(Collectors.toList());
+        Object[][] list = new Object[pedidos.size()][];
+        int i = 0;
+        for(Pedido p : pedidos){
+            PedidoOrcamento pedido = (PedidoOrcamento) p;
+            list[i++] = new Object[]{
+                    pedido.getIdPedido(),
+                    pedido.getIdCliente(),
+                    pedido.getIdFuncionario(),
+                    pedido.getDescricaoProblema(),
+                    pedido.getOrcamento() == -1 ? "Nao Definido" : pedido.getOrcamento(),
+                    pedido.getIdPlanoTrabalho() == null ? "Nao Criado" : pedido.getIdPlanoTrabalho(),
+                    pedido.getEstado(),
+                    this.pedidos.hasEquipamenteEntregue(pedido.getIdPedido())
+            };
+        }
+        String[] header = new String[]{"ID", "ID_CLIENT", "ID_FUNCIONARIO", "DESCRIÇÃO", "ORÇAMENTO", "ID_PLANO_TRABALHO", "ESTADO", "ENTREGUE"};
+        return list;
+    }
+
+    public Object[][] getListServicoExpresso(){
+        List<Pedido> pedidos = this.pedidos.getPedidos().stream()
+                .filter(p -> p instanceof ServicoExpresso)
+                .collect(Collectors.toList());
+        Object[][] list = new Object[pedidos.size()][];
+        int i = 0;
+        for(Pedido p : pedidos){
+            ServicoExpresso pedido = (ServicoExpresso) p;
+            list[i++] = new Object[]{
+                    pedido.getIdPedido(),
+                    pedido.getIdCliente(),
+                    pedido.getIdFuncionario(),
+                    pedido.getIdTecnico(),
+                    pedido.getTipo(),
+                    pedido.getDescricao(),
+                    pedido.getEstado(),
+                    this.pedidos.hasEquipamenteEntregue(pedido.getIdPedido())
+            };
+        }
+        String[] header = new String[]{"ID", "ID_CLIENT", "ID_FUNCIONARIO", "ID_TECNICO", "TIPO_DE_SERVICO", "DESCRIÇÃO", "ESTADO", "ENTREGUE"};
+        return list;
+    }
+
+    public Object[][] getListReparacoesByTecnico(LocalDateTime month) {
         List<String> pedidosMonth = pedidos.getPedidosConcluidosMonth(month);
         Map<String, Integer> servicosExpressoMap = pedidos.getNrServicosExpressoMonth(month, pedidosMonth);
+        Map<String, InfoReparacao> infoReparacaoMap = reparacoes.reparacoesByTecnicoMonth(pedidosMonth);
 
-        return null;
+        Map<String, Object[]> tabelaMap = new HashMap<>();
+
+        for (Map.Entry<String, Integer> entry : servicosExpressoMap.entrySet()) {
+            Object[] object = new Object[]{entry.getKey(), entry.getValue(), 0, 0};
+            tabelaMap.put(entry.getKey(), object);
+        }
+
+        for (Map.Entry<String, InfoReparacao> entry : infoReparacaoMap.entrySet()) {
+            String idTecnico= entry.getKey();
+            InfoReparacao info = entry.getValue();
+            int totalReparacoesProgramadas = info.getNumeroTotalReparacoes();
+            long duracao = info.duracaoMedia();
+            long desvio = info.mediaDesvio();
+            Object[] object = new Object[]{idTecnico, totalReparacoesProgramadas,duracao,desvio};
+            tabelaMap.putIfAbsent(idTecnico,object);
+
+            Object[]objectTabela = tabelaMap.get(idTecnico);
+            int totalReparacoesSE = (int) objectTabela[1];
+            int numeroTotalReparacoes = totalReparacoesProgramadas + totalReparacoesSE;
+
+            objectTabela[1] = numeroTotalReparacoes;
+        }
+
+
+//        String[] cabecalho = {"Id Tecnico", "Nr Reparacoes", "Duracao Media", "Desvio em relação à duração prevista"};
+        return tabelaMap.values().toArray(Object[][]::new);
+
+
+    }
+
+    public int getNrRececaoEntregaByFuncionario(LocalDateTime month) {
+        Map<String, Integer> pedidosMap = pedidos.getNrPedidosByFuncionario(month);
+        Map<String, Integer> entregasMap = pedidos.getNrEntregasByFuncionario(month);
+        return 0;
     }
 
     public Map<String, List<String>> getListIntervencoesByTecnico(LocalDateTime month) {
@@ -222,12 +309,6 @@ public class SGCR implements Serializable {
         Map<String, List<String>> resultMap = pedidos.getServicosExpressoByTecnico(pedidosMonth);
         reparacoes.reparacoesExaustivaByTecnicoMonth(pedidosMonth, resultMap);
         return resultMap;
-    }
-
-    public int getNrRececaoEntregaByFuncionario(LocalDateTime month) {
-        Map<String, Integer> pedidosMap = pedidos.getNrPedidosByFuncionario(month);
-        Map<String, Integer> entregasMap = pedidos.getNrEntregasByFuncionario(month);
-        return 0;
     }
 
     public void registaAceitacaoPlanoCliente(String idPedido) {
@@ -254,7 +335,6 @@ public class SGCR implements Serializable {
         return resultList;
     }
 
-
     public void reparacaoParaDecorrer(String idReparacao) {
         reparacoes.reparacaoParaDecorrer(idReparacao);
     }
@@ -263,7 +343,7 @@ public class SGCR implements Serializable {
         return pedidos.getPedidoOrcamentoMaisAntigo();
     }
 
-    public String getReparacaoMaisUrgente(String idTecnico)throws SemReparacoesException{
+    public String getReparacaoMaisUrgente(String idTecnico) throws SemReparacoesException {
         return reparacoes.getReparacaoMaisUrgente(idTecnico);
     }
 
@@ -287,9 +367,38 @@ public class SGCR implements Serializable {
         this.pedidos.registarOutro(idCliente, idFuncionario, idTecnico, descricao);
     }
 
-    public boolean isClienteAutenticado(String idCliente){
+    public boolean isClienteAutenticado(String idCliente) {
         return pedidos.isClienteAutenticado(idCliente);
         //return true;
     }
 
+    public void addSubPasso(String idPlano, int indexPasso, double horas, double custoPecas, String descricao) {
+        reparacoes.addSubPasso(idPlano, indexPasso, horas, custoPecas, descricao);
+    }
+
+    public String getDescricaoPedido(String idPedido) {
+        return this.pedidos.getDescricaoPedido(idPedido);
+    }
+
+    public boolean isValidID(String idPedido){
+        return this.pedidos.isValidPedidoID(idPedido);
+    }
+
+    public String getPassoAtualDescricao(String idReparacao){
+        Map.Entry<String,String[]> entry = this.reparacoes.getPassoAtualDescricao(idReparacao);
+        StringBuilder s = new StringBuilder(entry.getKey());
+        if(entry.getValue() == null) return s.toString();
+        s.append("\n");
+        for(String sub : entry.getValue())
+            s.append("    ").append(sub).append("\n");
+        return s.toString();
+    }
+
+    public int getTotalPassos(String idReparacao){
+        return this.reparacoes.getTotalPassos(idReparacao);
+    }
+
+    public int getPassoAtualIndex(String idReparacao){
+        return this.reparacoes.getPassoAtualIndex(idReparacao);
+    }
 }

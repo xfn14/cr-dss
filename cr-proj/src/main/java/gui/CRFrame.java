@@ -3,7 +3,9 @@ package gui;
 import gui.admin.AdminPanel;
 import gui.clientes.ClientesPanel;
 import gui.pedidos.PedidosPanel;
+import gui.tecnico.TecnicoPanel;
 import trabalhadores.Gestor;
+import trabalhadores.Tecnico;
 import trabalhadores.Trabalhador;
 
 import javax.swing.*;
@@ -25,12 +27,14 @@ public class CRFrame extends JFrame implements Runnable, ActionListener {
     private ButtonGroup buttonGroup;
     private JRadioButton pedidosButton;
     private JRadioButton clientesButton;
+    private JRadioButton tecnicoButton;
     private JRadioButton adminButton;
 
     private JPanel mainPanel;
     private CardLayout cardLayout;
     private ClientesPanel clientesPanel;
     private PedidosPanel pedidosPanel;
+    private TecnicoPanel tecnicoPanel;
     private AdminPanel adminPanel;
 
     public CRFrame(LoginFrame loginFrame, Trabalhador trabalhador) {
@@ -80,31 +84,43 @@ public class CRFrame extends JFrame implements Runnable, ActionListener {
 
         this.buttonGroup = new ButtonGroup();
 
+        int line = 0;
+
         JLabel welcome = new JLabel("Bem-vindo, " + this.trabalhador.getIdTrabalhador());
         grid.gridx = 0;
-        grid.gridy = 0;
+        grid.gridy = line++;
         this.sidePanel.add(welcome, grid);
 
         this.pedidosButton = new JRadioButton("Pedidos");
         this.pedidosButton.setSelected(true);
         this.pedidosButton.setActionCommand("pedidosButton");
         this.pedidosButton.addActionListener(this);
-        grid.gridy = 1;
+        grid.gridy = line++;
         this.sidePanel.add(this.pedidosButton, grid);
 
         this.clientesButton = new JRadioButton("Clientes");
         this.clientesButton.setSelected(false);
         this.clientesButton.setActionCommand("clientesButton");
         this.clientesButton.addActionListener(this);
-        grid.gridy = 2;
+        grid.gridy = line++;
         this.sidePanel.add(this.clientesButton, grid);
+
+        if (this.trabalhador instanceof Tecnico) {
+            this.tecnicoButton = new JRadioButton("Tecnico");
+            this.tecnicoButton.setSelected(false);
+            this.tecnicoButton.setActionCommand("tecnicoButton");
+            this.tecnicoButton.addActionListener(this);
+            grid.gridy = line++;
+            this.sidePanel.add(this.tecnicoButton, grid);
+            this.buttonGroup.add(this.tecnicoButton);
+        }
 
         if (this.trabalhador instanceof Gestor) {
             this.adminButton = new JRadioButton("Admin");
             this.adminButton.setSelected(false);
             this.adminButton.setActionCommand("adminButton");
             this.adminButton.addActionListener(this);
-            grid.gridy = 3;
+            grid.gridy = line;
             this.sidePanel.add(this.adminButton, grid);
             this.buttonGroup.add(this.adminButton);
         }
@@ -116,11 +132,14 @@ public class CRFrame extends JFrame implements Runnable, ActionListener {
     private void initMainPanel() {
         this.pedidosPanel = new PedidosPanel(this.loginFrame.getSgcr(), this.trabalhador);
         this.clientesPanel = new ClientesPanel(this.loginFrame.getSgcr());
+        this.tecnicoPanel = new TecnicoPanel(this.loginFrame.getSgcr(), this.trabalhador);
         this.adminPanel = new AdminPanel(this.loginFrame.getSgcr());
         this.cardLayout = new CardLayout();
         this.mainPanel = new JPanel(cardLayout);
         this.mainPanel.add(this.clientesPanel, "clientesPanel");
         this.mainPanel.add(this.pedidosPanel, "pedidosPanel");
+        if(this.trabalhador instanceof Tecnico)
+            this.mainPanel.add(this.tecnicoPanel, "tecnicoPanel");
         if (this.trabalhador instanceof Gestor)
             this.mainPanel.add(this.adminPanel, "adminPanel");
     }
@@ -133,6 +152,8 @@ public class CRFrame extends JFrame implements Runnable, ActionListener {
             this.cardLayout.show(this.mainPanel, "clientesPanel");
         } else if (e.getActionCommand().equals("adminButton")) {
             this.cardLayout.show(this.mainPanel, "adminPanel");
+        } else if(e.getActionCommand().equals("tecnicoButton")){
+            this.cardLayout.show(this.mainPanel, "tecnicoPanel");
         }
     }
 

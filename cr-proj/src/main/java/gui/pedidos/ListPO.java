@@ -1,6 +1,5 @@
 package gui.pedidos;
 
-import pedidos.Pedido;
 import sgcr.SGCR;
 import utils.gui.HintTextField;
 
@@ -12,7 +11,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class ListPedido extends JFrame implements ActionListener {
+public class ListPO extends JFrame implements ActionListener {
     private final SGCR sgcr;
 
     private JPanel panel;
@@ -21,14 +20,14 @@ public class ListPedido extends JFrame implements ActionListener {
     private TableModel model;
     private TableRowSorter<TableModel> sorter;
 
-    public ListPedido(SGCR sgcr) {
-        super("Listar Pedidos");
+    public ListPO(SGCR sgcr) {
+        super("Lista de Pedidos de Orçamento");
         this.sgcr = sgcr;
 
         this.initPanel();
         super.add(this.panel, BorderLayout.CENTER);
 
-        super.setSize(1100, 750);
+        super.setSize(1300, 800);
         super.setResizable(false);
         super.setLocationRelativeTo(null);
         super.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -42,21 +41,9 @@ public class ListPedido extends JFrame implements ActionListener {
         this.search.addActionListener(this);
         this.panel.add(this.search, BorderLayout.NORTH);
 
-        java.util.List<Pedido> lista = this.sgcr.getPedidos().getPedidos();
-        Object[][] data = new Object[lista.size()][];
-        int i = 0;
-        for (Pedido c : lista) {
-            data[i++] = new Object[]{
-                    c.getIdPedido(),
-                    c.getIdCliente(),
-                    c.getIdEquipamento(),
-                    c.getIdFuncionario(),
-                    c.getEstado().toString(),
-                    c.getContactos().toString()
-            };
-        }
-        String[] cols = {"ID", "Cliente_NIF", "ID_Equipamento", "Criado Por", "Estado", "Contactos"};
-        this.model = new DefaultTableModel(data, cols);
+        String[] header = new String[]{"ID", "ID_CLIENT", "ID_FUNCIONARIO", "DESCRIÇÃO", "ORÇAMENTO", "ID_PLANO_TRABALHO", "ESTADO", "ENTREGUE"};
+        Object[][] data = this.sgcr.getListPedidoOrcamento();
+        this.model = new DefaultTableModel(data, header);
         this.list = new JTable(this.model);
         this.sorter = new TableRowSorter<>(this.model);
         this.list.setRowSorter(sorter);

@@ -24,12 +24,11 @@ public class Main {
         }
 
         Email email = new Email(sgcr);
+        Thread emailThread = new Thread(email);
+        emailThread.start();
         LoginFrame loginFrame = new LoginFrame(sgcr, email);
         Thread thread = new Thread(loginFrame);
         thread.start();
-
-        //Thread emailThread = new Thread(email);
-        //emailThread.start();
     }
 
     private static void loadLoggerSettings() {

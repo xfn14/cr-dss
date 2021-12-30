@@ -48,13 +48,23 @@ public class RegistarCliente extends PrettyFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource().equals(this.confirm)) {
-            this.sgcr.criarFichaCliente(
-                    this.nomeInput.getText(),
-                    this.emailInput.getText(),
-                    this.numeroInput.getText(),
-                    this.nifInput.getText()
-            );
-            super.dispose();
+            if(!this.nifInput.getText().isBlank()){
+                this.sgcr.criarFichaCliente(
+                        this.nomeInput.getText(),
+                        this.emailInput.getText(),
+                        this.numeroInput.getText(),
+                        this.nifInput.getText()
+                );
+                super.dispose();
+            }else{
+                JOptionPane.showConfirmDialog(
+                        new JFrame(),
+                        "NIF obrigatório",
+                        "Registar Cliente",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.PLAIN_MESSAGE
+                );
+            }
         }
     }
 }

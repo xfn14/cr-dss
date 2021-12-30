@@ -2,8 +2,11 @@ package reparacoes;
 
 import java.io.Serializable;
 import java.time.Duration;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class PlanoTrabalho implements Serializable {
     private String idPlanoTrabalho;
@@ -26,10 +29,28 @@ public class PlanoTrabalho implements Serializable {
         this.passos = new ArrayList<>();
         this.estado = Estado.DECORRER;
         this.orcamento = 0;
+        this.duracaoTotal = Duration.ZERO;
     }
 
     public PlanoTrabalho(PlanoTrabalho planoTrabalho) {
         this.idPlanoTrabalho = planoTrabalho.getIdPlanoTrabalho();
+        this.idTecnico = planoTrabalho.getIdTecnico();
+        this.passos = planoTrabalho.getPassos();
+        this.estado = planoTrabalho.getEstado();
+        this.orcamento = planoTrabalho.getOrcamento();
+        this.duracaoTotal = planoTrabalho.getDuracaoTotal();
+    }
+
+    public Map.Entry<String,String[]> passoToEntry(int index){
+        Passo passo = this.passos.get(index);
+        String[] subPassos = new String[passo.getSubPassos().size()];
+        int i = 0;
+        for(Passo p : passo.getSubPassos())
+            subPassos[i] = "(" + passo.getDuration() + "/" + passo.getCustoPecas() + ") " + p.getDescricao();
+        return new AbstractMap.SimpleEntry<>(
+                "(" + (index + 1) + "/" + this.passos.size() + ") " + passo.getDescricao(),
+                subPassos
+        );
     }
 
     public void addPasso(double horas, double custoPecas, String descricao) {
@@ -43,7 +64,7 @@ public class PlanoTrabalho implements Serializable {
         this.estado = estado;
     }
 
-    public void addSubPasso(List<Integer> indexs, double horas, double custoPecas, String descricao) {
+    public void addSubPasso(int indexPasso, double horas, double custoPecas, String descricao) {
         if (indexPasso >= passos.size()) {
             Passo passo = new Passo(0, 0, descricao);
             passos.add(passo);
@@ -70,15 +91,23 @@ public class PlanoTrabalho implements Serializable {
     }
 
     public double getOrcamento() {
-        return orcamento;
+        return this.orcamento;
     }
 
     public Duration getDuracaoTotal() {
-        return duracaoTotal;
+        return this.duracaoTotal;
     }
 
     public String getIdTecnico() {
-        return idTecnico;
+        return this.idTecnico;
+    }
+
+    public Estado getEstado() {
+        return this.estado;
+    }
+
+    public List<Passo> getPassos() {
+        return new ArrayList<>(this.passos);
     }
 
     public enum Estado {
@@ -87,5 +116,18 @@ public class PlanoTrabalho implements Serializable {
         PAUSA,
         FINALIZADO,
         CANCELADO
+    }
+
+
+    @Override
+    public String toString() {
+        return "PlanoTrabalho{" +
+                "idPlanoTrabalho='" + idPlanoTrabalho + '\'' +
+                ", idTecnico='" + idTecnico + '\'' +
+                ", passos=" + passos.stream().map(Passo::toString).collect(Collectors.toList()).toString() +
+                ", estado=" + estado +
+                ", orcamento=" + orcamento +
+                ", duracaoTotal=" + duracaoTotal +
+                '}';
     }
 }

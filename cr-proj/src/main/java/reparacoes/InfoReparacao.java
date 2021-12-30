@@ -23,11 +23,11 @@ public class InfoReparacao {
         return numeroTotalReparacoes;
     }
 
-    public Duration duracaoMedia(){
-        return duracaoTotal.dividedBy(numeroTotalReparacoes);
+    public long duracaoMedia(){
+        return duracaoTotal.dividedBy(numeroTotalReparacoes).toHours();
     }
+
     public long mediaDesvio(){
         return desvioDuracaoHoras/ numeroTotalReparacoes;
     }
-
 }

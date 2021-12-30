@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Passo implements Serializable {
     private double custoPecas;
@@ -38,6 +39,10 @@ public class Passo implements Serializable {
         this.subPassos.add(passo);
     }
 
+    public Duration getDuration() {
+        return this.duration;
+    }
+
     public double getCustoPecas() {
         return this.custoPecas;
     }
@@ -56,5 +61,16 @@ public class Passo implements Serializable {
 
     public String getDescricao() {
         return descricao;
+    }
+
+
+    @Override
+    public String toString() {
+        return "Passo{" +
+                "custoPecas=" + custoPecas +
+                ", duration=" + duration +
+                ", subPassos=" + subPassos.stream().map(Passo::toString).collect(Collectors.toList()) +
+                ", descricao='" + descricao + '\'' +
+                '}';
     }
 }

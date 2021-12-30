@@ -35,12 +35,12 @@ public class RegistarPO extends PrettyFrame implements ActionListener {
         this.confirm = new JButton("Registar");
         this.status = new JLabel("");
 
-        super.addComponent(new JLabel("Cliente"), 0,0,1,1);
-        super.addComponent(this.cliente, 0,1,1,1);
-        super.addComponent(new JLabel("Descrição"), 1,0,1,1);
-        super.addComponent(scroll, 1,1,1,1);
-        super.addComponent(this.confirm, 2,1,2,1);
-        super.addComponent(this.status, 3,1,2,1);
+        super.addComponent(new JLabel("Cliente"), 0, 0, 1, 1);
+        super.addComponent(this.cliente, 0, 1, 1, 1);
+        super.addComponent(new JLabel("Descrição"), 1, 0, 1, 1);
+        super.addComponent(scroll, 1, 1, 1, 1);
+        super.addComponent(this.confirm, 2, 1, 2, 1);
+        super.addComponent(this.status, 3, 1, 2, 1);
     }
 
     @Override
@@ -51,7 +51,9 @@ public class RegistarPO extends PrettyFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource().equals(this.confirm)) {
-            if (this.sgcr.isClienteAutenticado(this.cliente.getText())) {
+            if (this.descricao.getText().isBlank()) {
+                this.status.setText("<html><font color=red>Descrição Obrigatória!</font></html>");
+            } else if (this.sgcr.isClienteAutenticado(this.cliente.getText())) {
                 this.sgcr.registaPedidoOrcamento(
                         this.cliente.getText(),
                         this.trabalhador.getIdTrabalhador(),
@@ -60,7 +62,7 @@ public class RegistarPO extends PrettyFrame implements ActionListener {
                 this.status.setText("");
                 this.dispose();
             } else {
-                this.status.setText("<html><font color=red>Cliente Invalido!</font></html>");
+                this.status.setText("<html><font color=red>Cliente Inválido!</font></html>");
             }
         }
     }

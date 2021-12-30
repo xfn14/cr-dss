@@ -6,7 +6,6 @@ import utils.Constantes;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import java.sql.Time;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.*;

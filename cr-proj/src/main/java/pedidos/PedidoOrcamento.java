@@ -5,12 +5,12 @@ import java.io.Serializable;
 public class PedidoOrcamento extends Pedido implements Serializable {
     private double orcamento;
     private String idPlanoTrabalho;
-    private String descricaoProblema;
-
+    private final String descricaoProblema;
 
     public PedidoOrcamento(String idPedido, String idCliente, String idFuncionario, String idEquipamento, String descricao) {
         super(idPedido, idCliente, idEquipamento, idFuncionario);
         this.descricaoProblema = descricao;
+        this.orcamento = -1;
         setEstado(Estado.AGUARDA_PLANO);
     }
 
@@ -30,4 +30,7 @@ public class PedidoOrcamento extends Pedido implements Serializable {
         this.idPlanoTrabalho = idPlanoTrabalho;
     }
 
+    public String getDescricaoProblema() {
+        return this.descricaoProblema;
+    }
 }

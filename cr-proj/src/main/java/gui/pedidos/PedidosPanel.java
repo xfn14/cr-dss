@@ -1,8 +1,8 @@
 package gui.pedidos;
 
-import exceptions.SemPedidosOrcamento;
 import exceptions.SemTecnicosDisponiveis;
 import sgcr.SGCR;
+import trabalhadores.Funcionario;
 import trabalhadores.Trabalhador;
 
 import javax.swing.*;
@@ -17,11 +17,12 @@ public class PedidosPanel extends JPanel implements ActionListener {
     private SGCR sgcr;
     private Trabalhador trabalhador;
 
-    private JButton list;
+    private JButton listPO;
+    private JButton listSE;
     private JButton registarPO;
     private JButton registarSE;
     private JButton cancelarPedido;
-    private JButton createPlano;
+    private JButton registaEntrega;
 
     public PedidosPanel(SGCR sgcr, Trabalhador trabalhador) {
         super(new GridBagLayout());
@@ -32,35 +33,43 @@ public class PedidosPanel extends JPanel implements ActionListener {
         grid.insets = new Insets(5, 5, 5, 5);
         grid.fill = GridBagConstraints.HORIZONTAL;
 
-        this.list = new JButton("Listar Pedidos");
-        this.list.addActionListener(this);
+        this.listPO = new JButton("Listar Pedidos Orcamento");
+        this.listPO.addActionListener(this);
         grid.gridx = 0;
         grid.gridy = 0;
-        super.add(this.list, grid);
+        super.add(this.listPO, grid);
+
+        this.listSE = new JButton("Listar Serviços Expresso");
+        this.listSE.addActionListener(this);
+        grid.gridx = 1;
+        grid.gridy = 0;
+        super.add(this.listSE, grid);
 
         this.registarPO = new JButton("Registar Pedido Orcamento");
         this.registarPO.addActionListener(this);
-        grid.gridx = 1;
-        grid.gridy = 0;
+        grid.gridx = 0;
+        grid.gridy = 1;
         super.add(this.registarPO, grid);
 
         this.registarSE = new JButton("Registar Serviço Expresso");
         this.registarSE.addActionListener(this);
-        grid.gridx = 0;
+        grid.gridx = 1;
         grid.gridy = 1;
         super.add(this.registarSE, grid);
 
         this.cancelarPedido = new JButton("Cancelar Pedido");
         this.cancelarPedido.addActionListener(this);
-        grid.gridx = 1;
-        grid.gridy = 1;
-        super.add(this.cancelarPedido, grid);
-
-        this.createPlano = new JButton("Cria Plano Trabalho");
-        this.createPlano.addActionListener(this);
         grid.gridx = 0;
         grid.gridy = 2;
-        super.add(this.createPlano, grid);
+        super.add(this.cancelarPedido, grid);
+
+        if(this.trabalhador instanceof Funcionario){
+            this.registaEntrega = new JButton("Regista Entrega");
+            this.registaEntrega.addActionListener(this);
+            grid.gridx = 1;
+            grid.gridy = 2;
+            super.add(this.registaEntrega, grid);
+        }
 
         super.setBackground(new Color(0, 255, 0, 255));
     }
@@ -68,14 +77,11 @@ public class PedidosPanel extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource().equals(this.registarPO)) {
-            RegistarPO registarPO = new RegistarPO(this.sgcr, this.trabalhador);
-            registarPO.setAlwaysOnTop(true);
+            new RegistarPO(this.sgcr, this.trabalhador);
         } else if (e.getSource().equals(this.registarSE)) {
-            Trabalhador tecnico;
             try {
-                tecnico = this.sgcr.verificarDisponibilidadeTecnicos();
-                RegistarSE registarSE = new RegistarSE(this.sgcr, this.trabalhador, tecnico);
-                registarSE.setAlwaysOnTop(true);
+                Trabalhador tecnico = this.sgcr.verificarDisponibilidadeTecnicos();
+                new RegistarSE(this.sgcr, this.trabalhador, tecnico);
             } catch (SemTecnicosDisponiveis semTecnicosDisponiveis) {
                 this.logger.log(Level.INFO, "Sem tecnicos disponiveis");
                 JOptionPane.showConfirmDialog(
@@ -87,27 +93,14 @@ public class PedidosPanel extends JPanel implements ActionListener {
                 );
             }
 
-        } else if (e.getSource().equals(this.list)) {
-            ListPedido listPedido = new ListPedido(this.sgcr);
-            listPedido.setAlwaysOnTop(true);
+        } else if (e.getSource().equals(this.listPO)) {
+            new ListPO(this.sgcr);
         } else if(e.getSource().equals(this.cancelarPedido)){
-            CancelaPedido cancelaPedido = new CancelaPedido(this.sgcr);
-            cancelaPedido.setAlwaysOnTop(true);
-        }else if(e.getSource().equals(this.createPlano)){
-            try {
-                String idPedido = this.sgcr.getPedidoOrcamentoMaisAntigo();
-                CriaPlanoTrabalho criaPlanoTrabalho = new CriaPlanoTrabalho(this.sgcr, idPedido);
-                criaPlanoTrabalho.setAlwaysOnTop(true);
-            } catch (SemPedidosOrcamento ex) {
-                this.logger.log(Level.INFO, "Sem tecnicos disponiveis");
-                JOptionPane.showConfirmDialog(
-                        new JFrame(),
-                        "Nao existes pedidos de orçamento",
-                        "Criar Plano de Trabalho",
-                        JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.PLAIN_MESSAGE
-                );
-            }
+            new CancelaPedido(this.sgcr);
+        } else if(e.getSource().equals(this.listSE)){
+            new ListSE(this.sgcr);
+        } else if(e.getSource().equals(this.registaEntrega)){
+            new RegistaEntrega(this.sgcr, this.trabalhador.getIdTrabalhador());
         }
     }
 }

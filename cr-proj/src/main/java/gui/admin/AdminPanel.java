@@ -39,11 +39,9 @@ public class AdminPanel extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource().equals(this.registar)) {
-            RegistarTrabalhador registarTrabalhador = new RegistarTrabalhador(this.sgcr);
-            registarTrabalhador.setAlwaysOnTop(true);
+            new RegistarTrabalhador(this.sgcr);
         } else if (e.getSource().equals(this.list)) {
-            ListTrabalhadores listTrabalhadores = new ListTrabalhadores(this.sgcr);
-            listTrabalhadores.setAlwaysOnTop(true);
+            new ListTrabalhadores(this.sgcr);
         }
     }
 }

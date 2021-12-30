@@ -39,11 +39,9 @@ public class ClientesPanel extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource().equals(this.registar)) {
-            RegistarCliente registarCliente = new RegistarCliente(this.sgcr);
-            registarCliente.setAlwaysOnTop(true);
+            new RegistarCliente(this.sgcr);
         } else if (e.getSource().equals(this.list)) {
-            ListClientes listClientes = new ListClientes(this.sgcr);
-            listClientes.setAlwaysOnTop(true);
+            new ListClientes(this.sgcr);
         }
     }
 }

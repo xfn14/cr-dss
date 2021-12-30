@@ -6,81 +6,76 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Reparacao implements Serializable {
-    private String idReparacao;
     private final String idTecnico;
+    private final double orcamentoExpectavel;
+    private String idReparacao;
     private Estado estado;
     private Duration duracaoTotal;
     private List<Passo> passos; //TODO: Registar passos
     private double orcamento;
-    private final double orcamentoExpectavel;
 
-    public Reparacao(String idReparacao, String idTecnico,double orcamento) {
+    public Reparacao(String idReparacao, String idTecnico, double orcamento) {
         this.idTecnico = idTecnico;
         this.idReparacao = idReparacao;
         this.orcamento = orcamento;
         this.orcamentoExpectavel = orcamento;
         this.duracaoTotal = Duration.ZERO;
-        this.estado=Estado.AGUARDA_INICIO;
+        this.estado = Estado.AGUARDA_INICIO;
     }
 
     public enum Estado {
         AGUARDA_INICIO,
         DECORRER,
         PAUSA,
-        AGURDA_ACEITACAO,
+        AGUARDA_ACEITACAO,
         FINALIZADA,
         CANCELADA
     }
 
+    public int nPassoAtual(){
+        return this.passos.size()-1;
+    }
 
-
-    public boolean aguardaAceitacao(){
-        return estado.equals(Estado.AGURDA_ACEITACAO);
+    public boolean aguardaAceitacao() {
+        return this.estado.equals(Estado.AGUARDA_ACEITACAO);
     }
 
     public String getIdReparacao() {
         return this.idReparacao;
     }
 
+    public void setIdReparacao(String idReparacao) {
+        this.idReparacao = idReparacao;
+    }
+
     public int registaPasso(double horas, double custoPecas) {
         Passo passo = new Passo(horas, custoPecas);
         this.duracaoTotal = this.duracaoTotal.plus(Duration.ofHours((long) horas));
         this.passos.add(passo);
-        return passos.size()-1;
+        return passos.size() - 1;
     }
 
-    public void changeOrcamento (double diff){
-        this.orcamento+= diff;
+    public void changeOrcamento(double diff) {
+        this.orcamento += diff;
     }
 
-    public boolean checkSuperior120(){
-        double superior = orcamentoExpectavel*1.2;
+    public boolean checkSuperior120() {
+        double superior = orcamentoExpectavel * 1.2;
         return orcamento > superior;
     }
 
-
-    public void reparacaoAceite (){
+    public void reparacaoAceite() {
         setEstado(Estado.PAUSA);
         this.orcamento = this.orcamentoExpectavel;
     }
 
-
-    public void addDescricoesToList (List<String> list){
-        for (Passo passo : passos){
-            String descricao = passo.getDescricao();
-            list.add(descricao);
-        }
+    public void addDescricoesToList(List<String> list) {
+        for (Passo passo : passos)
+            list.add(passo.getDescricao());
     }
 
-
-    public boolean emPausa(){
+    public boolean emPausa() {
         return this.estado.equals(Estado.PAUSA);
-    }
-
-
-
-    public void setIdReparacao(String idReparacao) {
-        this.idReparacao = idReparacao;
     }
 
     public Estado getEstado() {
@@ -100,14 +95,10 @@ public class Reparacao implements Serializable {
     }
 
     public Duration getDuracaoTotal() {
-        return duracaoTotal;
+        return this.duracaoTotal;
     }
 
     public String getIdTecnico() {
-        return idTecnico;
+        return this.idTecnico;
     }
-
-
-
-
 }
