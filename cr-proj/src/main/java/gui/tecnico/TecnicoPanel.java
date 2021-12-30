@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.lang.Thread;
 
 public class TecnicoPanel extends JPanel implements ActionListener {
     private Logger logger = Logger.getLogger("CR");
@@ -68,7 +69,9 @@ public class TecnicoPanel extends JPanel implements ActionListener {
                 // qnd o cliente fecha a janela a reparacao fica em pausa e o tecnico volta a estar
                 // disponivel
                 String idReparacao = this.sgcr.getReparacaoMaisUrgente(this.trabalhador.getIdTrabalhador());
-                new ReparacaoFrame(this.sgcr, idReparacao);
+                ReparacaoFrame reparacaoFrame = new ReparacaoFrame(this.sgcr, idReparacao);
+                Thread repracaoThread = new Thread(reparacaoFrame);
+                reparacaoThread.start();
             } catch (SemReparacoesException ex) {
                 this.logger.log(Level.INFO, "Não existem reparaçoes");
                 JOptionPane.showConfirmDialog(
