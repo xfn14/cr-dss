@@ -26,8 +26,6 @@ public interface IReparacoes {
 
     double getOrcamento(String idPlano);
 
-    Map.Entry<Double, String> getOrcamentoEHorasPlano(String idPlano);
-
     void reparacaoAguardaAceitacao(String idReparacao);
 
     List<String> listAguardaAceitacao();
@@ -57,4 +55,6 @@ public interface IReparacoes {
     int getPassoAtualIndex(String idReparacao);
 
     String checkPlanoTrabalhoPausa (String idTecnico) throws SemReparacoesException;
-    }
+
+    void arquivarPedido(String idPedido);
+}

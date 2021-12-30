@@ -59,6 +59,15 @@ public class Pedido implements Serializable {
         }
         return LocalDateTime.now();
     }
+    public LocalDateTime getDataContactoValorSuperior(){
+        for (Contacto contacto : contactos){
+            if (contacto.getType().equals(Contacto.Type.VALOR_SUPERIOR)){
+                return contacto.getDateTime();
+            }
+        }
+        return LocalDateTime.now();
+    }
+
 
 
     public String getIdFuncionario() {
@@ -119,6 +128,7 @@ public class Pedido implements Serializable {
         AGUARDA_ACEITACAO,
         AGUARDA_REPARACAO,
         FINALIZADO,
+        ARQUIVADO,
         CANCELADO
     }
 }

@@ -7,6 +7,8 @@ import utils.FileUtils;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.logging.*;
 
@@ -30,8 +32,10 @@ public class Main {
         }
 
         Email email = new Email(sgcr);
-        Thread emailThread = new Thread(email);
-        emailThread.start();
+        email.checkEmail();
+        //Thread emailThread = new Thread(email);
+        //emailThread.start();
+
         LoginFrame loginFrame = new LoginFrame(sgcr, email);
         Thread thread = new Thread(loginFrame);
         thread.start();

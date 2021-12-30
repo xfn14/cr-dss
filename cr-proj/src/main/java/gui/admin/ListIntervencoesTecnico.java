@@ -1,9 +1,6 @@
 package gui.admin;
 
 import sgcr.SGCR;
-import trabalhadores.Gestor;
-import trabalhadores.Tecnico;
-import trabalhadores.Trabalhador;
 import utils.gui.HintTextField;
 
 import javax.swing.*;
@@ -13,10 +10,11 @@ import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Map;
+import java.time.LocalDateTime;
 
-public class ListTrabalhadores extends JFrame implements ActionListener {
+public class ListIntervencoesTecnico extends JFrame implements ActionListener {
     private final SGCR sgcr;
+    private final LocalDateTime month;
 
     private JPanel panel;
     private JTextField search;
@@ -24,14 +22,15 @@ public class ListTrabalhadores extends JFrame implements ActionListener {
     private TableModel model;
     private TableRowSorter<TableModel> sorter;
 
-    public ListTrabalhadores(SGCR sgcr) {
-        super("Listar Trabalhadores");
+    public ListIntervencoesTecnico(SGCR sgcr, LocalDateTime month) {
+        super("Lista de Intervenções dos Tecnicos");
         this.sgcr = sgcr;
+        this.month = month;
 
         this.initPanel();
         super.add(this.panel, BorderLayout.CENTER);
 
-        super.setSize(800, 500);
+        super.setSize(700, 800);
         super.setResizable(false);
         super.setLocationRelativeTo(null);
         super.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -40,20 +39,14 @@ public class ListTrabalhadores extends JFrame implements ActionListener {
 
     private void initPanel() {
         this.panel = new JPanel(new BorderLayout());
+
         this.search = new HintTextField("Procurar");
         this.search.addActionListener(this);
         this.panel.add(this.search, BorderLayout.NORTH);
 
-        Map<String, Trabalhador> lista = this.sgcr.getTrabalhadores().getTrabalhadores();
-        Object[][] data = new Object[lista.size()][];
-        int i = 0;
-        for (Trabalhador t : lista.values()) {
-            String cargo = t instanceof Gestor ? "Gestor" :
-                    t instanceof Tecnico ? "Tecnico" : "Funcionario";
-            data[i++] = new Object[]{t.getIdTrabalhador(), cargo};
-        }
-        String[] cols = {"Username", "Cargo"};
-        this.model = new DefaultTableModel(data, cols);
+        String[] header = {"Id Tecnico", "Intervencao"};
+        Object[][] data = this.sgcr.getListIntervencoesByTecnico(this.month);
+        this.model = new DefaultTableModel(data, header);
         this.list = new JTable(this.model);
         this.sorter = new TableRowSorter<>(this.model);
         this.list.setRowSorter(sorter);

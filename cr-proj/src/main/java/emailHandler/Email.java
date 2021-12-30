@@ -7,13 +7,12 @@ import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.time.Duration;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.*;
 
-public class Email implements Runnable {
+public class Email{
     private static final int pedidoOrcamento = 0;
     private static final int naoPodeSerReparado = 1;
-    //private LocalDate date  TODO: Ver o dia e se ainda não tiver corrido neste dia, correr a verificação para ausência de resposta| Arquivar Pedido
     private static final int prontoaLevantar = 2;
     private static final int valorSuperiorOrcamento = 3;
     private static String password = "grupoG35";
@@ -25,7 +24,6 @@ public class Email implements Runnable {
         - Resposta plano Trabalho
      */
     private static String user = "sgcrgrupo35@gmail.com";
-    private boolean running = true;
     private SGCR sgcr;
     private Timer timer;
     public Email(SGCR sgcr) {
@@ -139,66 +137,7 @@ public class Email implements Runnable {
                 });
     }
 
-    /*
-    public static boolean checkRespostaPedidoOrcamento(String email) {
-        return checkIfRespond(email, subject(pedidoOrcamento));
-    }
 
-    public static boolean checkRespostaValorSuperior(String email) {
-        return checkIfRespond(email, subject(valorSuperiorOrcamento));
-    }
-
-
-    private static boolean checkIfRespond(String email, String subjectName) {
-        try {
-            Properties properties = new Properties();
-            //
-            String host = "pop.gmail.com";
-            properties.put("mail.pop3.host", host);
-            properties.put("mail.pop3.port", "995");
-            properties.put("mail.pop3.starttls.enable", "true");
-            Session emailSession = Session.getInstance(properties);
-
-            //create the POP3 store object and connect with the pop server
-            Store store = emailSession.getStore("pop3s");
-
-            store.connect(host, user, password);
-
-            //create the folder object and open it
-            Folder emailFolder = store.getFolder("INBOX");
-            emailFolder.open(Folder.READ_ONLY);
-
-            // retrieve the messages from the folder in an array and print it
-            Message[] messages = emailFolder.getMessages();
-
-
-            for (Message message : messages) {
-                Address address = message.getFrom()[0];
-                String adressString = address.toString();
-                adressString = adressString.substring(adressString.indexOf('<') + 1);
-                adressString = adressString.substring(0, adressString.length() - 1);
-                boolean emailBool = adressString.equals(email);
-                if (emailBool) {
-                    String subject = message.getSubject();
-                    System.out.println("Email:" + adressString);
-                    System.out.println("Subject: " + message.getSubject());
-                    boolean subjectBool = subject.contains("Re: " + subjectName);
-                    if (subjectBool) return true;
-                }
-
-            }
-
-            //close the store and folder objects
-            emailFolder.close(false);
-            store.close();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-     */
 
     public static void main(String[] args) {
         String email = "jdmartinsvieira63@gmail.com";
@@ -238,12 +177,17 @@ public class Email implements Runnable {
         this.timer.cancel();
     }
 
+
+    private boolean passou30dias(LocalDateTime sent){
+        return sent.plusDays(30).isBefore(LocalDateTime.now());
+    }
+
     public void checkEmail(){
         int minutes = 5;
         timer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
-                List<Map.Entry<String, String>> pedidosAguardarEmail = sgcr.listPedidosAguardaAceitacao();
-                List<Map.Entry<String, String>> reparacoesAguardarEmail = sgcr.listReparacoesAguardaAceitacao();
+                Map<String,Map.Entry<String, LocalDateTime>> pedidosAguardarEmail = sgcr.listPedidosAguardaAceitacao();
+                Map<String,Map.Entry<String, LocalDateTime>> reparacoesAguardarEmail = sgcr.listReparacoesAguardaAceitacao();
                 try {
                     Message[] messagesArray = getMessage();
                     for (Message message : messagesArray) {
@@ -253,25 +197,39 @@ public class Email implements Runnable {
                         adressString = adressString.substring(0, adressString.length() - 1);
                         String subject = message.getSubject();
 
-                        for (Map.Entry<String, String> entry : pedidosAguardarEmail) {
-                            String email = entry.getValue();
+                        for (Map.Entry<String,Map.Entry<String,LocalDateTime>> entry : pedidosAguardarEmail.entrySet()) {
+                            Map.Entry<String,LocalDateTime> emailDataEntry = entry.getValue();
+                            String email = emailDataEntry.getKey();
                             String idPedido = entry.getKey();
                             if (email.equals(adressString)) {
                                 String subjectCompare = subject(pedidoOrcamento);
                                 if (subject.equals("Re: " + subjectCompare)) {
                                     sgcr.registaAceitacaoPlanoCliente(idPedido);
+                                    continue;
                                 }
                             }
+                            LocalDateTime dataContacto =emailDataEntry.getValue();
+                            if (passou30dias(dataContacto)){
+                                sgcr.arquivarPedido(idPedido);
+                            }
+
+
                         }
 
-                        for (Map.Entry<String, String> entry : reparacoesAguardarEmail) {
-                            String reparacao = entry.getKey();
-                            String email = entry.getValue();
+                        for (Map.Entry<String,Map.Entry<String,LocalDateTime>> entry : reparacoesAguardarEmail.entrySet()) {
+                            Map.Entry<String,LocalDateTime> emailDataEntry = entry.getValue();
+                            String email = emailDataEntry.getKey();
+                            String idPedido = entry.getKey();
                             if (email.equals(adressString)) {
                                 String subjectCompare = subject(valorSuperiorOrcamento);
                                 if (subject.equals("Re: " + subjectCompare)) {
-                                    sgcr.registaAceitacaoReparacaoCliente(reparacao);
+                                    sgcr.registaAceitacaoReparacaoCliente(idPedido);
+                                    continue;
                                 }
+                            }
+                            LocalDateTime dataContacto =emailDataEntry.getValue();
+                            if (passou30dias(dataContacto)){
+                                sgcr.arquivarPedido(idPedido);
                             }
                         }
                     }
@@ -282,100 +240,4 @@ public class Email implements Runnable {
                     }
         }, 0, minutes * 60 * 1000);
     }
-
-
-    public void run() {
-        ZonedDateTime lastRun = null;
-        while (this.running) {
-
-            ZonedDateTime now = ZonedDateTime.now();
-            if (lastRun == null || now.isAfter(lastRun.plusMinutes(5))) {
-                lastRun = now;
-                List<Map.Entry<String, String>> pedidosAguardarEmail = sgcr.listPedidosAguardaAceitacao();
-                List<Map.Entry<String, String>> reparacoesAguardarEmail = sgcr.listReparacoesAguardaAceitacao();
-
-                try {
-                    Message[] messagesArray = getMessage();
-                    for (Message message : messagesArray) {
-                        Address address = message.getFrom()[0];
-                        String adressString = address.toString();
-                        adressString = adressString.substring(adressString.indexOf('<') + 1);
-                        adressString = adressString.substring(0, adressString.length() - 1);
-                        String subject = message.getSubject();
-
-                        for (Map.Entry<String, String> entry : pedidosAguardarEmail) {
-                            String email = entry.getValue();
-                            String idPedido = entry.getKey();
-                            if (email.equals(adressString)) {
-                                String subjectCompare = subject(pedidoOrcamento);
-                                if (subject.equals("Re: " + subjectCompare)) {
-                                    sgcr.registaAceitacaoPlanoCliente(idPedido);
-                                }
-                            }
-                        }
-
-                        for (Map.Entry<String, String> entry : reparacoesAguardarEmail) {
-                            String reparacao = entry.getKey();
-                            String email = entry.getValue();
-                            if (email.equals(adressString)) {
-                                String subjectCompare = subject(valorSuperiorOrcamento);
-                                if (subject.equals("Re: " + subjectCompare)) {
-                                    sgcr.registaAceitacaoReparacaoCliente(reparacao);
-                                }
-                            }
-                        }
-                    }
-                } catch (MessagingException e) {
-                    e.printStackTrace();
-                }
-            }
-
-//            try {
-//                Thread.sleep(5000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-        }
-    }
-
-    public void stop() {
-        this.running = false;
-    }
-
-    /*
-    public void sendEmail (String email){
-
-        Properties properties = new Properties();
-        properties.put("mail.smtp.auth", true);
-        properties.put("mail.smtp.host", "smtp.gmail.com");
-        properties.put("mail.smtp.port", 587);
-        properties.put("mail.smtp.starttls.enable", true);
-        properties.put("mail.transport.protocol", "smtp");
-
-        Session session = Session.getDefaultInstance(properties,
-                new javax.mail.Authenticator() {
-                    protected PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication(user, password);
-                    }
-                });
-        try {
-            MimeMessage message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(user));
-            message.addRecipient(Message.RecipientType.TO, new InternetAddress(email));
-            message.setSubject("sgcr.SGCR - Mensagem");
-            message.setText("Mensagem relativamente ao seu pedido na nossa loja..");
-
-            //send the message
-            Transport.send(message);
-
-            System.out.println("message sent successfully...");
-
-        } catch (MessagingException e) {
-            e.printStackTrace();
-
-            //check(host, mailStoreType, username, password);
-
-        }
-    }
-     */
 }

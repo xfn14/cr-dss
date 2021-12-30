@@ -78,5 +78,9 @@ public interface IPedidos {
     boolean isValidPedidoID(String idPedido);
 
     boolean hasEquipamenteEntregue(String idPedido);
+
+    LocalDateTime getDataContactoValorSuperior(String id);
+
+    void arquivarPedido(String idPedido);
 }
 

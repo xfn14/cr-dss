@@ -3,6 +3,7 @@ package reparacoes;
 import exceptions.InvalidIdException;
 import exceptions.SemReparacoesException;
 import exceptions.ValorSuperior;
+import pedidos.Pedido;
 
 import java.io.Serializable;
 import java.time.Duration;
@@ -11,7 +12,7 @@ import java.util.*;
 public class Reparacoes implements IReparacoes, Serializable {
     private final Map<String, Reparacao> reparacaoMap;
     private final Map<String, PlanoTrabalho> planoTrabalhoMap;
-    private Map<String, List<String>> queueMap;
+    private final Map<String, List<String>> queueMap;
 
     public Reparacoes() {
         this.reparacaoMap = new HashMap<>();
@@ -109,13 +110,6 @@ public class Reparacoes implements IReparacoes, Serializable {
         this.planoTrabalhoMap.get(idPlano).setEstado(PlanoTrabalho.Estado.PAUSA);
     }
 
-    public Map.Entry<Double, String> getOrcamentoEHorasPlano(String idPlano) {
-        PlanoTrabalho planoTrabalho = planoTrabalhoMap.get(idPlano);
-        double orcamento = planoTrabalho.getOrcamento();
-        String idTecnico = planoTrabalho.getIdTecnico();
-        return new AbstractMap.SimpleEntry<>(orcamento, idTecnico);
-    }
-
     @Override
     public void reparacaoAguardaAceitacao(String idReparacao) {
         Reparacao reparacao = reparacaoMap.get(idReparacao);
@@ -203,6 +197,7 @@ public class Reparacoes implements IReparacoes, Serializable {
     }
 
     public String getReparacaoMaisUrgente(String idTecnico) throws SemReparacoesException {
+        if (!queueMap.containsKey(idTecnico)) throw new SemReparacoesException();
         List<String> queueTecnico = queueMap.get(idTecnico);
         for (String idPedido : queueTecnico) {
             Reparacao reparacao = reparacaoMap.get(idPedido);
@@ -223,6 +218,20 @@ public class Reparacoes implements IReparacoes, Serializable {
                 map(PlanoTrabalho::getIdPlanoTrabalho).
                 findFirst().orElseThrow(SemReparacoesException::new);
     }
+
+
+    public void arquivarPedido(String idPedido){
+        if (reparacaoMap.containsKey(idPedido)){
+            Reparacao reparacao = reparacaoMap.get(idPedido);
+            reparacao.setEstado(Reparacao.Estado.CANCELADA);
+        }
+        if (planoTrabalhoMap.containsKey(idPedido)){
+            PlanoTrabalho planoTrabalho =planoTrabalhoMap.get(idPedido);
+            planoTrabalho.setEstado(PlanoTrabalho.Estado.CANCELADO);
+        }
+    }
+
+
 
 
 }

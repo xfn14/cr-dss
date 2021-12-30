@@ -28,10 +28,12 @@ public class Reparacao implements Serializable {
         AGUARDA_INICIO,
         DECORRER,
         PAUSA,
+        //TODO: Modificar Pausa, quando dá logout, passar as DECORRER para PAUSA_TEMPO
+        //PAUSA_TEMPO ->
+        //PAUSA_PECAS
         AGUARDA_ACEITACAO,
         FINALIZADA,
         CANCELADA;
-
     }
 
 

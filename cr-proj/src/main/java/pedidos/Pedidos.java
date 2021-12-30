@@ -201,16 +201,11 @@ public class Pedidos implements IPedidos, Serializable {
     }
 
     public Map<String,Map.Entry<String,LocalDateTime>> aguardaResposta() {
+
+        //IdPedido,{Email,Data do Contacto}
         Map<String,Map.Entry<String,LocalDateTime>> mapResult = new HashMap<>();
-
-
-
-        //List<Map.Entry<String, String>> resultList = new ArrayList<>();
         for (Pedido pedido : pedidoMap.values()) {
             if (pedido.aguardaReparacao()) {
-
-
-
                 String idPedido = pedido.getIdPedido();
                 String idCliente = pedido.getIdCliente();
                 Cliente cliente = clientesMap.get(idCliente);
@@ -218,7 +213,6 @@ public class Pedidos implements IPedidos, Serializable {
                 LocalDateTime time = pedido.getDataContactoPedidoOrcamento();
                 AbstractMap.SimpleEntry<String, LocalDateTime> entry = new AbstractMap.SimpleEntry<>(email,time);
                 mapResult.put(idPedido,entry);
-
             }
         }
         return mapResult;
@@ -329,4 +323,16 @@ public class Pedidos implements IPedidos, Serializable {
     public boolean hasEquipamenteEntregue(String idPedido) {
         return this.entregaMap.containsKey(idPedido);
     }
+
+    public LocalDateTime getDataContactoValorSuperior(String id){
+        Pedido pedido = pedidoMap.get(id);
+        return pedido.getDataContactoValorSuperior();
+    }
+
+    public void arquivarPedido(String idPedido){
+        Pedido pedido = pedidoMap.get(idPedido);
+        pedido.setEstado(Pedido.Estado.ARQUIVADO);
+    }
+
+
 }

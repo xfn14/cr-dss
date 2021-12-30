@@ -42,7 +42,7 @@ public class LoginFrame extends JFrame implements Runnable, ActionListener {
         super.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
-                email.stop();
+                email.cancelTimer();
                 try {
                     FileUtils.objectToFile(sgcr, RESOURCES_PATH + "sgcr.obj");
                 } catch (IOException ex) {

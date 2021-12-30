@@ -70,7 +70,7 @@ public class TecnicoPanel extends JPanel implements ActionListener {
                 // disponivel
                 String idReparacao = this.sgcr.getReparacaoMaisUrgente(this.trabalhador.getIdTrabalhador());
                 ReparacaoFrame reparacaoFrame = new ReparacaoFrame(this.sgcr, idReparacao);
-                Thread repracaoThread = new Thread(reparacaoFrame);
+                Thread reparacaoThread = new Thread(reparacaoFrame);
                 reparacaoThread.start();
             } catch (SemReparacoesException ex) {
                 this.logger.log(Level.INFO, "Não existem reparaçoes");

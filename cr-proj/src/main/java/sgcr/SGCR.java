@@ -81,9 +81,11 @@ public class SGCR implements Serializable {
         this.pedidos.pedidoAguardaAceitacao(idPlano);
         this.pedidos.registarContactoPedidoOrcamento(idPlano, "Sistema");
 
-        Map.Entry<Double, String> entry = reparacoes.getOrcamentoEHorasPlano(idPlano);
-        double orcamento = entry.getKey();
-        String idTecnico = entry.getValue();
+        String idTecnico = reparacoes.getIdTecnico(idPlano);
+        trabalhadores.setAvailable(idTecnico);
+
+        reparacoes.getOrcamento(idPlano);
+        double orcamento = reparacoes.getOrcamento(idPlano);
 
         Duration duration = trabalhadores.getTrabalhoPorRealizarTecnico(idTecnico);
 
@@ -93,6 +95,8 @@ public class SGCR implements Serializable {
 
         Email.pedidoOrcamento(email, nome, orcamento, duration);
     }
+
+
 
     public Trabalhador doLogin(String username, String passe) {
         return trabalhadores.doLogin(username, passe);
@@ -211,13 +215,6 @@ public class SGCR implements Serializable {
 
     }
 
-    public void conclusaoPlanoDeTrabalho(String idPedido) {
-        this.pedidos.pedidoAguardaAceitacao(idPedido);
-        this.reparacoes.conclusaoPlanoDeTrabalho(idPedido);
-        String idTecnico = reparacoes.getIdTecnico(idPedido);
-        trabalhadores.setAvailable(idTecnico);
-    }
-
     public Object[][] getListPedidoOrcamento(){
         List<Pedido> pedidos = this.pedidos.getPedidos().stream()
                 .filter(p -> p instanceof PedidoOrcamento)
@@ -299,7 +296,7 @@ public class SGCR implements Serializable {
 
     }
 
-    public int getNrRececaoEntregaByFuncionario(LocalDateTime month) {
+    public Object[][]  getNrRececaoEntregaByFuncionario(LocalDateTime month) {
         Map<String, Integer> pedidosMap = pedidos.getNrPedidosByFuncionario(month);
         Map<String, Integer> entregasMap = pedidos.getNrEntregasByFuncionario(month);
 
@@ -324,10 +321,10 @@ public class SGCR implements Serializable {
 
 
         //String[] cabecalho = {"Id Funcionario", "Pedidos Efetuados", "Entregas Efetuadas"};
-        return 0;
+        return tabelaMap.values().toArray(Object[][]::new);
     }
 
-    public Object[] getListIntervencoesByTecnico(LocalDateTime month) {
+    public Object[][] getListIntervencoesByTecnico(LocalDateTime month) {
         List<String> pedidosMonth = pedidos.getPedidosConcluidosMonth(month);
         Map<String, List<String>> resultMap = pedidos.getServicosExpressoByTecnico(pedidosMonth);
         reparacoes.reparacoesExaustivaByTecnicoMonth(pedidosMonth, resultMap);
@@ -345,7 +342,7 @@ public class SGCR implements Serializable {
         }
 
         //String[]cabecalho ={"Id Tecnico","Intervencao"};
-        return listObjects.toArray();
+        return listObjects.toArray(Object[][]::new);
     }
 
     public void registaAceitacaoPlanoCliente(String idPedido) {
@@ -357,20 +354,21 @@ public class SGCR implements Serializable {
         reparacoes.reparacaoAceite(idReparacao);
     }
 
-    public List<Map.Entry<String, String>> listPedidosAguardaAceitacao() {
-        //return pedidos.aguardaResposta();
-        return null;
+    public Map<String,Map.Entry<String,LocalDateTime>> listPedidosAguardaAceitacao() {
+        return pedidos.aguardaResposta();
     }
 
-    public List<Map.Entry<String, String>> listReparacoesAguardaAceitacao() {
+
+    public Map<String,Map.Entry<String,LocalDateTime>> listReparacoesAguardaAceitacao() {
         List<String> list = reparacoes.listAguardaAceitacao();
-        List<Map.Entry<String, String>> resultList = new ArrayList<>();
+        Map<String,Map.Entry<String,LocalDateTime>> resultMap = new HashMap<>();
         for (String id : list) {
             String email = pedidos.getNomeEmailCliente(id).getValue();
-            AbstractMap.SimpleEntry<String, String> entry = new AbstractMap.SimpleEntry<>(id, email);
-            resultList.add(entry);
+            LocalDateTime date = pedidos.getDataContactoValorSuperior(id);
+            AbstractMap.SimpleEntry<String, LocalDateTime> entry = new AbstractMap.SimpleEntry<>(email, date);
+            resultMap.put(id,entry);
         }
-        return resultList;
+        return resultMap;
     }
 
     public void reparacaoParaDecorrer(String idReparacao) {
@@ -447,5 +445,10 @@ public class SGCR implements Serializable {
 
     public int getPassoAtualIndex(String idReparacao){
         return this.reparacoes.getPassoAtualIndex(idReparacao);
+    }
+
+    public void arquivarPedido (String idPedido){
+        pedidos.arquivarPedido(idPedido);
+        reparacoes.arquivarPedido(idPedido);
     }
 }
