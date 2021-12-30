@@ -6,31 +6,35 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Reparacao implements Serializable {
+    private String idReparacao;
     private final String idTecnico;
     private final double orcamentoExpectavel;
-    private String idReparacao;
     private Estado estado;
     private Duration duracaoTotal;
     private List<Passo> passos; //TODO: Registar passos
     private double orcamento;
 
     public Reparacao(String idReparacao, String idTecnico, double orcamento) {
-        this.idTecnico = idTecnico;
         this.idReparacao = idReparacao;
+        this.idTecnico = idTecnico;
         this.orcamento = orcamento;
         this.orcamentoExpectavel = orcamento;
         this.duracaoTotal = Duration.ZERO;
         this.estado = Estado.AGUARDA_INICIO;
     }
 
+    //TODO Add motivo para o Estado, para saber a razão de estar em pausa|cancelado,ect...
     public enum Estado {
         AGUARDA_INICIO,
         DECORRER,
         PAUSA,
         AGUARDA_ACEITACAO,
         FINALIZADA,
-        CANCELADA
+        CANCELADA;
+
     }
+
+
 
     public int nPassoAtual(){
         return this.passos.size()-1;

@@ -1,5 +1,7 @@
 package gui.admin;
 
+import exceptions.JaExisteException;
+import exceptions.PasswordErradaException;
 import gui.PrettyFrame;
 import sgcr.SGCR;
 
@@ -57,16 +59,32 @@ public class RegistarTrabalhador extends PrettyFrame implements ActionListener {
             String password = String.valueOf(this.passwordInput.getPassword());
             String confPass = String.valueOf(this.confirmPasswordInput.getPassword());
             if (cargo == null) return;
-            boolean result;
+            boolean result = false;
             switch (cargo) {
                 case "Tecnico":
-                    result = this.sgcr.registarTecnico(username, password, confPass);
+                    try {
+                        result = this.sgcr.registarTecnico(username, password, confPass);
+                    } catch (JaExisteException | PasswordErradaException exception) {
+                        String exceptionMessage = exception.getMessage();
+                        //TODO Adicionar mensagem de erro
+                    }
+
                     break;
                 case "Funcionario":
-                    result = this.sgcr.registarFuncionario(username, password, confPass);
+                    try {
+                        result = this.sgcr.registarFuncionario(username, password, confPass);
+                    } catch (JaExisteException | PasswordErradaException exception) {
+                        String exceptionMessage = exception.getMessage();
+                        //TODO Adicionar mensagem de erro
+                    }
                     break;
                 case "Gestor":
-                    result = this.sgcr.registarGestor(username, password, confPass);
+                    try {
+                        result = this.sgcr.registarGestor(username, password, confPass);
+                    } catch (JaExisteException | PasswordErradaException exception) {
+                        String exceptionMessage = exception.getMessage();
+                        //TODO Adicionar mensagem de erro
+                    }
                     break;
                 default:
                     result = false;

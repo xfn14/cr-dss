@@ -51,8 +51,14 @@ public class Pedido implements Serializable {
         return this.estado.equals(Estado.AGUARDA_PLANO);
     }
 
-
-
+    public LocalDateTime getDataContactoPedidoOrcamento(){
+        for (Contacto contacto : contactos){
+            if (contacto.getType().equals(Contacto.Type.PEDIDO_ORCAMENTO)){
+                return contacto.getDateTime();
+            }
+        }
+        return LocalDateTime.now();
+    }
 
 
     public String getIdFuncionario() {

@@ -208,12 +208,20 @@ public class Reparacoes implements IReparacoes, Serializable {
             Reparacao reparacao = reparacaoMap.get(idPedido);
             // TODO em pausa ta quando o tecnico tbm n esta a trabalhar nela ou quando mete em pausa
             // quando volta a abrir volta a meter em decorrer
-//            if (reparacao.emPausa()) continue;
+            if (reparacao.emPausa()) continue;
             if (reparacao.aguardaAceitacao()) continue;
-            //reparacaoParaDecorrer(idPedido); TODO: Not sure about this
+            reparacaoParaDecorrer(idPedido); //TODO: Not sure about this
             return idPedido;
         }
         throw new SemReparacoesException();
+    }
+
+    //TODO Change to SemPlanoTrabalhoException
+    public String checkPlanoTrabalhoPausa (String idTecnico) throws SemReparacoesException {
+        return planoTrabalhoMap.values().stream().
+                filter(planoTrabalho -> planoTrabalho.getIdTecnico().equals(idTecnico) && planoTrabalho.getEstado().equals(PlanoTrabalho.Estado.PAUSA)).
+                map(PlanoTrabalho::getIdPlanoTrabalho).
+                findFirst().orElseThrow(SemReparacoesException::new);
     }
 
 

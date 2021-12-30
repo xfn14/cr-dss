@@ -12,7 +12,7 @@ public class PlanoTrabalho implements Serializable {
     private String idPlanoTrabalho;
     private String idTecnico;
     private List<Passo> passos;
-    private Estado estado;// TODO
+    private Estado estado;
     private double orcamento;
     private Duration duracaoTotal;
 

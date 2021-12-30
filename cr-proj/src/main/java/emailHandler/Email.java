@@ -139,7 +139,7 @@ public class Email implements Runnable {
                 });
     }
 
-
+    /*
     public static boolean checkRespostaPedidoOrcamento(String email) {
         return checkIfRespond(email, subject(pedidoOrcamento));
     }
@@ -147,6 +147,7 @@ public class Email implements Runnable {
     public static boolean checkRespostaValorSuperior(String email) {
         return checkIfRespond(email, subject(valorSuperiorOrcamento));
     }
+
 
     private static boolean checkIfRespond(String email, String subjectName) {
         try {
@@ -196,6 +197,8 @@ public class Email implements Runnable {
         }
         return false;
     }
+
+     */
 
     public static void main(String[] args) {
         String email = "jdmartinsvieira63@gmail.com";

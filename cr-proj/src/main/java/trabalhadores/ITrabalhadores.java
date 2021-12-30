@@ -1,5 +1,7 @@
 package trabalhadores;
 
+import exceptions.JaExisteException;
+import exceptions.PasswordErradaException;
 import exceptions.SemTecnicosDisponiveis;
 
 import java.time.Duration;
@@ -11,21 +13,17 @@ public interface ITrabalhadores {
 
     Map<String, Trabalhador> getTrabalhadores();
 
-    boolean registarGestor(String id, String pass, String confirmaPass);
+    boolean registarGestor(String id, String pass, String confirmaPass) throws JaExisteException, PasswordErradaException;
 
-    boolean registarTecnico(String id, String pass, String confirmaPass);
+    boolean registarTecnico(String id, String pass, String confirmaPass) throws JaExisteException, PasswordErradaException;
 
-    boolean registarFuncionario(String id, String pass, String confirmaPass);
+    boolean registarFuncionario(String id, String pass, String confirmaPass) throws JaExisteException, PasswordErradaException;
 
     List<String> getListTecnicos();
 
     List<String> getListFuncionarios();
 
-    List<String> getListReparacoesByTecnico();
 
-    List<String> getListIntervencoesByTecnico();
-
-    int getNrRececaoEntregaByFuncionario();
 
     Trabalhador verificarDisponibilidadeTecnicos() throws SemTecnicosDisponiveis;
 

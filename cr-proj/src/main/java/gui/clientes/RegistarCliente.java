@@ -1,5 +1,6 @@
 package gui.clientes;
 
+import exceptions.JaExisteException;
 import gui.PrettyFrame;
 import sgcr.SGCR;
 
@@ -49,12 +50,26 @@ public class RegistarCliente extends PrettyFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource().equals(this.confirm)) {
             if(!this.nifInput.getText().isBlank()){
-                this.sgcr.criarFichaCliente(
-                        this.nomeInput.getText(),
-                        this.emailInput.getText(),
-                        this.numeroInput.getText(),
-                        this.nifInput.getText()
-                );
+                try {
+                    this.sgcr.criarFichaCliente(
+                            this.nomeInput.getText(),
+                            this.emailInput.getText(),
+                            this.numeroInput.getText(),
+                            this.nifInput.getText()
+                    );
+                }
+                catch (JaExisteException exception){
+                    //TODO: Adicionar caixa para este erro | Verificar se está certo
+                    String excepitonMessage = exception.getMessage();
+                    JOptionPane.showConfirmDialog(
+                            new JFrame(),
+                            excepitonMessage,
+                            "NIF em uso",
+                            JOptionPane.DEFAULT_OPTION,
+                            JOptionPane.PLAIN_MESSAGE
+                    );
+
+                }
                 super.dispose();
             }else{
                 JOptionPane.showConfirmDialog(
