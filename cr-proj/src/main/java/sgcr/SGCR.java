@@ -12,6 +12,7 @@ import trabalhadores.Trabalhador;
 import trabalhadores.Trabalhadores;
 
 import java.io.Serializable;
+import java.net.Inet4Address;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -97,15 +98,15 @@ public class SGCR implements Serializable {
         return trabalhadores.doLogin(username, passe);
     }
 
-    public boolean registarGestor(String id, String pass, String confirmaPass) {
+    public boolean registarGestor(String id, String pass, String confirmaPass) throws JaExisteException, PasswordErradaException {
         return this.trabalhadores.registarGestor(id, pass, confirmaPass);
     }
 
-    public boolean registarTecnico(String id, String pass, String confirmaPass) {
+    public boolean registarTecnico(String id, String pass, String confirmaPass) throws JaExisteException, PasswordErradaException {
         return this.trabalhadores.registarTecnico(id, pass, confirmaPass);
     }
 
-    public boolean registarFuncionario(String id, String pass, String confirmaPass) {
+    public boolean registarFuncionario(String id, String pass, String confirmaPass) throws JaExisteException, PasswordErradaException {
         return this.trabalhadores.registarFuncionario(id, pass, confirmaPass);
     }
 
@@ -138,7 +139,7 @@ public class SGCR implements Serializable {
         this.pedidos.registaPedidoOrcamento(idCliente, idFuncionario, descricao);
     }
 
-    public void criarFichaCliente(String nome, String email, String nmr, String nmrUtente) {
+    public void criarFichaCliente(String nome, String email, String nmr, String nmrUtente)throws JaExisteException {
         this.pedidos.criarFichaCliente(nome, email, nmr, nmrUtente);
     }
 
@@ -301,14 +302,50 @@ public class SGCR implements Serializable {
     public int getNrRececaoEntregaByFuncionario(LocalDateTime month) {
         Map<String, Integer> pedidosMap = pedidos.getNrPedidosByFuncionario(month);
         Map<String, Integer> entregasMap = pedidos.getNrEntregasByFuncionario(month);
+
+        Map<String,Object[]> tabelaMap = new HashMap<>();
+
+
+        for (Map.Entry<String,Integer> entry : pedidosMap.entrySet()){
+            String idFuncionario = entry.getKey();
+            int pedidosFeitos = entry.getValue();
+            Object[] object = new Object[]{idFuncionario, pedidosFeitos,0};
+            tabelaMap.putIfAbsent(idFuncionario,object);
+        }
+
+        for (Map.Entry<String,Integer> entry : entregasMap.entrySet()){
+            String idFuncionario = entry.getKey();
+            int entregasFeitas = entry.getValue();
+            Object[] object = new Object[]{idFuncionario,0,entregasFeitas};
+            tabelaMap.putIfAbsent(idFuncionario,object);
+            object = tabelaMap.get(idFuncionario);
+            object[2]= entregasFeitas;
+        }
+
+
+        //String[] cabecalho = {"Id Funcionario", "Pedidos Efetuados", "Entregas Efetuadas"};
         return 0;
     }
 
-    public Map<String, List<String>> getListIntervencoesByTecnico(LocalDateTime month) {
+    public Object[] getListIntervencoesByTecnico(LocalDateTime month) {
         List<String> pedidosMonth = pedidos.getPedidosConcluidosMonth(month);
         Map<String, List<String>> resultMap = pedidos.getServicosExpressoByTecnico(pedidosMonth);
         reparacoes.reparacoesExaustivaByTecnicoMonth(pedidosMonth, resultMap);
-        return resultMap;
+
+
+        List<Object[]> listObjects = new ArrayList<>();
+
+        for (Map.Entry<String,List<String>> entry : resultMap.entrySet()){
+            String idTecnico = entry.getKey();
+            List<String> intervencoes = entry.getValue();
+            for (String str : intervencoes){
+                Object[] object = new Object[]{idTecnico,str};
+                listObjects.add(object);
+            }
+        }
+
+        //String[]cabecalho ={"Id Tecnico","Intervencao"};
+        return listObjects.toArray();
     }
 
     public void registaAceitacaoPlanoCliente(String idPedido) {
@@ -321,7 +358,8 @@ public class SGCR implements Serializable {
     }
 
     public List<Map.Entry<String, String>> listPedidosAguardaAceitacao() {
-        return pedidos.aguardaResposta();
+        //return pedidos.aguardaResposta();
+        return null;
     }
 
     public List<Map.Entry<String, String>> listReparacoesAguardaAceitacao() {
@@ -340,7 +378,17 @@ public class SGCR implements Serializable {
     }
 
     public String getPedidoOrcamentoMaisAntigo() throws SemPedidosOrcamento {
+        //TODO verificar se existe algum plano de trabalho do técnico em pausa
+
         return pedidos.getPedidoOrcamentoMaisAntigo();
+    }
+
+    public String getPedidoOrcamentoMaisAntigo(String idTecnico) throws SemPedidosOrcamento {
+        try {
+            return reparacoes.checkPlanoTrabalhoPausa(idTecnico);
+        }catch (SemReparacoesException e){
+            return pedidos.getPedidoOrcamentoMaisAntigo();
+        }
     }
 
     public String getReparacaoMaisUrgente(String idTecnico) throws SemReparacoesException {
@@ -369,7 +417,6 @@ public class SGCR implements Serializable {
 
     public boolean isClienteAutenticado(String idCliente) {
         return pedidos.isClienteAutenticado(idCliente);
-        //return true;
     }
 
     public void addSubPasso(String idPlano, int indexPasso, double horas, double custoPecas, String descricao) {

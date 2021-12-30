@@ -1,5 +1,7 @@
 package trabalhadores;
 
+import exceptions.JaExisteException;
+import exceptions.PasswordErradaException;
 import exceptions.SemTecnicosDisponiveis;
 import utils.SecurityUtils;
 
@@ -52,8 +54,9 @@ public class Trabalhadores implements ITrabalhadores, Serializable {
         return null;
     }
 
-    public Trabalhador criaTrabalhador(String id, String pass, String confirmaPass) {
-        if (this.trabalhadores.containsKey(id) || !pass.equals(confirmaPass)) return null;
+    private Trabalhador criaTrabalhador(String id, String pass, String confirmaPass) throws JaExisteException, PasswordErradaException {
+        if (this.trabalhadores.containsKey(id)) throw new JaExisteException("Já existe trabalhador com o id :" + id);
+        if (!pass.equals(confirmaPass)) throw new PasswordErradaException("Passwords inseridas não coincidem");
         try {
             String passe = SecurityUtils.getStringSHA1(pass);
             return new Trabalhador(id, passe);
@@ -64,7 +67,7 @@ public class Trabalhadores implements ITrabalhadores, Serializable {
     }
 
     @Override
-    public boolean registarGestor(String id, String pass, String confirmaPass) {
+    public boolean registarGestor(String id, String pass, String confirmaPass) throws JaExisteException, PasswordErradaException {
         Trabalhador t = criaTrabalhador(id, pass, confirmaPass);
         if (t == null) return false;
         Gestor g = new Gestor(t);
@@ -73,7 +76,7 @@ public class Trabalhadores implements ITrabalhadores, Serializable {
     }
 
     @Override
-    public boolean registarTecnico(String id, String pass, String confirmaPass) {
+    public boolean registarTecnico(String id, String pass, String confirmaPass) throws JaExisteException, PasswordErradaException {
         Trabalhador t = criaTrabalhador(id, pass, confirmaPass);
         if (t == null) return false;
         Tecnico tec = new Tecnico(t);
@@ -82,7 +85,7 @@ public class Trabalhadores implements ITrabalhadores, Serializable {
     }
 
     @Override
-    public boolean registarFuncionario(String id, String pass, String confirmaPass) {
+    public boolean registarFuncionario(String id, String pass, String confirmaPass) throws JaExisteException, PasswordErradaException {
         Trabalhador t = criaTrabalhador(id, pass, confirmaPass);
         if (t == null) return false;
         Funcionario g = new Funcionario(t);
@@ -109,11 +112,6 @@ public class Trabalhadores implements ITrabalhadores, Serializable {
 //        return t;
     }
 
-    @Override
-    public List<String> getListReparacoesByTecnico() {
-        return null;
-    }
-
     public List<String> getListFuncionarios() {
         return trabalhadores.values().stream().
                 filter(trabalhador -> trabalhador instanceof Funcionario).
@@ -121,15 +119,6 @@ public class Trabalhadores implements ITrabalhadores, Serializable {
                 collect(Collectors.toList());
     }
 
-    @Override
-    public List<String> getListIntervencoesByTecnico() {
-        return null;
-    }
-
-    @Override
-    public int getNrRececaoEntregaByFuncionario() {
-        return 0;
-    }
 
     public void addHorasTecnico(String idTecnico, long horas) {
         Tecnico tecnico = (Tecnico) this.trabalhadores.get(idTecnico);

@@ -1,6 +1,7 @@
 package pedidos;
 
 import exceptions.InvalidIdException;
+import exceptions.JaExisteException;
 import exceptions.SemPedidosOrcamento;
 
 import java.time.LocalDateTime;
@@ -23,9 +24,8 @@ public interface IPedidos {
     void finalizaPedido(String idPedido);
 
     void entregaEquipamento(String codE, String idFuncionario);
-
-
-    void criarFichaCliente(String nome, String email, String nmr, String nif);
+    
+    void criarFichaCliente(String nome, String email, String nmr, String nif) throws JaExisteException;
 
     Map.Entry<String, String> getNomeEmailCliente(String idPedido);
 
@@ -57,7 +57,7 @@ public interface IPedidos {
 
     Map<String, Integer> getNrServicosExpressoMonth(LocalDateTime month, List<String> pedidos);
 
-    List<Map.Entry<String, String>> aguardaResposta();
+    Map<String,Map.Entry<String,LocalDateTime>> aguardaResposta();
 
     Map<String, List<String>> getServicosExpressoByTecnico(List<String> pedidos);
 

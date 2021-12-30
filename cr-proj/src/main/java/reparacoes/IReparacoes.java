@@ -55,4 +55,6 @@ public interface IReparacoes {
     int getTotalPassos(String idReparacao);
 
     int getPassoAtualIndex(String idReparacao);
-}
+
+    String checkPlanoTrabalhoPausa (String idTecnico) throws SemReparacoesException;
+    }

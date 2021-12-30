@@ -1,4 +1,6 @@
 import emailHandler.Email;
+import exceptions.JaExisteException;
+import exceptions.PasswordErradaException;
 import gui.LoginFrame;
 import sgcr.SGCR;
 import utils.FileUtils;
@@ -19,7 +21,11 @@ public class Main {
             sgcr = (SGCR) FileUtils.fileToObject(LoginFrame.RESOURCES_PATH + "sgcr.obj");
         } catch (IOException | ClassNotFoundException e) {
             sgcr = new SGCR();
-            sgcr.registarGestor("fn14", "", "");
+            try {
+                sgcr.registarGestor("fn14", "", "");
+            } catch (JaExisteException | PasswordErradaException exception) {
+                exception.printStackTrace();
+            }
             LOGGER.log(Level.SEVERE, "WARNING! SGCR couldn't be loaded.", e);
         }
 

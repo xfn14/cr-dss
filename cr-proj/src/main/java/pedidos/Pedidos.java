@@ -1,6 +1,7 @@
 package pedidos;
 
 import exceptions.InvalidIdException;
+import exceptions.JaExisteException;
 import exceptions.SemPedidosOrcamento;
 
 import java.io.Serializable;
@@ -181,7 +182,9 @@ public class Pedidos implements IPedidos, Serializable {
     }
 
     @Override
-    public void criarFichaCliente(String nome, String email, String nmr, String nif) {
+    public void criarFichaCliente(String nome, String email, String nmr, String nif) throws JaExisteException{
+        if (this.clientesMap.containsKey(nif))
+            throw new JaExisteException("Já existe uma ficha de cliente associada ao nif: " + nif);
         this.clientesMap.put(nif, new Cliente(nome, nif, nmr, email));
     }
 
@@ -197,20 +200,28 @@ public class Pedidos implements IPedidos, Serializable {
         return clientesMap.containsKey(idCliente);
     }
 
-    public List<Map.Entry<String, String>> aguardaResposta() {
-        List<Map.Entry<String, String>> resultList = new ArrayList<>();
+    public Map<String,Map.Entry<String,LocalDateTime>> aguardaResposta() {
+        Map<String,Map.Entry<String,LocalDateTime>> mapResult = new HashMap<>();
+
+
+
+        //List<Map.Entry<String, String>> resultList = new ArrayList<>();
         for (Pedido pedido : pedidoMap.values()) {
             if (pedido.aguardaReparacao()) {
+
+
+
                 String idPedido = pedido.getIdPedido();
                 String idCliente = pedido.getIdCliente();
                 Cliente cliente = clientesMap.get(idCliente);
                 String email = cliente.getEmail();
-                AbstractMap.SimpleEntry<String, String> entry = new AbstractMap.SimpleEntry<>(idPedido, email);
-                resultList.add(entry);
+                LocalDateTime time = pedido.getDataContactoPedidoOrcamento();
+                AbstractMap.SimpleEntry<String, LocalDateTime> entry = new AbstractMap.SimpleEntry<>(email,time);
+                mapResult.put(idPedido,entry);
 
             }
         }
-        return resultList;
+        return mapResult;
     }
 
     public void pedidoAguardaAceitacao(String idPedido) {
