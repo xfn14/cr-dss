@@ -112,8 +112,13 @@ public class Email {
             Transport.send(message);
         } catch (MessagingException e) {
             e.printStackTrace();
-
         }
+    }
+
+    public static void main(String[] args) {
+        System.out.println("oui");
+        sendEmail("andre.vaz1411@gmail.com", "test", "teste");
+        System.out.println("Test");
     }
 
 
@@ -224,7 +229,7 @@ public class Email {
                 }
 
             }
-        }, 0, 5000);
+        }, 0, 10000);
     }
 
 }

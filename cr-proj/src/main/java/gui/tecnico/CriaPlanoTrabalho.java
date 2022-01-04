@@ -70,7 +70,7 @@ public class CriaPlanoTrabalho extends PrettyFrame implements ActionListener {
         super.addComponent(this.custo, 2, 1);
         super.addComponent(new JLabel("Descrição"), 3, 0);
         super.addComponent(this.descricao, 3, 1);
-        super.addComponent(this.status, 5, 0, 2, 1);
+        super.addComponent(this.status, 6, 0, 2, 1);
     }
 
     @Override
@@ -146,6 +146,7 @@ public class CriaPlanoTrabalho extends PrettyFrame implements ActionListener {
             } catch (InvalidIdException ex) {
                 ex.printStackTrace();
             }
+            super.dispose();
         }
     }
 
